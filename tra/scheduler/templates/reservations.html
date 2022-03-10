@@ -1,0 +1,44 @@
+{% extends 'base_layout.html' %}
+
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+
+{% load static %}
+
+{% block css-links %}
+	{{ block.super }}
+	<link rel="stylesheet" type="text/css" href='{% static "css/bootstrap_3_3_7.min.css" %}'>
+	<link rel="stylesheet" type="text/css" href='{% static "css/customStyles.css" %}'>
+{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<br/>
+{% if filter %}
+<div class="row">
+    <div class="col">
+        <div class="card card-body">
+            <form action="" method="get">
+                <div class="form-group form-inline">
+                    {% bootstrap_form filter.form %}
+                    <button class="btn btn-primary" type="submit">Filter</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+<hr/>
+<div class="row">
+    <div class="col">
+        <div class="card card-body">
+            {% render_table table 'django_tables2/bootstrap.html' %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

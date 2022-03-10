@@ -1,0 +1,111 @@
+ul.dashboard_menu {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		background-color: #124191;
+	}
+
+	li.dashboard_menu {
+		float: left;
+	}
+
+	li.dashboard_menu a {
+		display: inline-block;
+		color: white;
+		text-align: center;
+		padding: 14px 16px;
+		text-decoration: none;
+	}
+
+	li.dashboard_menu  a:hover {
+		background-color: #F4D81C;
+		text-decoration: none;
+		text-underscore: none;
+	}
+
+
+
+
+      #menu_kpi_dashboard {
+        width:100%;
+        margin:0 auto;
+        padding:0;
+        list-style-type:none;
+        background-color:#124191;
+      }
+
+
+      #menu_kpi_dashboard:after {
+        content:'';
+        display:block;
+        clear:both;
+      }
+
+
+      #menu_kpi_dashboard > li {
+        float:left;
+      }
+
+
+
+
+      #menu_kpi_dashboard > li > a {
+        display:block;
+        padding:15px;
+        text-decoration:none;
+        text-align:center;
+        color:white;
+        background-color:#124191;
+      }
+
+
+      #menu_kpi_dashboard > li:hover > a {
+        color:#124191;
+        background-color:#F4D81C;
+        background-image:none;
+        box-shadow:0px -2px 1px #FFFFFF inset;
+      }
+
+
+      #menu_kpi_dashboard > li {
+        position:relative;
+      }
+
+
+      #menu_kpi_dashboard > li > ul {
+        width:100%;
+        display:none;
+        position:absolute;
+        z-index:2;
+        margin:0;
+        padding:0;
+        list-style-type:none;
+        background-color:#124191;
+      }
+
+
+      #menu_kpi_dashboard > li:hover > ul {
+        display:block;
+                /* box-shadow:0 0px 10px 0px #FFFFFF; */
+                /* box-shadow:0 -4px 4px -4px #AAA, 0 4px 4px -4px #AAA; */
+      }
+
+
+      #menu_kpi_dashboard > li > ul > li > a {
+        display:block;
+        text-decoration:none;
+        padding:15px;
+        color:white;
+      }
+
+
+      #menu_kpi_dashboard > li > ul > li:hover > a {
+        color:#00F;
+        background-color:#F4D81C;
+        box-shadow:0px -2px 1px #FFFFFF inset;
+
+      }
+
+
+

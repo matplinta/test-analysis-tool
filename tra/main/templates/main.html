@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %} Testline Reservation Tool {% endblock %}
+{% block header %} Testline Reservation Tool {% endblock %}
+
+{%  block css-links %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href='{% static "css/metro-bootstrap.min.css" %}'/>
+    <link rel="stylesheet" type="text/css" href='{% static "css/font-awesome.min.css" %}'/>
+{% endblock %}
+
+{% block body %}
+<style>
+.head-tile {
+    width: 50%;
+    background-color: #124191 !important;
+}
+.tile-25-0 {
+    width: 50% !important;
+    margin-bottom: 0;
+}
+.tile-hidden {
+    cursor: default;
+    background-color: #ffffff;
+}
+</style>
+
+<div>
+		<div class="grid">
+            <div class="row col-md-12" style="margin-left: 0">
+                <div class="tile tile-blue col-md-3 col-xs-12 head-tile">
+                    <a><h1>Management</h1></a>
+                </div>
+            </div>
+            <div class="row col-md-12" style="margin-left: 0">
+                <div class="thumbnail tile tile-wide tile-blue tile-25-0">
+                    <a href="{% url 'reservations' %}"><h1 class="tile-href">Testline Reservation Scheduler</h1></a>
+                </div>
+            </div>
+        </div>
+</div>
+
+{% endblock %}

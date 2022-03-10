@@ -1,0 +1,11 @@
+django
+python-ldap
+django-auth-ldap
+django-rest-framework
+django_currentuser
+requests
+mysqlclient
+django-tables2
+django_filter
+django-bootstrap3
+django_compressor
