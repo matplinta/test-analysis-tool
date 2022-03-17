@@ -1,0 +1,55 @@
+@font-face {
+  font-family: "PureLight";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Light.eot");
+}
+
+@font-face {
+  font-family: "PureLight";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Light.woff");
+}
+
+@font-face {
+  font-family: "PureLight";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Light.ttf");
+}
+
+@font-face {
+  font-family: "PureRegular";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Regular.eot");
+}
+
+@font-face {
+  font-family: "PureRegular";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Regular.woff");
+}
+
+@font-face {
+  font-family: "PureRegular";
+  font-weight: 200;
+  src: url("../fonts/Roboto-Regular.ttf");
+}
+
+html {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+body {
+  width: 100%;
+  background: #f2f2f2;
+  color: #000000;
+  font-family: PureLight;
+}
+
+.btn-primary {
+  background-color: #004c9a !important;
+}
+
+.btn {
+  margin-right: 5px;
+}

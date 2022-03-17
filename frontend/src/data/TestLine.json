@@ -1,0 +1,38 @@
+[{
+    "serial_number": "L1184119802",
+    "hard_ware_type": "ASIK",
+    "version": None,
+    "name": "485",
+    "one_lab_reservation": "Reserved",
+    "PDU": {
+        "port": "02",
+        "status": "",
+        "name": "fpfh-GD13-24",
+        "ip": "0.0.0.0.0"
+    }
+}, {
+    "serial_number": "L1184010536",
+    "hard_ware_type": "ABIL",
+    "version": None,
+    "name": "No name",
+    "one_lab_reservation": "testowa rewzerwacja"
+}, {
+    "serial_number": "L1184119788",
+    "hard_ware_type": "ASIK",
+    "version": None,
+    "name": "487",
+    "one_lab_reservation": "Reserved",
+    "PDU": {
+        "port": "03",
+        "status": "",
+        "name": "fpfh-GD13-24",
+        "ip": "0.0.0.0.0"
+    }
+}, {
+    "serial_number": "L1184010482",
+    "hard_ware_type": "ABIL",
+    "version": None,
+    "name": "noname2",
+    "one_lab_reservation": "Reserved"
+}
+]
