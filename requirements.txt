@@ -1,11 +1,15 @@
 django
-python-ldap
+djangorestframework  # tools needed to serialize data and turn our Django application into a RESTful API
+django-cors-headers
+django-rest-auth     # logic, and endpoints needed for user authentication. Saves a lot of time vs writing everything from scratch
 django-auth-ldap
-django-rest-framework
-django_currentuser
+django-allauth
 requests
-mysqlclient
-django-tables2
-django_filter
-django-bootstrap3
-django_compressor
+python-ldap
+# django_currentuser
+# mysqlclient
+# django-tables2
+# django_filter
+# django-bootstrap3
+# django_compressor
+

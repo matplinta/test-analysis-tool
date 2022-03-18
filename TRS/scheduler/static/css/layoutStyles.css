@@ -1,0 +1,602 @@
+body {
+    font-size: 14px;
+    font-family: _pure_text;
+}
+
+.loading {
+    overflow: hidden;
+}
+
+body.loading .modal {
+    display: block;
+}
+
+h1 {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 3px;
+    color: #124191;
+}
+
+h2 {
+    font-size: 17px;
+    margin-top: 10px;
+    margin-bottom: 3px;
+}
+
+h3 {
+    font-size: 15px !important;
+    margin-top: 10px !important;
+    margin-bottom: 3px;
+}
+
+input.text {
+    margin-bottom: 12px;
+    width: 95%;
+    padding: .4em;
+}
+
+fieldset {
+    padding: 0;
+    border: 0;
+    margin-top: 25px;
+}
+
+.validateTips {
+    border: 1px solid transparent;
+    padding: 0.3em;
+}
+
+.button_padding {
+    padding: 0.1em 1em;
+    margin-left: 0.3em;
+}
+
+.ui-dialog .ui-state-error {
+    padding: .3em;
+}
+
+.ui-button-text-only .ui-button-text {
+    padding: 0 1em; !important;
+}
+
+.validateTips {
+    border: 1px solid transparent;
+    padding: 0.3em;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) url('http://i.stack.imgur.com/FhHRx.gif') 50% 50% no-repeat;
+}
+
+.header {
+    font-size: 20px;
+    padding: 35px 25px;
+    color: black;
+}
+
+.header_container {
+    padding: 0px 0 0px;
+    height: 50px;
+    background-color: #124191;
+}
+
+.header_container a {
+    font-color: black;
+}
+
+.baseline_description {
+    font-size: 15px;
+    float: right;
+    margin-left: 15px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    color: #124191;
+}
+
+.graph-checkbox {
+
+}
+
+.no_borders {
+    margin-left: 10px;
+    margin-top: 6px;
+    border: 0;
+}
+
+.width-90 {
+    width: 90%;
+}
+
+.width_100 {
+    width: 100%;
+}
+
+.width_100_form select {
+    width: 800px;
+}
+
+.width_100_form .half select {
+    width: 250px;
+}
+
+.width_100_form th {
+    width: 280px;
+    vertical-align: middle;
+    text-align: right;
+    padding-right: 20px;
+}
+
+.width_100_form tr {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.width_100_form th, .width_100_form td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.width_100_inlinetable {
+    width: 100%;
+}
+
+.main_container_center {
+    /*width: 1100px;*/
+    margin: 0 auto;
+    position: relative;
+    background-color: white;
+}
+
+.main_container_full_width {
+    padding: 20px;
+    background-color: white;
+}
+
+.sortable_table {
+    font-size: 11px;
+}
+
+.sortable_table td {
+    vertical-align: middle;
+}
+
+/* Superseeds the info on jquery.dataTables_themeroller.css */
+.dataTables_wrapper .dataTables_length {
+    float: left;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: left;
+    text-align: right;
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    margin-left: 0.5em;
+}
+
+.dataTables_wrapper .dataTables_info {
+    clear: both;
+    float: left;
+    padding-top: 0.55em;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    float: right;
+    text-align: right;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+div.horizontal-line {
+    height: 0;
+    background-color: #124191;
+    width: 100%;
+    border: 2px ridge #124191;
+    border-radius: 2px;
+    margin: 0 0 8px 0;
+
+}
+
+/* Define row height and font size for the results table (default one is too big) */
+table.dataTable tbody tr {
+    line-height: 4px;
+    font-size: 12px;
+}
+
+table.dataTable tfoot tr td a {
+    font-size: 12px;
+    font-weight: bold;
+    color: #124191;
+}
+
+/* Individual column filters */
+tfoot input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 12px;
+}
+
+/* Show/hide columns button and box */
+ul.ColVis_collection {
+    overflow: auto;
+    height: 300px;
+}
+
+/* Table styling for the rotated table */
+
+table.dataTable.rotated-cell-border th {
+    font-size: 14px;
+    border: solid #00c9ff 1px;
+    border-collapse: collapse;
+
+    color: #124191;
+}
+
+table.dataTable.rotated-cell-border td {
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+}
+
+table.dataTable {
+    border-collapse: collapse;
+}
+
+/* This stuff was copied from the old django application. Some of these may not be necessary anymore. Need to do some cleanup */
+
+/* background: url("{{ MEDIA_URL }}frontend/images/bg.png") repeat-x scroll left 218px #FFFFFF; } */
+.small {
+    font-size: 10px;
+}
+
+.normal {
+    font-size: 14px;
+}
+
+.left {
+    text-align: left;
+}
+
+.center {
+    text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+.float_left {
+    float: left;
+}
+
+.float_right {
+    float: right;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.dataTables_wrapper {
+    min-height: 0;
+}
+
+a, a:visited {
+    text-decoration: none;
+}
+
+.executed {
+    background: lightgray !important;
+    color: black;
+    font-weight: bold;
+}
+
+.investigated {
+    background: blue !important;
+    color: white;
+    font-weight: bold;
+}
+.not_analyzed {
+    background: blue !important;
+    color: gold;
+    font-weight: bold;
+}
+
+.env_issue {
+    background: blue !important;
+    color: darkgrey;
+    font-weight: bold;
+}
+
+.failed {
+    background: red !important;
+    color: white;
+    font-weight: bold;
+}
+
+.passed {
+    background: green !important;
+    color: white;
+    font-weight: bold;
+}
+
+.blocked {
+    background: lightblue !important;
+    color: white;
+    font-weight: bold;
+}
+
+.executed a {
+    color: black !important;
+    font-weight: bold;
+}
+
+.investigated a {
+    color: white !important;
+    font-weight: bold;
+}
+
+.failed a {
+    color: white !important;
+    font-weight: bold;
+}
+
+.passed a {
+    color: white !important;
+    font-weight: bold;
+}
+
+.blocked a {
+    color: white !important;
+    font-weight: bold;
+}
+
+.ui-multiselect-filter input {
+    width: 200px;
+}
+
+.filterable {
+    height: 500px;
+}
+
+.color_good {
+    background: green !important;
+    color: white;
+    font-weight: bold;
+}
+
+.color_bad {
+    background: red !important;
+    color: white;
+    font-weight: bold;
+}
+
+.odd .color_good {
+    background: darkgreen !important;
+    color: white;
+    font-weight: bold;
+}
+
+.odd .color_bad {
+    background: darkred !important;
+    color: white;
+    font-weight: bold;
+}
+
+.color_passed {
+    background: green !important;
+    color: white;
+    font-weight: bold;
+}
+
+.color_failed {
+    background: red !important;
+    color: white;
+    font-weight: bold;
+}
+
+.color_investigated {
+    background: blue !important;
+    color: white;
+    font-weight: bold;
+}
+
+.color_executed {
+    background: lightgray !important;
+    color: #333;
+    font-weight: bold;
+}
+
+.odd .color_passed {
+    background: #006000 !important;
+    color: white;
+    font-weight: bold;
+}
+
+.odd .color_failed {
+    background: #cc0000 !important;
+    color: white;
+    font-weight: bold;
+}
+
+.odd .color_investigated {
+    background: #0000cc !important;
+    color: white;
+    font-weight: bold;
+}
+
+.odd .color_executed {
+    background: gray !important;
+    color: #333;
+    font-weight: bold;
+}
+
+.columns_7 td {
+    width: 14.2857143%;
+}
+
+.columns_6 td {
+    width: 16.6666667%;
+}
+
+#results_table th {
+    max-width: 100px;
+    word-wrap: break-word;
+}
+
+#results_table td {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.edit_notes input {
+    width: 400px;
+}
+
+#setuptable td {
+    white-space: nowrap;
+    border: 0px solid white;
+}
+
+#setuptable thead th {
+    padding: 3px 16px 3px 5px;
+}
+
+#results_table_wrapper table {
+    border: solid #00c9ff 1px;
+    border-collapse: collapse;
+}
+
+#results_table_wrapper th {
+    border-collapse: collapse;
+    border: solid #00c9ff 1px;
+}
+
+#graphCheckboxesRow td {
+	border-collapse: collapse;
+    border: solid #00c9ff 1px;
+}
+
+#toc {
+    position: fixed;
+    z-index: 999;
+    right: 0px;
+    top: auto;
+    bottom: auto;
+    background-color: white;
+    border: 1px solid gray;
+    padding: 10px;
+    border-right: 0px;
+    border-radius: 10px 0 0 10px;
+}
+
+#toc ol, #toc ul {
+    padding-left: 20px;
+    list-style: none;
+}
+
+#id_table, #id_output{
+	list-style-type: none
+}
+
+.pointing-hand{
+	cursor: pointer;
+	cursor: hand;
+}
+
+.hover-hand:hover {
+	cursor: pointer;
+	cursor: hand;
+	border: 1px solid #00c9ff;
+	background: #124191 url("images/ui-bg_flat_100_124191_40x100.png") 50% 50% repeat-x;
+	font-weight: bold;
+	color: #ffffff;
+}
+
+.font25 {
+    font-size: 25px;
+}
+
+.highlighted_list {
+    margin-left: 30px;
+}
+
+.highlighted_list li {
+    list-style-image: url("images/round-circle-blue-20px.png");
+    padding: 3px;
+}
+
+.highlighted_list li:hover {
+    list-style-image: url("images/round-circle-orange-20px.png");
+}
+
+.form-title {
+    font-family: _pure_text;
+    align-content: center;
+    font-size: 30px;
+    margin-left: 305px;
+    font-weight: bold;
+}
+
+.container {
+    border: 2px solid;
+
+}
+
+.main_container {
+    border: 1px darkgrey outset;
+}
+
+#search-button {
+    padding: 5px 25px 5px 25px;
+    font-family: _pure_text;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.tile-href {
+    height: 80% !important;
+}
+
+.blue-yellow-btn {
+    float: right;
+    cursor: pointer;
+    margin-top: 6px;
+    margin-left: 8px;
+    color: #fff;
+    -webkit-tap-highlight-color: #FF5E9;
+    border: 1px solid #004ABC;
+    border-radius: 4px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px #0051BC;
+    font: bold 11px "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+    line-height: 1;
+    padding: 7px 10px;
+    background: #2487E7 -webkit-linear-gradient(top, #1A89F5, #0E4CEC);
+    background: #2487E7 -moz-linear-gradient(top, #1A89F5, #0E4CEC);
+}
+
+.blue-yellow-btn:hover {
+    border: 1px solid #EDAE0A;
+    text-shadow: 0 1px 1px #664406;
+    color: #fff;
+    background: #F4D81C -webkit-linear-gradient(top, #F6FC0D, #EC950E);
+    background: #F4D81C -moz-linear-gradient(top, #F6FC0D, #EC950E);
+}
+
+.form-error {
+    border-color: red;
+    background: red -webkit-linear-gradient(top, #ffcccc, #ff8080);
+    font-weight: bold;
+}

@@ -1,0 +1,22 @@
+.form-inline .form-group {
+  margin-right: 10px;
+}
+
+.form-inline .control-label {
+    color: #124191
+}
+
+.btn-primary {
+    background-color: #124191;
+    margin-top: 19px;
+    left-padding: 30px;
+    right-padding: 30px;
+}
+
+.has-success .form-control {
+    border-color: #808080
+}
+
+.table-condensed{
+  font-size: 10px;
+}
