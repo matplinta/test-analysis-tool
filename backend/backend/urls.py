@@ -16,22 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tra.views import HelloView, TestAuthView
-
-# from rest_framework_simplejwt.views import (
-#     TokenObtainPairView,
-#     TokenRefreshView,
-# )
-
+from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView
 from dj_rest_auth.views import LoginView, LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', HelloView.as_view(), name='hello'),
-    path('test/', TestAuthView.as_view(), name='hello'),
+    path('check/', CheckView.as_view(), name='check'),
+    path('test/', TestAuthView.as_view(), name='test'),
+    path('session/', TestSessView.as_view(), name='session'),
     path('login/', LoginView.as_view(), name='rest_login'),
     # URLs that require a user to be logged in with a valid session / token.
     path('logout/', LogoutView.as_view(), name='rest_logout'),
-    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

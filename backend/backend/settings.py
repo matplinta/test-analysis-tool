@@ -42,46 +42,19 @@ LOGGING = {
     "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
 }
 
-from django.contrib.auth import authenticate, login, logout
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-class LDAPLogin(APIView):
-    """
-    Class to authenticate a user via LDAP and
-    then creating a login session
-    """
-    authentication_classes = ()
-
-    def post(self, request):
-        """
-        Api to login a user
-        :param request:
-        :return:
-        """
-        user_obj = authenticate(username=request.data['username'],
-                                password=request.data['password'])
-        login(request, user_obj)
-        data={'detail': 'User logged in successfully'}
-        return Response(data, status=200)
-
-class LDAPLogout(APIView):
-    """
-    Class for logging out a user by clearing his/her session
-    """
-    permission_classes = (IsAuthenticated,)
-
-    def post(self, request):
-        """
-        Api to logout a user
-        :param request:
-        :return:
-        """
-        logout(request)
-        data={'detail': 'User logged out successfully'}
-        return Response(data, status=200)
-
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #     # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -174,17 +147,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# REST_SESSION_LOGIN = False
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
 
 
 # Internationalization
