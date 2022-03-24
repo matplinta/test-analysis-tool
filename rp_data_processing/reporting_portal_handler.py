@@ -83,9 +83,23 @@ class RepPortal():
         if isinstance(data_list, list):
             selected_data = list()
             for test_run in data_list:
-                if re.search(msg, test_run[search_key]):
+                if isinstance(search_key, tuple):
+                    key = self._handle_tuple_key(search_key, test_run)
+                else:
+                    key = test_run[search_key]
+                if re.search(msg, key):
                     selected_data.append(test_run)
             return selected_data
+
+
+    def _handle_tuple_key(self, search_key, test_run):
+        key = test_run
+        for item in search_key:
+            try:
+                key = key[item]
+            except KeyError:
+                key = "Doesn't have excpected key"
+        return key
 
 
     def _extract_data_from_selected_tests(self, selected_data):
@@ -142,7 +156,9 @@ class RepPortal():
     #_post_all_test_results(extracted_tests_info, com)
 
 _re_qc_msg = r'5GC001085-B'
-data = RepPortal().get_data_and_filter({'qc_test_set':_re_qc_msg})
+data = RepPortal().get_data_and_filter({('qc_test_instance', 'organization'):r'RAN_L2',
+                                        'qc_test_set':'gNB_neighbor_NRREL_and_Xn_addition_SON_Config_Transfer',
+                                        'end':'2022-03-24T01'})
 print(data)
 
 
