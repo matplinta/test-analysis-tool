@@ -19,8 +19,15 @@ from django.urls import path, include
 from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView
 from dj_rest_auth.views import LoginView, LogoutView
 
+from rest_framework import routers
+from tra import views
+
+router = routers.DefaultRouter()
+router.register(r'test_runs', views.TestRunView, 'testrun')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),
     path('hello/', HelloView.as_view(), name='hello'),
     path('check/', CheckView.as_view(), name='check'),
     path('test/', TestAuthView.as_view(), name='test'),
