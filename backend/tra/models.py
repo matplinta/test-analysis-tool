@@ -5,8 +5,11 @@ from django.contrib.auth.models import User
 import re
 
 class TestlineType(models.Model):
-    id = models.BigAutoField(primary_key=True)
+    id   = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=False, unique=True)
+
+    # class Meta:
+    #     constraints = [models.UniqueConstraint(fields=['name'], name='testline_name_uniq')]
 
     def __str__(self):
         return self.name
@@ -18,8 +21,12 @@ class TestSet(models.Model):
     test_lab_path  = models.CharField(max_length=300, blank=False, null=True, help_text="Test Lab Path")
     branch         = models.CharField(max_length=100, blank=False, null=True, help_text="gNB Build Branch")
 
+    class Meta:
+        unique_together = (("name", "test_lab_path"),)
+
+
     def __str__(self):
-        return f"{self.test_set} on {self.branch}"
+        return f"{self.name} on {self.branch}"
 
     def save(self, *args, **kwargs):
         match = re.search(r'Root\\+Test_Sets\\+(\w+)\\+', self.test_lab_path)
@@ -36,13 +43,16 @@ class TestInstance(models.Model):
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, null=True,  help_text="Execution suspended status")
     
+    class Meta:
+        unique_together = (("test_set", "test_case_name", "execution_suspended"),)
+
     def __str__(self):
         return f"{self.test_case_name} on {self.test_set.branch}"
 
 
 class TestRun(models.Model):
     id               = models.BigAutoField(primary_key=True, help_text="Internal TRA TestRun id")
-    test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance")
+    # test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance")
     testline_type    = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=True, help_text="Testline configuration")
     
     test_line        = models.CharField(max_length=100, blank=True, null=True, help_text="Testline")
@@ -58,8 +68,8 @@ class TestRun(models.Model):
     start_time       = models.TimeField(blank=True, null=False, verbose_name='Start', help_text="Start time of testrun")
     end_time         = models.TimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
 
-    def __str__(self):
-        return f"{self.test_case_name} from {self.test_instance.test_set.name}"
+    # def __str__(self):
+    #     return f"{self.test_instance.test_case_name} from {self.test_instance.test_set.name}"
 
 
 class TestsFilter(models.Model):
