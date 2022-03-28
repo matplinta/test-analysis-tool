@@ -21,12 +21,10 @@ class TestInstanceAdmin(admin.ModelAdmin):
 
 
 class TestRunAdmin(admin.ModelAdmin):
-    list_display = ['testline_type', 'test_line', 'test_suite', 'organization', 'result', 
-    # list_display = ['test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 'result', 
+    list_display = ['test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 'result', 
                     'env_issue_type', 'builds', 'fail_message', 'ute_exec_url', 'log_file_url',  
                     'log_file_url_ext', 'start_time', 'end_time']
-    # list_filter = ['result', 'test_instance', 'testline_type', 'test_suite']
-    list_filter = ['result', 'testline_type', 'test_suite']
+    list_filter = ['result', 'test_instance', 'testline_type', 'test_suite']
     search_fields = ['fail_message', 'result', 'env_issue_type', ]
 
 

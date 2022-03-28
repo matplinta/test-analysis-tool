@@ -10,8 +10,8 @@ from rest_framework import viewsets
 from dj_rest_auth.views import LoginView, LogoutView
 from rest_framework.settings import api_settings
 
-from .serializers import TestRunSerializer
-from .models import TestRun
+from .serializers import TestRunSerializer, TestsFilterSerializer
+from .models import TestRun, TestsFilter
 
 class CheckView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
@@ -62,3 +62,12 @@ class LogoutViewEx(LogoutView):
 class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
+
+
+class TestsFilterView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestsFilterSerializer
+    queryset = TestsFilter.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

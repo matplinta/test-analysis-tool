@@ -24,6 +24,7 @@ from tra import views
 
 router = routers.DefaultRouter()
 router.register(r'test_runs', views.TestRunView, 'testrun')
+router.register(r'tests_filters', views.TestsFilterView, 'testfilter')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
