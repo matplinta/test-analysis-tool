@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView
+from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView
 from dj_rest_auth.views import LoginView, LogoutView
 
 from rest_framework import routers
@@ -24,11 +24,13 @@ from tra import views
 
 router = routers.DefaultRouter()
 router.register(r'test_runs', views.TestRunView, 'testrun')
-router.register(r'tests_filters', views.TestsFilterView, 'testfilter')
+router.register(r'tests_filters', views.TestsFilterView, 'testsfilters')
+router.register(r'user_tests_filters', views.UserTestsFilterView, 'usertestsfilters')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
     path('hello/', HelloView.as_view(), name='hello'),
     path('check/', CheckView.as_view(), name='check'),
     path('test/', TestAuthView.as_view(), name='test'),

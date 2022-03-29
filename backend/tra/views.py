@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from django.views.generic import ListView
+from rest_framework import generics
+
 # from .models import Reservation, APIKey, Configuration, Branch, Membership
 # from rest_framework.response import Response
 # from django.contrib.auth.models import User
@@ -71,3 +74,23 @@ class TestsFilterView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserTestsFilterView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestsFilterSerializer
+    queryset = TestsFilter.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+
+class TestRunsBasedOnTestsFiltersView(generics.ListAPIView):
+    serializer_class = TestRunSerializer
+
+    def get_queryset(self):
+        queryset = TestRun.objects.all()
+        tf_id = self.kwargs['tf_id']
+        test_filter = TestsFilter.objects.get(pk=tf_id)
+        return queryset.filter(testline_type=test_filter.testline_type, 
+                               test_instance__test_set=test_filter.test_set)

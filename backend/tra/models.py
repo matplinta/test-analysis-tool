@@ -61,8 +61,8 @@ class TestRun(models.Model):
     ute_exec_url     = models.CharField(max_length=1000, blank=True, null=True, help_text="URL of ute execution details")
     log_file_url     = models.CharField(max_length=1000, blank=True, null=True, help_text="UTE Cloud log file url")
     log_file_url_ext = models.CharField(max_length=1000, blank=True, null=True, help_text="External log file url")
-    start_time       = models.TimeField(blank=True, null=False, verbose_name='Start', help_text="Start time of testrun")
-    end_time         = models.TimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
+    start_time       = models.DateTimeField(blank=True, null=False, verbose_name='Start', help_text="Start time of testrun")
+    end_time         = models.DateTimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
 
     def __str__(self):
         return f"{self.test_instance.test_case_name} from {self.test_instance.test_set.branch}"
@@ -73,7 +73,11 @@ class TestsFilter(models.Model):
     name          = models.CharField(max_length=50, blank=False, null=True, help_text="Name of test filter")
     user          = models.ForeignKey(User, on_delete=models.CASCADE)
     test_set      = models.ForeignKey(TestSet, on_delete=models.CASCADE, blank=False, help_text="Test set")
-    testline_type = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=True, help_text="Testline configuration")
-
+    testline_type = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=True, help_text="Testline type")
+    
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["test_set", "testline_type", "user"], name='test_set_type_uniq'),
+                       models.UniqueConstraint(fields=["name", "user"], name='name_uniq')]
+    
     def __str__(self):
         return self.name
