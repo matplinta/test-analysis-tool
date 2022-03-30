@@ -30,12 +30,12 @@ router.register(r'user_tests_filters', views.UserTestsFilterView, 'usertestsfilt
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
+    path('api/filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
+    path('api-auth/login/', LoginView.as_view(), name='rest_login'),
+    path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
+
     path('hello/', HelloView.as_view(), name='hello'),
     path('check/', CheckView.as_view(), name='check'),
     path('test/', TestAuthView.as_view(), name='test'),
     path('session/', TestSessView.as_view(), name='session'),
-    path('login/', LoginView.as_view(), name='rest_login'),
-    # URLs that require a user to be logged in with a valid session / token.
-    path('logout/', LogoutView.as_view(), name='rest_logout'),
 ]

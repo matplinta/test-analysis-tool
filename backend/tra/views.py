@@ -16,6 +16,10 @@ from rest_framework.settings import api_settings
 from .serializers import TestRunSerializer, TestsFilterSerializer
 from .models import TestRun, TestsFilter
 
+
+class AccessingRestrictedDataError(Exception):
+    pass
+
 class CheckView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)   
@@ -86,11 +90,14 @@ class UserTestsFilterView(viewsets.ModelViewSet):
 
 
 class TestRunsBasedOnTestsFiltersView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
 
     def get_queryset(self):
         queryset = TestRun.objects.all()
         tf_id = self.kwargs['tf_id']
         test_filter = TestsFilter.objects.get(pk=tf_id)
+        if test_filter.user != self.request.user:
+            raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={tf_id}")
         return queryset.filter(testline_type=test_filter.testline_type, 
                                test_instance__test_set=test_filter.test_set)

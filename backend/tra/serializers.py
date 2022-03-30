@@ -106,6 +106,7 @@ class TestsFilterSerializer(serializers.ModelSerializer):
                                                            testline_type=testline_type_instance, **validated_data)
         return tests_filter_instance
 
+
     def update(self, instance, validated_data):
         testline_type_data = validated_data.pop('testline_type')
         test_set_data = validated_data.pop('test_set')

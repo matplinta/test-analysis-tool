@@ -7,10 +7,9 @@ django-allauth
 requests
 python-ldap
 dj-rest-auth
-django_currentuser
+django-tables2
+django-filter
+# django_currentuser
 # mysqlclient
-# django-tables2
-# django_filter
 # django-bootstrap3
 # django_compressor
-
