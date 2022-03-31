@@ -16,15 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView
+from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView, TestlineTypeView
 from dj_rest_auth.views import LoginView, LogoutView
 
 from rest_framework import routers
 from tra import views
 
 router = routers.DefaultRouter()
-router.register(r'test_runs', views.TestRunView, 'testrun')
+router.register(r'test_runs', views.TestRunView, 'testruns')
 router.register(r'tests_filters', views.TestsFilterView, 'testsfilters')
+router.register(r'test_sets', views.TestsSetView, 'testsets')
+router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 router.register(r'user_tests_filters', views.UserTestsFilterView, 'usertestsfilters')
 
 urlpatterns = [
