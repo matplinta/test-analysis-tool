@@ -16,26 +16,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView
+from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView, TestlineTypeView
 from dj_rest_auth.views import LoginView, LogoutView
 
 from rest_framework import routers
 from tra import views
 
 router = routers.DefaultRouter()
-router.register(r'test_runs', views.TestRunView, 'testrun')
+router.register(r'test_runs', views.TestRunView, 'testruns')
 router.register(r'tests_filters', views.TestsFilterView, 'testsfilters')
+router.register(r'test_sets', views.TestsSetView, 'testsets')
+router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 router.register(r'user_tests_filters', views.UserTestsFilterView, 'usertestsfilters')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
+    path('api/filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
+    path('api-auth/login/', LoginView.as_view(), name='rest_login'),
+    path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
+
     path('hello/', HelloView.as_view(), name='hello'),
     path('check/', CheckView.as_view(), name='check'),
     path('test/', TestAuthView.as_view(), name='test'),
     path('session/', TestSessView.as_view(), name='session'),
-    path('login/', LoginView.as_view(), name='rest_login'),
-    # URLs that require a user to be logged in with a valid session / token.
-    path('logout/', LogoutView.as_view(), name='rest_logout'),
 ]

@@ -1,4 +1,4 @@
-from .models import TestlineType, TestSet, TestInstance, TestRun, TestsFilter
+from .models import Organization, TestRunResult, TestlineType, TestSet, TestInstance, TestRun, TestsFilter, EnvIsssueType
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -6,14 +6,11 @@ from django.contrib.auth.models import User
 class TestlineTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestlineType
-        fields = ('id', 'name',)
-        extra_kwargs = {
-            'name': {'validators': []},
-        }
+        fields = ('name',)
 
 
 class TestSetSerializer(serializers.ModelSerializer):
-    branch = serializers.CharField(read_only=True)
+    branch = serializers.CharField(source="branch.name", read_only=True)
     class Meta:
         model = TestSet
         fields = ('id', 'branch', 'name', 'test_lab_path')
@@ -22,6 +19,13 @@ class TestSetSerializer(serializers.ModelSerializer):
             'name': {'validators': []},
             'test_lab_path': {'validators': []},
         }
+
+
+class TestSetSerializerRO(serializers.ModelSerializer):
+    class Meta:
+        model = TestSet
+        fields = ('id', 'branch', 'name', 'test_lab_path')
+        read_only_fields = ('id', 'branch', 'name', 'test_lab_path')
 
 
 class TestInstanceSerializer(serializers.ModelSerializer):
@@ -45,7 +49,11 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
 class TestRunSerializer(serializers.ModelSerializer):
     test_instance = TestInstanceSerializer()
-    testline_type = TestlineTypeSerializer()
+    # testline_type = TestlineTypeSerializer()
+    testline_type = serializers.CharField(source='testline_type.name')
+    organization = serializers.CharField(source='organization.name')
+    result = serializers.CharField(source='result.name')
+    env_issue_type = serializers.CharField(source='env_issue_type.name')
 
     class Meta:
         model = TestRun
@@ -56,62 +64,72 @@ class TestRunSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         testline_type_data = validated_data.pop('testline_type')
-        testline_type_instance, was_created_tl = TestlineType.objects.get_or_create(**testline_type_data)
+        testline_type_instance, _ = TestlineType.objects.get_or_create(**testline_type_data)
+
+        organization_data = validated_data.pop('organization')
+        organization_instance, _ = Organization.objects.get_or_create(**organization_data)
+
+        result_data = validated_data.pop('result')
+        result_instance, _ = TestRunResult.objects.get_or_create(**result_data)
+
+        env_issue_type_data = validated_data.pop('env_issue_type')
+        env_issue_type_instance, _ = EnvIsssueType.objects.get_or_create(**env_issue_type_data)
 
         test_instance_data = validated_data.pop('test_instance')
         test_set_data = test_instance_data.pop('test_set')
-        test_set_instance, was_created_ts = TestSet.objects.get_or_create(**test_set_data)
-        test_instance_instance, was_created_ti = TestInstance.objects.get_or_create(test_set=test_set_instance, **test_instance_data)
+        test_set_instance, _ = TestSet.objects.get_or_create(**test_set_data)
+        test_instance_instance, _ = TestInstance.objects.get_or_create(test_set=test_set_instance, **test_instance_data)
 
         test_run_instance = TestRun.objects.create(testline_type=testline_type_instance, 
-                                                   test_instance=test_instance_instance, **validated_data)
+                                                   test_instance=test_instance_instance, 
+                                                   organization=organization_instance,
+                                                   result=result_instance,
+                                                   env_issue_type=env_issue_type_instance,
+                                                   **validated_data)
         return test_run_instance
 
 
     def update(self, instance, validated_data):
-        test_instance_data = validated_data.pop('test_instance')
-        testline_type_data = validated_data.pop('testline_type')
-        validated_data['test_instance'] = instance.test_instance
-        validated_data['testline_type'] = instance.testline_type 
-        instance.result = validated_data.get('result', instance.result)
-        instance.env_issue_type = validated_data.get('env_issue_type', instance.env_issue_type)
+        result_data = validated_data.pop('result')
+        env_issue_type_data = validated_data.pop('env_issue_type')
+        result_instance, _ = TestRunResult.objects.get_or_create(**result_data)
+        env_issue_type_instance, _ = EnvIsssueType.objects.get_or_create(**env_issue_type_data)
+        instance.result = result_instance
+        instance.env_issue_type = env_issue_type_instance
         instance.log_file_url_ext = validated_data.get('log_file_url_ext', instance.log_file_url_ext)
         instance.save()
         return instance
 
 
-
 class TestsFilterSerializer(serializers.ModelSerializer):
-    test_set = TestSetSerializer()
-    testline_type = TestlineTypeSerializer()
+    # test_set = TestSetSerializer()
+    # testline_type = TestlineTypeSerializer()
+    # testline_type = serializers.CharField(source='testline_type.name')
     user = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
-    # user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), default=serializers.CurrentUserDefault())
 
 
     class Meta:
         model = TestsFilter
         fields = ('id', 'name', 'user', 'test_set', 'testline_type', )
         read_only_fields = ('user',)
-        extra_kwargs = {
-            'test_set': {'validators': []},
-        }
 
 
-    def create(self, validated_data):
-        testline_type_data = validated_data.pop('testline_type')
-        test_set_data = validated_data.pop('test_set')
-        testline_type_instance, was_created_tl = TestlineType.objects.get_or_create(**testline_type_data)
-        test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
-        tests_filter_instance = TestsFilter.objects.create(test_set=test_set_instance,
-                                                           testline_type=testline_type_instance, **validated_data)
-        return tests_filter_instance
+    # def create(self, validated_data):
+    #     testline_type_data = validated_data.pop('testline_type')
+    #     test_set_data = validated_data.pop('test_set')
+    #     testline_type_instance, was_created_tl = TestlineType.objects.get_or_create(**testline_type_data)
+    #     test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+    #     tests_filter_instance = TestsFilter.objects.create(test_set=test_set_instance,
+    #                                                        testline_type=testline_type_instance, **validated_data)
+    #     return tests_filter_instance
 
-    def update(self, instance, validated_data):
-        testline_type_data = validated_data.pop('testline_type')
-        test_set_data = validated_data.pop('test_set')
-        testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
-        test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
-        instance.test_set = test_set_instance
-        instance.testline_type = testline_type_instance
-        instance.save()
-        return instance
+
+    # def update(self, instance, validated_data):
+    #     testline_type_data = validated_data.pop('testline_type')
+    #     test_set_data = validated_data.pop('test_set')
+    #     testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
+    #     test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+    #     instance.test_set = test_set_instance
+    #     instance.testline_type = testline_type_instance
+    #     instance.save()
+    #     return instance

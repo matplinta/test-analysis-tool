@@ -7,14 +7,72 @@ from rest_framework import viewsets
 from django.views.generic import ListView
 from rest_framework import generics
 
-# from .models import Reservation, APIKey, Configuration, Branch, Membership
-# from rest_framework.response import Response
-# from django.contrib.auth.models import User
-from dj_rest_auth.views import LoginView, LogoutView
+from dj_rest_auth.views import LogoutView
 from rest_framework.settings import api_settings
 
-from .serializers import TestRunSerializer, TestsFilterSerializer
-from .models import TestRun, TestsFilter
+from .serializers import TestRunSerializer, TestlineTypeSerializer, TestsFilterSerializer, TestSetSerializer
+from .models import TestRun, TestlineType, TestsFilter, TestSet
+
+
+class AccessingRestrictedDataError(Exception):
+    pass
+
+
+class TestRunView(viewsets.ModelViewSet):
+    serializer_class = TestRunSerializer
+    queryset = TestRun.objects.all()
+
+
+class TestlineTypeView(viewsets.ModelViewSet):
+    serializer_class = TestlineTypeSerializer
+    queryset = TestlineType.objects.all()
+
+
+class TestsSetView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestSetSerializer
+    queryset = TestSet.objects.all()
+
+
+class TestsFilterView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestsFilterSerializer
+    queryset = TestsFilter.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class UserTestsFilterView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = TestsFilterSerializer
+    queryset = TestsFilter.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+
+class TestRunsBasedOnTestsFiltersView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestRunSerializer
+
+    def get_queryset(self):
+        queryset = TestRun.objects.all()
+        tf_id = self.kwargs['tf_id']
+        test_filter = TestsFilter.objects.get(pk=tf_id)
+        if test_filter.user != self.request.user:
+            raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={tf_id}")
+        return queryset.filter(testline_type=test_filter.testline_type, 
+                               test_instance__test_set=test_filter.test_set)
+
+
+
+
+
+
+
+
+
 
 class CheckView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
@@ -61,36 +119,3 @@ class LogoutViewEx(LogoutView):
     permission_classes = (IsAuthenticated,)   
 
 
-
-class TestRunView(viewsets.ModelViewSet):
-    serializer_class = TestRunSerializer
-    queryset = TestRun.objects.all()
-
-
-class TestsFilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = TestsFilterSerializer
-    queryset = TestsFilter.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class UserTestsFilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = TestsFilterSerializer
-    queryset = TestsFilter.objects.all()
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
-
-class TestRunsBasedOnTestsFiltersView(generics.ListAPIView):
-    serializer_class = TestRunSerializer
-
-    def get_queryset(self):
-        queryset = TestRun.objects.all()
-        tf_id = self.kwargs['tf_id']
-        test_filter = TestsFilter.objects.get(pk=tf_id)
-        return queryset.filter(testline_type=test_filter.testline_type, 
-                               test_instance__test_set=test_filter.test_set)
