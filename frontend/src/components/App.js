@@ -12,6 +12,9 @@ import TestLineListComponent from './test-line-manager/TestLineListComponent';
 import MyTestLineComponentList from './test-line-manager/MyTestLineComponentList';
 import LoginComponent from './home/authorization/LoginComponent';
 import LogoutComponent from './home/authorization/LogoutComponent';
+import AnalyzedTestRunsComponent from './test-results-analyzer/AnalyzedTestRunsComponent';
+import WaitingTestRunsComponent from './test-results-analyzer/WaitingTestRunsComponent';
+import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 
 import './App.css';
 
@@ -47,7 +50,11 @@ const App = () => {
               <Route path="test-lines" element={<TestLineListComponent />} />
               <Route path="my-test-lines" element={<MyTestLineComponentList />} />
             </Route>
-            <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} />
+            <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
+              <Route index path="analyzed-test-runs" element={<AnalyzedTestRunsComponent />} />
+              <Route path="waiting-test-runs" element={<WaitingTestRunsComponent />} />
+              <Route path="user-filters" index element={<UserFiltersComponent />} />
+            </Route>
           </Routes>
         </section>
       </>
