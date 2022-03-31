@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "name": "7-7-UTE5GCLOUDT410",
+        "topology": "CLOUD_5G_O_E_AP_KL_SANSA_L1B_ECPRI_CMWV_TDD",
+        "owner": "jugacek",
+        "ute_cloud_status": "Reserved",
+        "test_line_status": "working"
+    },
+    {
+        "id": 2,
+        "name": "7-7-UTE5GCLOUDT407",
+        "topology": "CLOUD_5G_O_E_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "owner": "jugacek",
+        "ute_cloud_status": "Reserved",
+        "test_line_status": "working"
+    },
+    {
+        "id": 3,
+        "name": "7-7-UTE5GCLOUDT413",
+        "topology": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "owner": "jugacek",
+        "ute_cloud_status": "Reserved",
+        "test_line_status": "working"
+    },
+    {
+        "id": 4,
+        "name": "7-7-UTE5GCLOUDT227",
+        "topology": "CLOUD_5G_O_E_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "owner": "jugacek",
+        "ute_cloud_status": "Reserved",
+        "test_line_status": "working"
+    },
+    {
+        "id": 5,
+        "name": "7-7-UTE5GCLOUDT482",
+        "topology": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "owner": "jugacek",
+        "ute_cloud_status": "Reserved",
+        "test_line_status": "working"
+    }
+]

@@ -11,7 +11,7 @@ let GridApplications = () => {
         <Container>
             <Row>
                 <Col className="title-grid">
-                    <Link to="/" exact="true" className='link-style' >
+                    <Link to="/" className='link-style' >
                     Management
                     </Link>
                 </Col>

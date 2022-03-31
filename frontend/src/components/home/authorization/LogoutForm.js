@@ -3,24 +3,33 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { RiErrorWarningLine } from "react-icons/ri";
 
+import AuthService from "../../../services/auth.service.js";
+
 import './LoginComponent.css';
 
 
-let LogoutComponent = () => {
+let LogoutComponent = ({handleSuccess}) => {
+
+    let handleLogoutClick = async (event) => {
+        event.preventDefault();
+        AuthService.logout();
+        handleSuccess();
+    }
 
     return(
-        <Form className="text-center">
-            <RiErrorWarningLine size='150' centered />
-            <h3><strong>Are you sure?</strong></h3>
-            <p>You will be logged out.</p>
-            <Button variant="primary" type="submit">
-                Logout
-            </Button>
-            <Button variant="primary" type="submit">
-                Cancel
-            </Button>
-        </Form>
-        
+        <>
+            <Form className="text-center" onSubmit={handleLogoutClick}>
+                <RiErrorWarningLine size='150' centered="true" />
+                <h3><strong>Are you sure?</strong></h3>
+                <p>You will be logged out.</p>
+                <Button variant="primary" type="submit">
+                    Logout
+                </Button>
+                <Button variant="primary" type="submit">
+                    Cancel
+                </Button>
+            </Form>
+        </> 
     )
 }
 
