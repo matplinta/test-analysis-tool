@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TestSet, TestInstance, TestlineType, TestRun, TestsFilter, Branch, Organization, EnvIsssueType, TestRunResult
+from .models import TestSet, TestInstance, TestlineType, TestRun, TestsFilter, Branch, Organization, EnvIssueType, TestRunResult
 
 
 class TestRunResultAdmin(admin.ModelAdmin):
@@ -8,7 +8,7 @@ class TestRunResultAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-class EnvIsssueTypeAdmin(admin.ModelAdmin):
+class EnvIssueTypeAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
@@ -45,7 +45,7 @@ class TestInstanceAdmin(admin.ModelAdmin):
 
 
 class TestRunAdmin(admin.ModelAdmin):
-    list_display = ['test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 'result', 
+    list_display = ['rp_id', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 'result', 'analyzed', 
                     'env_issue_type', 'builds', 'fail_message', 'ute_exec_url', 'log_file_url',  
                     'log_file_url_ext', 'start_time', 'end_time']
     list_filter = ['result', 'test_instance', 'testline_type', 'test_suite']
@@ -58,7 +58,7 @@ class TestsFilterAdmin(admin.ModelAdmin):
     search_fields = ['name', 'test_set']
 
 
-admin.site.register(EnvIsssueType, EnvIsssueTypeAdmin)
+admin.site.register(EnvIssueType, EnvIssueTypeAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(TestRunResult, TestRunResultAdmin)
 admin.site.register(Branch, BranchAdmin)

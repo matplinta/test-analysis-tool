@@ -1,4 +1,4 @@
-from .models import Organization, TestRunResult, TestlineType, TestSet, TestInstance, TestRun, TestsFilter, EnvIsssueType
+from .models import Organization, TestRunResult, TestlineType, TestSet, TestInstance, TestRun, TestsFilter, EnvIssueType
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -19,13 +19,6 @@ class TestSetSerializer(serializers.ModelSerializer):
             'name': {'validators': []},
             'test_lab_path': {'validators': []},
         }
-
-
-class TestSetSerializerRO(serializers.ModelSerializer):
-    class Meta:
-        model = TestSet
-        fields = ('id', 'branch', 'name', 'test_lab_path')
-        read_only_fields = ('id', 'branch', 'name', 'test_lab_path')
 
 
 class TestInstanceSerializer(serializers.ModelSerializer):
@@ -49,7 +42,6 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
 class TestRunSerializer(serializers.ModelSerializer):
     test_instance = TestInstanceSerializer()
-    # testline_type = TestlineTypeSerializer()
     testline_type = serializers.CharField(source='testline_type.name')
     organization = serializers.CharField(source='organization.name')
     result = serializers.CharField(source='result.name')
@@ -57,9 +49,9 @@ class TestRunSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestRun
-        fields = ('id', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
+        fields = ('id', 'rp_id', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
                   'result', 'env_issue_type', 'builds', 'fail_message', 'ute_exec_url', 'log_file_url', 
-                  'log_file_url_ext', 'start_time', 'end_time', )
+                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed')
 
 
     def create(self, validated_data):
@@ -73,7 +65,7 @@ class TestRunSerializer(serializers.ModelSerializer):
         result_instance, _ = TestRunResult.objects.get_or_create(**result_data)
 
         env_issue_type_data = validated_data.pop('env_issue_type')
-        env_issue_type_instance, _ = EnvIsssueType.objects.get_or_create(**env_issue_type_data)
+        env_issue_type_instance, _ = EnvIssueType.objects.get_or_create(**env_issue_type_data)
 
         test_instance_data = validated_data.pop('test_instance')
         test_set_data = test_instance_data.pop('test_set')
@@ -93,7 +85,7 @@ class TestRunSerializer(serializers.ModelSerializer):
         result_data = validated_data.pop('result')
         env_issue_type_data = validated_data.pop('env_issue_type')
         result_instance, _ = TestRunResult.objects.get_or_create(**result_data)
-        env_issue_type_instance, _ = EnvIsssueType.objects.get_or_create(**env_issue_type_data)
+        env_issue_type_instance, _ = EnvIssueType.objects.get_or_create(**env_issue_type_data)
         instance.result = result_instance
         instance.env_issue_type = env_issue_type_instance
         instance.log_file_url_ext = validated_data.get('log_file_url_ext', instance.log_file_url_ext)

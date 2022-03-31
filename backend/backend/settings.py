@@ -40,6 +40,10 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "loggers": {"django_auth_ldap": {"level": "DEBUG", "handlers": ["console"]}},
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
 }
 
 REST_FRAMEWORK = {
