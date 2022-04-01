@@ -83,9 +83,9 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
     if TestRun.objects.filter(rp_id=rp_id).exists():
         raise TestRunWithSuchRPIDAlreadyExists(rp_id)
     timezone = pytz.timezone("UTC")
-    start = datetime.strptime(rp_test_run["start"], '%Y-%m-%dT%H:%M:%S.%f')
+    start = datetime.strptime(rp_test_run["start"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
     start = timezone.localize(start)
-    end = datetime.strptime(rp_test_run["end"], '%Y-%m-%dT%H:%M:%S.%f')
+    end = datetime.strptime(rp_test_run["end"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
     end = timezone.localize(end)
     test_set, _ = TestSet.objects.get_or_create(
         name=rp_test_run["qc_test_set"],
@@ -96,7 +96,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
         test_case_name=rp_test_run["test_case"]["name"]
     )
     testline_type, _ = TestlineType.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run["testline_type"])
+        name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
     organization, _ = Organization.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
@@ -131,13 +131,12 @@ class LoadTestRunsToDBView(APIView):
     permission_classes = (IsAuthenticated,)   
     
     def get(self, request):
-        list_param = 'qc_test_instance,qc_test_set,end'
-        # data = RepPortal().get_data_and_filter(
-        #     {
-        #         ('qc_test_instance', 'organization'):r'RAN_L2',
-        #         'qc_test_set':'gNB_neighbor_NRREL_and_Xn_addition_SON_Config_Transfer'}, param_list=list_param)
-        file_obj = open("/home/plinta/Desktop/web_tools/backend/rp_data_processing/test.json", "r")
-        data = json.load(file_obj)
+        filters = {
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "test_set": "5GC001085-B_Intra-frequency_inter-gNB_neighbor_NRREL_addition_-_Previously_established_Xn",
+            "test_lab_path": "Root\Test_Sets\Trunk\RAN_L2_SW_KRK_2\\5GC001085_ANR_for_SA_intra-NR_intra-frequency_UE_based"
+        }
+        data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
         for test_run in data:
             try:
                 create_testrun_obj_based_on_rp_data(test_run)
@@ -146,6 +145,29 @@ class LoadTestRunsToDBView(APIView):
         # content = {'message': str(data)}
         return Response(data)
 
+
+class LoadTestRunsToDBBasedOnTestFilter(APIView):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)   
+    
+    def get(self, request, tf_id):
+        # tf_id = self.kwargs['tf_id']
+        test_filter = TestsFilter.objects.get(pk=tf_id)
+        filters = {
+            "testline_type": test_filter.testline_type.name,
+            "test_set": test_filter.test_set.name,
+            "test_lab_path": test_filter.test_set.test_lab_path
+        }
+        data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
+        for test_run in data:
+            try:
+                create_testrun_obj_based_on_rp_data(test_run)
+            except TestRunWithSuchRPIDAlreadyExists as e:
+                logging.info(str(e))
+        # content = {'message': str(data)}
+        return Response(data)
+
+        
 
 
 class CheckView(APIView):

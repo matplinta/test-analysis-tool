@@ -16,7 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from tra.views import HelloView, TestAuthView, TestSessView, LogoutViewEx, CheckView, UserTestsFilterView, TestlineTypeView, LoadTestRunsToDBView
+from tra.views import (
+    HelloView,
+    LoadTestRunsToDBBasedOnTestFilter, 
+    TestAuthView, 
+    TestSessView, 
+    LogoutViewEx, 
+    CheckView, 
+    UserTestsFilterView, 
+    TestlineTypeView, 
+    LoadTestRunsToDBView,
+    LoadTestRunsToDBBasedOnTestFilter
+)
 from dj_rest_auth.views import LoginView, LogoutView
 
 from rest_framework import routers
@@ -33,6 +44,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
+    path('api/load_runs_from_filter/<int:tf_id>/', views.LoadTestRunsToDBBasedOnTestFilter.as_view(), name='load_filtered_trs'),
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
     path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
 
