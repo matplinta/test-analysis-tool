@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings
 from .serializers import TestRunSerializer, TestlineTypeSerializer, TestsFilterSerializer, TestSetSerializer
 from .models import EnvIssueType, Organization, TestInstance, TestRun, TestRunResult, TestlineType, TestsFilter, TestSet
 
-from rp_data_processing.data_handler import RepPortal
+from backend.rep_portal.api import RepPortal
 import json
 from datetime import datetime
 import pytz
@@ -27,9 +27,22 @@ class TestRunWithSuchRPIDAlreadyExists(Exception):
     pass
 
 
+class LogoutViewEx(LogoutView):
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)  
+
+
 class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
+
+
+class AnalyzeTestRunView(viewsets.ModelViewSet):
+    serializer_class = TestRunSerializer
+    queryset = TestRun.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(analyzed=True, analyzed_by=self.request.user)
 
 
 class TestlineTypeView(viewsets.ModelViewSet):
@@ -169,6 +182,11 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
         return Response(data)
 
 
+
+
+
+
+
 class CheckView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)   
@@ -209,8 +227,6 @@ class TestSessView(APIView):
         return Response("Hello {0}! Posted!".format(request.user))
 
 
-class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
+ 
 
 
