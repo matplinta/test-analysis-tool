@@ -1,3 +1,5 @@
+# FOR DJANGO
+
 django
 djangorestframework  # tools needed to serialize data and turn our Django application into a RESTful API
 django-cors-headers
@@ -9,7 +11,15 @@ python-ldap
 dj-rest-auth
 django-tables2
 django-filter
+
 # django_currentuser
 # mysqlclient
 # django-bootstrap3
 # django_compressor
+
+# FOR ReportingPortal API
+rep-api
+
+# FOR DATA ANALYSIS
+pandas
+matplotlib

@@ -12,8 +12,8 @@ class Organization(models.Model):
         return self.name
 
 
-class EnvIsssueType(models.Model):
-    name = models.CharField(primary_key=True, max_length=200, blank=False, unique=True)
+class EnvIssueType(models.Model):
+    name = models.CharField(primary_key=True, max_length=200, blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.name
@@ -87,7 +87,7 @@ class TestRun(models.Model):
     testline_type    = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline configuration")
     organization     = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, help_text="Organization")
     result           = models.ForeignKey(TestRunResult, on_delete=models.CASCADE, blank=False, help_text="Testrun result")
-    env_issue_type   = models.ForeignKey(EnvIsssueType, on_delete=models.CASCADE, blank=True, help_text="Env issue type")
+    env_issue_type   = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Env issue type")
 
     fail_message     = models.CharField(max_length=1000, blank=True, null=True, help_text="Fail message")
     
@@ -100,6 +100,9 @@ class TestRun(models.Model):
     start_time       = models.DateTimeField(blank=True, null=False, verbose_name='Start', help_text="Start time of testrun")
     end_time         = models.DateTimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
     analyzed         = models.BooleanField(blank=True, default=False, null=True,  help_text="Was test run analyzed in TRA")
+
+    class Meta:
+        ordering = ['-start_time']
 
     def __str__(self):
         return f"{self.test_instance.test_case_name[:40]} from {self.test_instance.test_set.branch}"
