@@ -67,7 +67,7 @@ class RepPortal():
             elif isinstance(fields, str):
                 fields = fields.strip().split(',')
             else:
-                raise RepPortalError('param list type {} is not list or string'.format(type(param_list)))
+                raise RepPortalError('fields type {} is not list or string'.format(type(fields)))
         return "fields=" + ",".join(self.basic_fields_list + fields)
     
 

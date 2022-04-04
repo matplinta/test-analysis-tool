@@ -154,6 +154,7 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
     def get(self, request, tf_id):
         test_filter = TestsFilter.objects.get(pk=tf_id)
         filters = {
+            "result": "not analyzed",
             "testline_type": test_filter.testline_type.name,
             "test_set": test_filter.test_set.name,
             "test_lab_path": test_filter.test_set.test_lab_path
