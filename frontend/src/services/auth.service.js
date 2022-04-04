@@ -2,7 +2,7 @@ import axios from "axios";
 import API_URL from '../server-settings';
 
 const login = (username, password) => {
-    return axios.post(API_URL + "login/", {username, password})
+    return axios.post(API_URL + "api-auth/login/", {username, password})
         .then(response => {
             if(response.data.key) {
                 let valueToSave = response.data;
