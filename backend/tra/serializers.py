@@ -94,7 +94,7 @@ class TestRunSerializer(serializers.ModelSerializer):
 
 
 class TestsFilterSerializer(serializers.ModelSerializer):
-    # test_set = TestSetSerializer()
+    test_set = TestSetSerializer()
     # testline_type = TestlineTypeSerializer()
     # testline_type = serializers.CharField(source='testline_type.name')
     user = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())

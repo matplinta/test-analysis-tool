@@ -101,6 +101,9 @@ class TestRun(models.Model):
     end_time         = models.DateTimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
     analyzed         = models.BooleanField(blank=True, default=False, null=True,  help_text="Was test run analyzed in TRA")
 
+    class Meta:
+        ordering = ['-start_time']
+
     def __str__(self):
         return f"{self.test_instance.test_case_name[:40]} from {self.test_instance.test_set.branch}"
 

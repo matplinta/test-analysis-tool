@@ -151,7 +151,6 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
     permission_classes = (IsAuthenticated,)   
     
     def get(self, request, tf_id):
-        # tf_id = self.kwargs['tf_id']
         test_filter = TestsFilter.objects.get(pk=tf_id)
         filters = {
             "testline_type": test_filter.testline_type.name,
@@ -166,8 +165,6 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
                 logging.info(str(e))
         # content = {'message': str(data)}
         return Response(data)
-
-        
 
 
 class CheckView(APIView):
