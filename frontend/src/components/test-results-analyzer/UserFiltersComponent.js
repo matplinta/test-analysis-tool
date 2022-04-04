@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import { getTest } from '../../services/test';
+
+import UserFilterAddModal from './UserFilterAddModal';
+
 import { getTestFilters, getTestSets, deleteTestFilter } from '../../services/test-results-analyzer/test-filters.service';
 
 import './UserFiltersComponent.css';
@@ -10,9 +13,12 @@ let UserFiltersComponent = () => {
     const [testFilters, setTestFilters] = useState([]);
     const [testSets, setTestSets] = useState([]);
 
+    const [showForm, setShowForm] = useState(false);
+    const handleFormClose = () => setShowForm(false);
+    const handleFormShow = () => setShowForm(true);
+
     let addUserFilter = () => {
-        // console.log(klikam)
-        // getTest().then((res => console.log(res)))
+        handleFormShow();
     }
 
     let fetchTestSets = () => {
@@ -51,24 +57,24 @@ let UserFiltersComponent = () => {
             })
     }
 
-    useEffect(() => {
-        fetchTestSets();
-        fetchTestFilters();
-    }, [])
-
     let createTestFiltersList = (
         testFilters.map((item) => {
         return (
             <tr key={item.id}>
                 <th>{item.name}</th>
-                <th>{testSets.find(testSet => testSet.id === item.test_set).name}</th>
-                <th>{testSets.find(testSet => testSet.id === item.test_set).test_lab_path}</th>
-                <th>{testSets.find(testSet => testSet.id === item.test_set).branch}</th>
+                <th>{item.test_set.name}</th>
+                <th>{item.test_set.test_lab_path}</th>
+                <th>{item.test_set.branch}</th>
                 <th>{item.testline_type}</th>
                 <th><Button variant="danger" size="sm" onClick={() => removeUserFilter(item.id)}>Remove</Button></th>
             </tr>
     )})
     )
+
+    useEffect(() => {
+        fetchTestSets();
+        fetchTestFilters();
+    }, [])
 
     return(
         <>
@@ -89,6 +95,8 @@ let UserFiltersComponent = () => {
                     {createTestFiltersList}
                 </tbody>
             </Table>
+
+            <UserFilterAddModal showForm={showForm} handleFormClose={handleFormClose} handleFormShow={handleFormShow} />
         </>
     )
 }

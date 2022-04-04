@@ -10,7 +10,7 @@ export const getTestSets = async () => {
     return (await axios.get(API_URL + 'api/test_sets/', {headers: authHeader()}));
 }
 
-export const getLineTypes = async () => {
+export const getTestLineTypes = async () => {
     return (await axios.get(API_URL + 'api/testline_types/', {headers: authHeader()}));
 }
 
