@@ -106,22 +106,23 @@ class TestsFilterSerializer(serializers.ModelSerializer):
         read_only_fields = ('user',)
 
 
-    # def create(self, validated_data):
-    #     testline_type_data = validated_data.pop('testline_type')
-    #     test_set_data = validated_data.pop('test_set')
-    #     testline_type_instance, was_created_tl = TestlineType.objects.get_or_create(**testline_type_data)
-    #     test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
-    #     tests_filter_instance = TestsFilter.objects.create(test_set=test_set_instance,
-    #                                                        testline_type=testline_type_instance, **validated_data)
-    #     return tests_filter_instance
+    def create(self, validated_data):
+        # testline_type_data = validated_data.pop('testline_type')
+        test_set_data = validated_data.pop('test_set')
+        # testline_type_instance, was_created_tl = TestlineType.objects.get_or_create(**testline_type_data)
+        test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+        tests_filter_instance = TestsFilter.objects.create(test_set=test_set_instance,
+                                                        #    testline_type=testline_type_instance, **validated_data)
+                                                           **validated_data)
+        return tests_filter_instance
 
 
-    # def update(self, instance, validated_data):
-    #     testline_type_data = validated_data.pop('testline_type')
-    #     test_set_data = validated_data.pop('test_set')
-    #     testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
-    #     test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
-    #     instance.test_set = test_set_instance
-    #     instance.testline_type = testline_type_instance
-    #     instance.save()
-    #     return instance
+    def update(self, instance, validated_data):
+        # testline_type_data = validated_data.pop('testline_type')
+        test_set_data = validated_data.pop('test_set')
+        # testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
+        test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+        instance.test_set = test_set_instance
+        # instance.testline_type = testline_type_instance
+        instance.save()
+        return instance
