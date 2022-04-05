@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings
 from .serializers import TestRunSerializer, TestlineTypeSerializer, TestsFilterSerializer, TestSetSerializer
 from .models import EnvIssueType, Organization, TestInstance, TestRun, TestRunResult, TestlineType, TestsFilter, TestSet
 
-from backend.rep_portal.api import RepPortal
+from rep_portal.api import RepPortal
 import json
 from datetime import datetime
 import pytz
