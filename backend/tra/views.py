@@ -13,7 +13,7 @@ from rest_framework.settings import api_settings
 from .serializers import TestRunSerializer, TestlineTypeSerializer, TestsFilterSerializer, TestSetSerializer
 from .models import EnvIssueType, Organization, TestInstance, TestRun, TestRunResult, TestlineType, TestsFilter, TestSet
 
-from rp_data_processing.data_handler import RepPortal
+from backend.rep_portal.api import RepPortal
 import json
 from datetime import datetime
 import pytz
@@ -27,9 +27,22 @@ class TestRunWithSuchRPIDAlreadyExists(Exception):
     pass
 
 
+class LogoutViewEx(LogoutView):
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)  
+
+
 class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
+
+
+class AnalyzeTestRunView(viewsets.ModelViewSet):
+    serializer_class = TestRunSerializer
+    queryset = TestRun.objects.all()
+
+    def perform_update(self, serializer):
+        serializer.save(analyzed=True, analyzed_by=self.request.user)
 
 
 class TestlineTypeView(viewsets.ModelViewSet):
@@ -132,6 +145,7 @@ class LoadTestRunsToDBView(APIView):
     
     def get(self, request):
         filters = {
+            "result": "not analyzed",
             "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
             "test_set": "5GC001085-B_Intra-frequency_inter-gNB_neighbor_NRREL_addition_-_Previously_established_Xn",
             "test_lab_path": "Root\Test_Sets\Trunk\RAN_L2_SW_KRK_2\\5GC001085_ANR_for_SA_intra-NR_intra-frequency_UE_based"
@@ -153,6 +167,7 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
     def get(self, request, tf_id):
         test_filter = TestsFilter.objects.get(pk=tf_id)
         filters = {
+            "result": "not analyzed",
             "testline_type": test_filter.testline_type.name,
             "test_set": test_filter.test_set.name,
             "test_lab_path": test_filter.test_set.test_lab_path
@@ -165,6 +180,11 @@ class LoadTestRunsToDBBasedOnTestFilter(APIView):
                 logging.info(str(e))
         # content = {'message': str(data)}
         return Response(data)
+
+
+
+
+
 
 
 class CheckView(APIView):
@@ -207,8 +227,6 @@ class TestSessView(APIView):
         return Response("Hello {0}! Posted!".format(request.user))
 
 
-class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
+ 
 
 

@@ -100,9 +100,10 @@ class TestRun(models.Model):
     start_time       = models.DateTimeField(blank=True, null=False, verbose_name='Start', help_text="Start time of testrun")
     end_time         = models.DateTimeField(blank=True, null=False, verbose_name='End', help_text="End time of testrun")
     analyzed         = models.BooleanField(blank=True, default=False, null=True,  help_text="Was test run analyzed in TRA")
+    analyzed_by      = models.ForeignKey(User, default=None, on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
-        ordering = ['-start_time']
+        ordering = ['-rp_id']
 
     def __str__(self):
         return f"{self.test_instance.test_case_name[:40]} from {self.test_instance.test_set.branch}"

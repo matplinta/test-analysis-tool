@@ -7,7 +7,7 @@ django-rest-auth     # logic, and endpoints needed for user authentication. Save
 django-auth-ldap
 django-allauth
 requests
-python-ldap
+python-ldap==3.2.0
 dj-rest-auth
 django-tables2
 django-filter
