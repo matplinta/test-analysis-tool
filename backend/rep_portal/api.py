@@ -5,6 +5,7 @@
 :contact: mateusz.plinta@.com
 :description:
 """
+from numpy import isin
 from rep_api import RepApi
 from urllib.parse import quote
 import json
@@ -77,6 +78,8 @@ class RepPortal():
         filters_list = []
         for key, value in filters.items():
             try:
+                if isinstance(value, list):
+                    value = ",".join(value)
                 value_url_parsed = quote(value)
                 filter_str = f"{self.filter_dict[key]}={value_url_parsed}"
                 filters_list.append(filter_str)

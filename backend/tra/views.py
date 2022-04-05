@@ -9,9 +9,29 @@ from rest_framework import generics
 
 from dj_rest_auth.views import LogoutView
 from rest_framework.settings import api_settings
+from django.conf import settings
 
-from .serializers import TestRunSerializer, TestlineTypeSerializer, TestsFilterSerializer, TestSetSerializer
-from .models import EnvIssueType, Organization, TestInstance, TestRun, TestRunResult, TestlineType, TestsFilter, TestSet
+from .serializers import (
+    TestRunSerializer, 
+    TestlineTypeSerializer, 
+    TestsFilterSerializer, 
+    TestSetSerializer, 
+    FailMessageTypeSerializer
+)
+
+from .models import (
+    FeatureBuild,
+    get_fb_info_based_on_date,
+    Organization, 
+    TestRunResult, 
+    TestlineType, 
+    TestSet, 
+    TestInstance, 
+    TestRun, 
+    TestsFilter, 
+    EnvIssueType, 
+    FailMessageType
+)
 
 from rep_portal.api import RepPortal
 import json
@@ -30,6 +50,11 @@ class TestRunWithSuchRPIDAlreadyExists(Exception):
 class LogoutViewEx(LogoutView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (IsAuthenticated,)  
+
+
+class FailMessageTypeView(viewsets.ModelViewSet):
+    serializer_class = FailMessageTypeSerializer
+    queryset = FailMessageType.objects.all()
 
 
 class TestRunView(viewsets.ModelViewSet):
@@ -95,11 +120,15 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
     rp_id = rp_test_run["id"]
     if TestRun.objects.filter(rp_id=rp_id).exists():
         raise TestRunWithSuchRPIDAlreadyExists(rp_id)
-    timezone = pytz.timezone("UTC")
+    timezone = pytz.timezone(settings.TIME_ZONE)
     start = datetime.strptime(rp_test_run["start"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
     start = timezone.localize(start)
     end = datetime.strptime(rp_test_run["end"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
     end = timezone.localize(end)
+
+    fb_name, fb_start, fb_end = get_fb_info_based_on_date(end)
+    fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
+    
     test_set, _ = TestSet.objects.get_or_create(
         name=rp_test_run["qc_test_set"],
         test_lab_path=rp_test_run["qc_test_instance"]["m_path"]
@@ -120,6 +149,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
     result, _ = TestRunResult.objects.get_or_create(name=rp_test_run["result"])
     tr = TestRun(
         rp_id=rp_id,
+        fb=fb,
         test_instance=test_instance,
         testline_type=testline_type,
         organization=organization,

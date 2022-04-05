@@ -1,6 +1,23 @@
-from .models import Organization, TestRunResult, TestlineType, TestSet, TestInstance, TestRun, TestsFilter, EnvIssueType
+from .models import (
+    Organization, 
+    TestRunResult, 
+    TestlineType, 
+    TestSet, 
+    TestInstance, 
+    TestRun, 
+    TestsFilter, 
+    EnvIssueType, 
+    FailMessageType,
+    FeatureBuild
+)
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+
+class FailMessageTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FailMessageType
+        fields = ('name', 'regex')
 
 
 class TestlineTypeSerializer(serializers.ModelSerializer):
@@ -46,13 +63,15 @@ class TestRunSerializer(serializers.ModelSerializer):
     organization = serializers.CharField(source='organization.name')
     result = serializers.CharField(source='result.name')
     env_issue_type = serializers.CharField(source='env_issue_type.name')
+    fb = serializers.CharField(read_only=True, source='fb.name')
     analyzed_by = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         model = TestRun
-        fields = ('id', 'rp_id', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
+        fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
                   'result', 'env_issue_type', 'builds', 'fail_message', 'ute_exec_url', 'log_file_url', 
                   'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by')
+        read_only_fields = ('analyzed', )
 
 
     def create(self, validated_data):

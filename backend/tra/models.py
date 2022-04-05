@@ -3,6 +3,32 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import User
 import re
+import datetime
+from django.conf import settings
+import pytz
+# from django.apps import apps
+# from django.contrib.contenttypes.models import ContentType
+
+
+
+def get_fb_info_based_on_date(test_datetime):
+    fb_start = datetime.datetime(2022, 1, 5, 0, 0, 0, tzinfo=pytz.timezone(settings.TIME_ZONE))
+    if test_datetime.year < 2022:
+        return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
+    while fb_start.year != test_datetime.year:
+        fb_start = fb_start + datetime.timedelta(days=14)
+
+    fb_no = 1
+    while True:
+        fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
+        if fb_start < test_datetime < fb_end:
+            break
+        else:
+            fb_no += 1
+            fb_start = fb_start + datetime.timedelta(days=14)
+    name = f"FB{str(test_datetime.year)[-2:]}{fb_no:02d}"
+    return name, fb_start, fb_end
+
 
 
 class Organization(models.Model):
@@ -38,6 +64,24 @@ class TestRunResult(models.Model):
 
 class TestlineType(models.Model):
     name = models.CharField(primary_key=True, max_length=255, blank=False, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class FailMessageType(models.Model):
+    id     = models.BigAutoField(primary_key=True)
+    name   = models.CharField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
+    regex  = models.CharField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class FeatureBuild(models.Model):
+    name = models.CharField(primary_key=True, max_length=20, blank=False, null=False, help_text="Feature Build name")
+    start_time = models.DateTimeField(blank=False, null=False, verbose_name='Start', help_text="Start time of the feature build")
+    end_time   = models.DateTimeField(blank=False, null=False, verbose_name='End', help_text="End time of the feature build")
 
     def __str__(self):
         return self.name
@@ -88,6 +132,7 @@ class TestRun(models.Model):
     organization     = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, help_text="Organization")
     result           = models.ForeignKey(TestRunResult, on_delete=models.CASCADE, blank=False, help_text="Testrun result")
     env_issue_type   = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Env issue type")
+    fb               = models.ForeignKey(FeatureBuild, on_delete=models.CASCADE, blank=True, help_text="Feature Build")
 
     fail_message     = models.CharField(max_length=1000, blank=True, null=True, help_text="Fail message")
     
@@ -122,3 +167,4 @@ class TestsFilter(models.Model):
     
     def __str__(self):
         return self.name
+

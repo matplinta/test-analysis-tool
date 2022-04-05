@@ -19,11 +19,13 @@ from django.urls import path, include
 from rest_framework import routers
 from dj_rest_auth.views import LoginView, LogoutView
 from tra import views
+from stats import views as stats_views
 
 router = routers.DefaultRouter()
 router.register(r'test_runs', views.TestRunView, 'testruns')
 router.register(r'test_runs/analyze', views.AnalyzeTestRunView, 'testruns')
 router.register(r'tests_filters', views.TestsFilterView, 'testsfilters')
+router.register(r'fail_message_types', views.FailMessageTypeView, 'failmessagetype')
 router.register(r'test_sets', views.TestsSetView, 'testsets')
 router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 router.register(r'user_tests_filters', views.UserTestsFilterView, 'usertestsfilters')
@@ -33,6 +35,7 @@ urlpatterns = [
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
     path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/', include(router.urls)),
+    path('stats/<int:filterset_id>', stats_views.FilterPresetView.as_view(), name="stats"),
     path('api/filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
     path('api/load_runs_from_filter/<int:tf_id>/', views.LoadTestRunsToDBBasedOnTestFilter.as_view(), name='load_filtered_trs'),
     # path('api/test_runs/analyze/<int:run_id>/', views.AnalyzeTestRunView.as_view(), name='load_filtered_trs'),

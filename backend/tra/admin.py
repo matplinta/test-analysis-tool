@@ -1,5 +1,29 @@
 from django.contrib import admin
-from .models import TestSet, TestInstance, TestlineType, TestRun, TestsFilter, Branch, Organization, EnvIssueType, TestRunResult
+from .models import (
+    TestSet, 
+    TestInstance, 
+    TestlineType,
+    TestRun, 
+    TestsFilter, 
+    Branch, 
+    Organization, 
+    EnvIssueType, 
+    TestRunResult,
+    FailMessageType,
+    FeatureBuild
+)
+
+
+class FeatureBuildAdmin(admin.ModelAdmin):
+    list_display = ['name', 'start_time', 'end_time']
+    list_filter = ['name']
+    search_fields = ['name', 'start_time', 'end_time']
+
+
+class FailMessageTypeAdmin(admin.ModelAdmin):
+    list_display = ['name', 'regex']
+    list_filter = ['name']
+    search_fields = ['name', 'regex']
 
 
 class TestRunResultAdmin(admin.ModelAdmin):
@@ -47,6 +71,7 @@ class TestInstanceAdmin(admin.ModelAdmin):
 class TestRunAdmin(admin.ModelAdmin):
     list_display = [
         'rp_id', 
+        'fb', 
         'test_instance', 
         'testline_type', 
         'test_line', 
@@ -64,8 +89,8 @@ class TestRunAdmin(admin.ModelAdmin):
         'start_time', 
         'end_time'
     ]
-    list_filter = ['result', 'test_instance', 'testline_type', 'test_suite']
-    search_fields = ['fail_message', 'result', 'env_issue_type', ]
+    list_filter = ['result', 'test_instance', 'testline_type', 'test_suite', 'fb']
+    search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
 
 
 class TestsFilterAdmin(admin.ModelAdmin):
@@ -74,6 +99,8 @@ class TestsFilterAdmin(admin.ModelAdmin):
     search_fields = ['name', 'test_set']
 
 
+admin.site.register(FeatureBuild, FeatureBuildAdmin)
+admin.site.register(FailMessageType, FailMessageTypeAdmin)
 admin.site.register(EnvIssueType, EnvIssueTypeAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(TestRunResult, TestRunResultAdmin)
