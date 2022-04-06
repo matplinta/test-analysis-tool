@@ -35,7 +35,7 @@ urlpatterns = [
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
     path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/', include(router.urls)),
-    path('stats/<int:filterset_id>', stats_views.FilterPresetView.as_view(), name="stats"),
+    path('stats/', include('stats.urls'), name="stats"),
     path('api/filtered_testruns/<int:tf_id>/', views.TestRunsBasedOnTestsFiltersView.as_view(), name='filtered_testruns'),
     path('api/load_runs_from_filter/<int:tf_id>/', views.LoadTestRunsToDBBasedOnTestFilter.as_view(), name='load_filtered_trs'),
     # path('api/test_runs/analyze/<int:run_id>/', views.AnalyzeTestRunView.as_view(), name='load_filtered_trs'),
