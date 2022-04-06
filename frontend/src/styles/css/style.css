@@ -53,3 +53,10 @@ body {
 .btn {
   margin-right: 5px;
 }
+
+.p-button {
+  background-color: #004c9a !important;
+  margin-right: 5px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}

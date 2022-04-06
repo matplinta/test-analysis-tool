@@ -59,16 +59,17 @@ let UserFiltersComponent = () => {
 
     let createTestFiltersList = (
         testFilters.map((item) => {
-        return (
-            <tr key={item.id}>
-                <th>{item.name}</th>
-                <th>{item.test_set.name}</th>
-                <th>{item.test_set.test_lab_path}</th>
-                <th>{item.test_set.branch}</th>
-                <th>{item.testline_type}</th>
-                <th><Button variant="danger" size="sm" onClick={() => removeUserFilter(item.id)}>Remove</Button></th>
-            </tr>
-    )})
+            return (
+                <tr key={item.id}>
+                    <th>{item.name}</th>
+                    <th>{item.test_set.name}</th>
+                    <th>{item.test_set.test_lab_path}</th>
+                    <th>{item.test_set.branch}</th>
+                    <th>{item.testline_type}</th>
+                    <th><Button variant="danger" size="sm" onClick={() => removeUserFilter(item.id)}>Remove</Button></th>
+                </tr>
+            )
+        })
     )
 
     useEffect(() => {
@@ -76,14 +77,14 @@ let UserFiltersComponent = () => {
         fetchTestFilters();
     }, [])
 
-    return(
+    return (
         <>
-            <br/>
-            <Button size="sm" style={{"marginLeft": '20px'}} onClick={addUserFilter}>Add user filter</Button>
+            <br />
+            <Button size="sm" style={{ "marginLeft": '20px' }} onClick={addUserFilter}>Add user filter</Button>
             <Table striped bordered hover size="sm" className="table-style">
                 <thead>
                     <tr>
-                        <th>Filter Name</th>
+                        <th>Filter</th>
                         <th>Test Set</th>
                         <th>Test Lab Path</th>
                         <th>Branch</th>
