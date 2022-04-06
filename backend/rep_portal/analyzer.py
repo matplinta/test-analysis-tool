@@ -14,9 +14,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from pandas import json_normalize
 import re
-from api import RepPortal
-
-
+from rep_portal.api import RepPortal
+# from tra.models import FailMessageType
 
 
 exception_dict = {
@@ -45,52 +44,72 @@ exception_dict = {
     r'NoMessageInFlow:.*': "PCAP validation failed",
 }
 
-def establishing_exception_type(msg):
+
+class Analyzer():
+    def __init__(self, fail_message_types, filter_sets) -> None:
+        
+        self.fail_message_dict = {fm_type.regex: fm_type.name for fm_type in fail_message_types}
+        self.filters = {filter_set.field.name: filter_set.value for filter_set in filter_sets}
+        datajson = RepPortal().get_data_from_testruns(limit=1000, filters=self.filters, )
+        df = json_normalize(datajson)
+        self.df_failed = self._drop_empty_fail_msg_rows(df)
+
+    def _drop_empty_fail_msg_rows(self, df):
+        df_failed = df[(df['fail_message'] != '') & (df['fail_message'].notnull())]
+        return df_failed
+
+
+    def _get_normalized_json(self, data):
+        recs = data['results']
+        return json_normalize(recs)
+    
+
+    def _get_normalized_json_from_url(self, url):
+        response = requests.get(url)
+        resp_dict = response.json()
+        return self._get_normalized_json(resp_dict)
+
+
+    def _establishing_exception_type(self, msg):
         lines = msg.split('\n')
         for line in lines:
-            for regexp in exception_dict.keys():
+            for regexp in self.fail_message_dict.keys():
                 if re.search(regexp, line):
-                    return exception_dict[regexp]
+                    return self.fail_message_dict[regexp]
         # print(msg)
         return lines[0]
 
-def get_normalized_exception_data(df):
-    df_temp = df.copy()
-    df_temp['exception_type'] = df_temp.apply(lambda value: establishing_exception_type(value.fail_message), axis=1)
-    return df_temp
+    def _get_normalized_exception_data(self, df):
+        df_temp = df.copy()
+        df_temp['exception_type'] = df_temp.apply(lambda value: self._establishing_exception_type(value.fail_message), axis=1)
+        return df_temp
 
-def plot_runs_by_exception_types(df, figure_name="figure"):
-    size = len(df.index)
-    df_temp = get_normalized_exception_data(df)
-    df_temp.drop(['fail_message'], axis=1, inplace=True)
-    df_temp = df_temp.groupby(['exception_type']).count()['result'].reset_index()
+
+    def plot_runs_by_exception_types(self, df=None, figure_name="figure"):
+        if not df:
+            df = self.df_failed
+        size = len(df.index)
+        df_temp = self._get_normalized_exception_data(df)
+        df_temp.drop(['fail_message'], axis=1, inplace=True)
+        df_temp = df_temp.groupby(['exception_type']).count()['result'].reset_index()
+        
+        df_temp.sort_values(by=["result"], inplace=True, ignore_index=True)
+        ax = df_temp.plot.barh(x="exception_type", figsize=(18,10))
+        ax.text(10, 3, f"Number of total failed runs {size}")
+        ax.legend(bbox_to_anchor=(1, 0.3), fontsize='14');
+        for p in ax.patches:
+            w = p.get_width()
+            ax.annotate(f'{w:.2f}', (w * 0.5, p.get_y() + 0.1))
+        plt.show()
+        plt.rcParams["figure.figsize"] = [7.00, 3.50]
+        plt.rcParams["figure.autolayout"] = True
+        fig = ax.get_figure()
+        plt.subplots_adjust(left=0.7, )
+        fig.savefig(f'media/{figure_name}.png')  
+        return df_temp.to_json()
     
-    df_temp.sort_values(by=["result"], inplace=True, ignore_index=True)
-    ax = df_temp.plot.barh(x="exception_type", figsize=(18,10))
-    ax.text(10, 3, f"Number of total failed runs {size}")
-    ax.legend(bbox_to_anchor=(1, 0.3), fontsize='14');
-    for p in ax.patches:
-        w = p.get_width()
-        ax.annotate(f'{w:.2f}', (w * 0.5, p.get_y() + 0.1))
-    plt.show()
-    plt.rcParams["figure.figsize"] = [7.00, 3.50]
-    plt.rcParams["figure.autolayout"] = True
-    fig = ax.get_figure()
-    plt.subplots_adjust(left=0.7, )
-    fig.savefig(f'../media/{figure_name}.png')  
-    return df_temp.to_json()
-    
-    
-def get_normalized_json(data):
-    recs = data['results']
-    df = json_normalize(recs)
-    return df
     
 
-def get_normalized_json_from_url(url):
-    response = requests.get(url)
-    resp_dict = response.json()
-    return get_normalized_json(resp_dict)
 
 
 
@@ -103,8 +122,8 @@ if __name__ == "__main__":
     #         "test_lab_path": "Root\Test_Sets\Trunk\RAN_L2_SW_KRK_2\\5GC001085_ANR_for_SA_intra-NR_intra-frequency_UE_based"
     #     }
     # data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
-    
-    df = get_normalized_json_from_url(url)
+    analyzer = Analyzer()
+    df = analyzer._get_normalized_json_from_url(url)
 
     # with open("data.json") as json_file:
     #     records = json.load(json_file)['results']
@@ -113,7 +132,7 @@ if __name__ == "__main__":
     df_failed = df[(df['fail_message'] != '') & (df['fail_message'].notnull())]
     # df_failed = df[df['fail_message'].notnull()]
     # display(df_failed)
-    json_data = plot_runs_by_exception_types(df_failed)
+    json_data = analyzer.plot_runs_by_exception_types(df_failed)
     print(json_data)
     # df_na.groupby(['test_exception']).count()
     # df_na.groupby([df_na.index, 'test_exception']).count()['result']

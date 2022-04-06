@@ -15,9 +15,10 @@ from django.contrib.auth.models import User
 
 
 class FailMessageTypeSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
         model = FailMessageType
-        fields = ('name', 'regex')
+        fields = ('name', 'regex', 'user')
 
 
 class TestlineTypeSerializer(serializers.ModelSerializer):

@@ -73,9 +73,10 @@ class FailMessageType(models.Model):
     id     = models.BigAutoField(primary_key=True)
     name   = models.CharField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
     regex  = models.CharField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
+    user   = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return self.regex
 
 
 class FeatureBuild(models.Model):

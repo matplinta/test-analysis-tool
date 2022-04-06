@@ -56,6 +56,9 @@ class FailMessageTypeView(viewsets.ModelViewSet):
     serializer_class = FailMessageTypeSerializer
     queryset = FailMessageType.objects.all()
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer

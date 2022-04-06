@@ -7,7 +7,7 @@ from .models import (
 
 class FilterAdmin(admin.ModelAdmin):
     list_display = ['field', 'filter_set', 'value']
-    list_filter = ['field', 'filter_set', 'value']
+    list_filter = ['field', 'filter_set']
     search_fields = ['field', 'filter_set', 'value']
 
 
@@ -17,7 +17,7 @@ class FilterDefinitionAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 class FilterSetAdmin(admin.ModelAdmin):
-    list_display = ['name']
+    list_display = ['name', 'id']
     list_filter = ['name']
     search_fields = ['name']
 

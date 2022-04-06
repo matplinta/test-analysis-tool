@@ -21,9 +21,9 @@ class FeatureBuildAdmin(admin.ModelAdmin):
 
 
 class FailMessageTypeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'regex']
-    list_filter = ['name']
-    search_fields = ['name', 'regex']
+    list_display = ['name', 'regex', 'user']
+    list_filter = ['name', 'user']
+    search_fields = ['name', 'regex', 'user']
 
 
 class TestRunResultAdmin(admin.ModelAdmin):
