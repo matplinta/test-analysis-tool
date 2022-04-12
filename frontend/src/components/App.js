@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+
+import Notify from './../services/Notify';
 
 import NOKIA_LOGO_WHITE_50px from './../assets/NOKIA_LOGO_WHITE_50px.png';
 import GoToAdminComponent from './home/GoToAdminComponent';
@@ -23,6 +26,10 @@ const App = () => {
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(undefined);
 
+  useEffect(() => {
+    Notify.notifications.subscribe((alert) => alert instanceof Function && alert());
+  }, [])
+
   return (
     <BrowserRouter>
       <>
@@ -35,8 +42,8 @@ const App = () => {
               <GoBackHomeComponent />
             </div>
             <div className="buttons-div">
-              {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} /> }
-              {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} /> }
+              {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
+              {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
               <GoToAdminComponent />
             </div>
           </div>
@@ -56,6 +63,7 @@ const App = () => {
               <Route path="user-filters" index element={<UserFiltersComponent />} />
             </Route>
           </Routes>
+          <ToastContainer autoClose={2500} />
         </section>
       </>
     </BrowserRouter>

@@ -10,6 +10,7 @@ import { FaPlus } from 'react-icons/fa';
 import TestSetAddModal from './TestSetAddModal';
 
 import { getTestFilters, getTestSets, getTestLineTypes, postTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import './UserFilterAddModal.css';
 
@@ -132,10 +133,10 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
                         optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Set" />
                 </div>
                 <div className="form-item">
-                    <Button variant="primary" type="submit" onClick={handleFilterAdd}>
+                    <Button variant="primary" className="p-button-color" type="submit" onClick={handleFilterAdd}>
                         Add Filter
                     </Button>
-                    <Button variant="primary" type="submit" onClick={clearForm}>
+                    <Button variant="primary" className="p-button-color" type="submit" onClick={clearForm}>
                         Clear Form
                     </Button>
                 </div>

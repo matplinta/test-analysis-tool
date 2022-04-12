@@ -5,6 +5,7 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 
 import { postTestSet } from '../../services/test-results-analyzer/test-filters.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 let TestSetAddModal = ({ showTestSetForm, handleTestSetFormClose }) => {
 
@@ -32,11 +33,11 @@ let TestSetAddModal = ({ showTestSetForm, handleTestSetFormClose }) => {
             (response) => {
                 clearForm();
                 handleTestSetFormClose();
-
-                console.log("Success!");
+                Notify.sendNotification(Successes.ADD_TEST_SET_SUCCESS, AlertTypes.success);
             },
             (error) => {
                 console.log("Error!")
+                Notify.sendNotification(Errors.ADD_TEST_SET_ERROR, AlertTypes.error);
             }
         )
     }

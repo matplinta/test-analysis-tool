@@ -1,41 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Button, Table } from 'react-bootstrap';
-import { getTest } from '../../services/test';
+import { useState, useEffect, useRef } from 'react';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { Button } from 'primereact/button';
+import { confirmDialog } from 'primereact/confirmdialog';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, getTestSets, deleteTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestFilters, deleteTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './UserFiltersComponent.css';
 
 let UserFiltersComponent = () => {
 
     const [testFilters, setTestFilters] = useState([]);
-    const [testSets, setTestSets] = useState([]);
 
     const [showForm, setShowForm] = useState(false);
     const handleFormClose = () => setShowForm(false);
     const handleFormShow = () => setShowForm(true);
 
-    let addUserFilter = () => {
-        handleFormShow();
-    }
-
-    let fetchTestSets = () => {
-        getTestSets().then(
-            (response) => {
-                setTestSets(response.data.results)
-                console.log(response.data.results);
-            },
-            (error) => {
-                console.log(error);
-            })
-    }
-
     let fetchTestFilters = () => {
         getTestFilters().then(
             (response) => {
-                console.log(response.data.results)
                 setTestFilters(response.data.results);
             },
             (error) => {
@@ -45,59 +32,59 @@ let UserFiltersComponent = () => {
     }
 
     let removeUserFilter = (id) => {
-        console.log(id)
         deleteTestFilter(id).then(
             (response) => {
                 let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
                 setTestFilters(testFiltersList);
-                console.log("Succesfully removed!");
+                fetchTestFilters();
+                Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.REMOVE_GLOBAL_FILTER_ERROR, AlertTypes.error);
             })
     }
 
-    let createTestFiltersList = (
-        testFilters.map((item) => {
-            return (
-                <tr key={item.id}>
-                    <th>{item.name}</th>
-                    <th>{item.test_set.name}</th>
-                    <th>{item.test_set.test_lab_path}</th>
-                    <th>{item.test_set.branch}</th>
-                    <th>{item.testline_type}</th>
-                    <th><Button variant="danger" size="sm" onClick={() => removeUserFilter(item.id)}>Remove</Button></th>
-                </tr>
-            )
-        })
-    )
+    let removeButton = (rowData) => {
+        return (
+            <Button icon="pi pi-times" className="p-button-sm" onClick={() => confirmRemove(rowData.id)} />
+        );
+    }
+
+    const confirmRemove = (id) => {
+        confirmDialog({
+            message: 'Are you sure you want to remove test filter?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => removeUserFilter(id)
+        });
+    };
+
+    let handleTestSetFormCloseAndRefresh = () => {
+        handleFormClose();
+        fetchTestFilters();
+        Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+    }
 
     useEffect(() => {
-        fetchTestSets();
         fetchTestFilters();
     }, [])
 
     return (
         <>
             <br />
-            <Button size="sm" style={{ "marginLeft": '20px' }} onClick={addUserFilter}>Add user filter</Button>
-            <Table striped bordered hover size="sm" className="table-style">
-                <thead>
-                    <tr>
-                        <th>Filter</th>
-                        <th>Test Set</th>
-                        <th>Test Lab Path</th>
-                        <th>Branch</th>
-                        <th>Test Line Type</th>
-                        <th>Remove</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {createTestFiltersList}
-                </tbody>
-            </Table>
+            <Button size="sm" style={{ "marginLeft": '20px' }} className="p-button-color" onClick={handleFormShow}>Add Glogal Filter</Button>
 
-            <UserFilterAddModal showForm={showForm} handleFormClose={handleFormClose} handleFormShow={handleFormShow} />
+            <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row">
+                <Column field="name" header="Name" sortable></Column>
+                <Column field="test_set.name" header="Test Set Name" sortable></Column>
+                <Column field="test_set.branch" header="Branch" sortable></Column>
+                <Column field="testline_type" header="Test Line Type" sortable></Column>
+                <Column body={removeButton} header="Remove" />
+
+            </DataTable>
+
+            <UserFilterAddModal showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
         </>
     )
 }
