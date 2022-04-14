@@ -80,7 +80,7 @@ class FailMessageType(models.Model):
     author      = models.ForeignKey(User, on_delete=models.CASCADE)
     name        = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
     regex       = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
-    description = models.TextField(max_length=500, blank=True, null=False, help_text="Description", unique=True)
+    description = models.TextField(max_length=500, blank=True, null=False, help_text="Description")
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["regex", "author"], name='regex_author_uniq')]

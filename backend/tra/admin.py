@@ -111,7 +111,7 @@ class TestRunAdmin(admin.ModelAdmin):
 
 
 class RegressionFilterAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'limit', 'test_set', 'testline_type']
+    list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
     list_filter = ['test_set', 'testline_type']
     search_fields = ['name', 'test_set']
 
