@@ -3,6 +3,7 @@ import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
 import Notify from './../services/Notify';
+import AuthService from './../services/auth.service.js';
 
 import NOKIA_LOGO_WHITE_50px from './../assets/NOKIA_LOGO_WHITE_50px.png';
 import GoToAdminComponent from './home/GoToAdminComponent';
@@ -15,8 +16,7 @@ import TestLineListComponent from './test-line-manager/TestLineListComponent';
 import MyTestLineComponentList from './test-line-manager/MyTestLineComponentList';
 import LoginComponent from './home/authorization/LoginComponent';
 import LogoutComponent from './home/authorization/LogoutComponent';
-import AnalyzedTestRunsComponent from './test-results-analyzer/AnalyzedTestRunsComponent';
-import WaitingTestRunsComponent from './test-results-analyzer/WaitingTestRunsComponent';
+import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
 import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 
 import './App.css';
@@ -28,6 +28,7 @@ const App = () => {
 
   useEffect(() => {
     Notify.notifications.subscribe((alert) => alert instanceof Function && alert());
+    setIsUserLoggedIn(AuthService.checkUserLoggedIn());
   }, [])
 
   return (
@@ -58,8 +59,7 @@ const App = () => {
               <Route path="my-test-lines" element={<MyTestLineComponentList />} />
             </Route>
             <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
-              <Route index path="analyzed-test-runs" element={<AnalyzedTestRunsComponent />} />
-              <Route path="waiting-test-runs" element={<WaitingTestRunsComponent />} />
+              <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
               <Route path="user-filters" index element={<UserFiltersComponent />} />
             </Route>
           </Routes>
