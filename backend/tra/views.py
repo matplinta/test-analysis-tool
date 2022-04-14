@@ -1,25 +1,36 @@
+from dataclasses import fields
+from functools import reduce
 from django.shortcuts import render
 from rest_framework import permissions, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from django.views.generic import ListView
-from rest_framework import generics
-
 from dj_rest_auth.views import LogoutView
 from rest_framework.settings import api_settings
+from rest_framework import generics, mixins, views
+from django_filters import fields
+from django_filters import rest_framework as filters
+from django.contrib.auth.models import User
 from django.conf import settings
+from itertools import chain
+from django.db.models import Q
+import distutils
+import distutils.util
 
 from .serializers import (
     TestRunSerializer, 
     TestlineTypeSerializer, 
-    TestsFilterSerializer, 
+    RegressionFilterSerializer, 
     TestSetSerializer, 
-    FailMessageTypeSerializer
+    FailMessageTypeSerializer,
+    FailMessageTypeGroupSerializer
 )
 
 from .models import (
+    FailMessageTypeGroup,
     FeatureBuild,
     get_fb_info_based_on_date,
     Organization, 
@@ -28,9 +39,10 @@ from .models import (
     TestSet, 
     TestInstance, 
     TestRun, 
-    TestsFilter, 
+    RegressionFilter, 
     EnvIssueType, 
-    FailMessageType
+    FailMessageType,
+    FailMessageTypeGroup,
 )
 
 from rep_portal.api import RepPortal
@@ -45,75 +57,6 @@ class AccessingRestrictedDataError(Exception):
 
 class TestRunWithSuchRPIDAlreadyExists(Exception):
     pass
-
-
-class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)  
-
-
-class FailMessageTypeView(viewsets.ModelViewSet):
-    serializer_class = FailMessageTypeSerializer
-    queryset = FailMessageType.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class TestRunView(viewsets.ModelViewSet):
-    serializer_class = TestRunSerializer
-    queryset = TestRun.objects.all()
-
-
-class AnalyzeTestRunView(viewsets.ModelViewSet):
-    serializer_class = TestRunSerializer
-    queryset = TestRun.objects.all()
-
-    def perform_update(self, serializer):
-        serializer.save(analyzed=True, analyzed_by=self.request.user)
-
-
-class TestlineTypeView(viewsets.ModelViewSet):
-    serializer_class = TestlineTypeSerializer
-    queryset = TestlineType.objects.all()
-
-
-class TestsSetView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = TestSetSerializer
-    queryset = TestSet.objects.all()
-
-
-class TestsFilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = TestsFilterSerializer
-    queryset = TestsFilter.objects.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class UserTestsFilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = TestsFilterSerializer
-    queryset = TestsFilter.objects.all()
-
-    def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-
-
-class TestRunsBasedOnTestsFiltersView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = TestRunSerializer
-
-    def get_queryset(self):
-        queryset = TestRun.objects.all()
-        tf_id = self.kwargs['tf_id']
-        test_filter = TestsFilter.objects.get(pk=tf_id)
-        if test_filter.user != self.request.user:
-            raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={tf_id}")
-        return queryset.filter(testline_type=test_filter.testline_type, 
-                               test_instance__test_set=test_filter.test_set)
 
 
 def create_testrun_obj_based_on_rp_data(rp_test_run):
@@ -158,6 +101,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
         organization=organization,
         result=result,
         env_issue_type=env_issue_type,
+        comment=rp_test_run["comment"],
         fail_message=rp_test_run["fail_message"],
         test_line=rp_test_run["test_line"],
         test_suite=rp_test_run["test_suite"],
@@ -170,6 +114,201 @@ def create_testrun_obj_based_on_rp_data(rp_test_run):
         # analyzed
         )
     tr.save()
+    return tr
+
+
+class LogoutViewEx(LogoutView):
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)  
+
+
+class FailMessageTypeView(viewsets.ModelViewSet):
+    serializer_class = FailMessageTypeSerializer
+    queryset = FailMessageType.objects.all()
+    pagination_class = None
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class FailMessageTypeGroupView(viewsets.ModelViewSet):
+    serializer_class = FailMessageTypeGroupSerializer
+    queryset = FailMessageTypeGroup.objects.all()
+    pagination_class = None
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class TestRunView(viewsets.ModelViewSet):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)  
+    serializer_class = TestRunSerializer
+    queryset = TestRun.objects.all()
+
+    @action(detail=True, methods=['put'], url_path="analyze")
+    def analyze(self, request, pk=None):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(analyzed=True, analyzed_by=self.request.user)
+        return Response(serializer.data)
+
+
+# class AnalyzeTestRunView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+#                          viewsets.GenericViewSet):
+#     serializer_class = TestRunSerializer
+#     queryset = TestRun.objects.all()
+
+#     def perform_update(self, serializer):
+#         serializer.save(analyzed=True, analyzed_by=self.request.user)
+
+
+class TestlineTypeView(viewsets.ModelViewSet):
+    serializer_class = TestlineTypeSerializer
+    queryset = TestlineType.objects.all()
+    pagination_class = None
+
+
+class TestsSetView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestSetSerializer
+    queryset = TestSet.objects.all()
+
+
+class RegressionFilterView(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = RegressionFilterSerializer
+    queryset = RegressionFilter.objects.all()
+
+
+    # @action(detail=False, url_path="other")
+    # def other(self, request):
+    #     regfilters = request.user.owned_reg_filters.all()
+    #     serializer = self.get_serializer(regfilters, many=True)
+    #     return Response(serializer.data)
+
+
+    @action(detail=False, url_path="owned")
+    def user_is_owner(self, request):
+        regfilters = RegressionFilter.objects.filter(owners=request.user)
+        serializer = self.get_serializer(regfilters, many=True)
+        return Response(serializer.data)
+
+
+    @action(detail=False, url_path="subscribed")
+    def user_is_subscribed(self, request):
+        regfilters = RegressionFilter.objects.filter(subscribers=request.user)
+        serializer = self.get_serializer(regfilters, many=True)
+        return Response(serializer.data)
+
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.owners.add(self.request.user)
+        instance.subscribers.add(self.request.user)
+
+
+class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestRunSerializer
+
+    def get_queryset(self):
+        queryset = TestRun.objects.all()
+        rfid = self.kwargs['rfid']
+        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        # if test_filter.user != self.request.user:
+        #     raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={rfid}")
+        return queryset.filter(testline_type=regression_filter.testline_type, 
+                               test_instance__test_set=regression_filter.test_set)
+
+
+class TestRunsBasedOnAllSubscribedRegressionFiltersView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestRunSerializer
+
+    def get_queryset(self):
+        queryset = TestRun.objects.all()
+        rfid = self.kwargs['rfid']
+        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        # if test_filter.user != self.request.user:
+        #     raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={rfid}")
+        return queryset.filter(testline_type=regression_filter.testline_type, 
+                               test_instance__test_set=regression_filter.test_set)
+
+
+class TestRunFilter(filters.FilterSet):
+    reg_filters = filters.ModelMultipleChoiceFilter(
+        field_name='reg_filters',
+        queryset=RegressionFilter.objects.all(),
+        method='reg_filter_filter_method'
+    )
+
+    def reg_filter_filter_method(self, queryset, name, value):
+        reg_filters = value
+        queryset = queryset.filter(
+            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
+                                               test_instance__test_set=reg_filter.test_set), reg_filters, Q())
+        )
+        return queryset
+
+    test_instance = filters.ModelMultipleChoiceFilter(field_name='test_instance', queryset=TestInstance.objects.all())
+    fb = filters.ModelMultipleChoiceFilter(field_name='fb', queryset=FeatureBuild.objects.all())
+    result = filters.ModelMultipleChoiceFilter(field_name='result', queryset=TestRunResult.objects.all())
+    testline_type = filters.ModelMultipleChoiceFilter(field_name='testline_type', queryset=TestlineType.objects.all())
+    env_issue_type = filters.ModelMultipleChoiceFilter(field_name='env_issue_type', queryset=EnvIssueType.objects.all())
+    analyzed_by = filters.ModelMultipleChoiceFilter(field_name='analyzed_by__username', to_field_name="username", queryset=User.objects.all())
+    analyzed = filters.BooleanFilter()
+
+    class Meta:
+        model = TestRun
+        fields = ["test_instance", "fb", "result", "testline_type", "env_issue_type", "analyzed", "analyzed_by"] 
+
+
+class TestRunsBasedOnQuery(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestRunSerializer
+    filterset_class = TestRunFilter
+
+    def get_queryset(self):
+        return TestRun.objects.all()
+
+    # def get_queryset(self):
+    #     queryset = TestRun.objects.all()
+    #     reg_filters = self.request.query_params.get('regression_filter')
+    #     test_instance = self.request.query_params.get('test_instance')
+    #     fb = self.request.query_params.get('fb')
+    #     result = self.request.query_params.get('result')
+    #     analyzed = self.request.query_params.get('analyzed')
+    #     analyzed_by = self.request.query_params.get('analyzed_by')
+    #     testline_type = self.request.query_params.get('testline_type')
+    #     env_issue_type = self.request.query_params.get('env_issue_type')
+    #     if reg_filters is not None:
+    #         reg_filters = [RegressionFilter.objects.get(pk=rfid) for rfid in reg_filters.split(',')]
+    #         queryset = queryset.filter(
+    #             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
+    #                                                test_instance__test_set=reg_filter.test_set), reg_filters, Q())
+    #         )
+    #     if test_instance is not None:
+    #         test_instances = [TestInstance.objects.get(pk=ti_id) for ti_id in test_instance.split(',')]
+    #         queryset = queryset.filter(
+    #             reduce(lambda q, test_instance: q | Q(test_instance=test_instance), test_instances, Q())
+    #         )
+    #     if result is not None:
+    #         results = [TestRunResult.objects.get(pk=result_name) for result_name in result.split(',')]
+    #         queryset = queryset.filter(
+    #             reduce(lambda q, res: q | Q(result=res), results, Q())
+    #         )
+    #     if analyzed is not None:
+    #         analyzed = bool(distutils.util.strtobool(analyzed))
+    #         queryset = queryset.filter(analyzed=analyzed)
+    #     if analyzed_by is not None:
+    #         queryset = queryset.filter(analyzed_by__username=analyzed_by)
+    #     if fb is not None:
+    #         queryset = queryset.filter(fb__name=fb)
+    #     return queryset
+
+
 
 
 class LoadTestRunsToDBView(APIView):
@@ -193,26 +332,53 @@ class LoadTestRunsToDBView(APIView):
         return Response(data)
 
 
-class LoadTestRunsToDBBasedOnTestFilter(APIView):
+class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (IsAuthenticated,)   
     
-    def get(self, request, tf_id):
-        test_filter = TestsFilter.objects.get(pk=tf_id)
+    def get(self, request, rfid):
+        tr_list = []
+        regression_filter = RegressionFilter.objects.get(pk=rfid)
         filters = {
             "result": "not analyzed",
-            "testline_type": test_filter.testline_type.name,
-            "test_set": test_filter.test_set.name,
-            "test_lab_path": test_filter.test_set.test_lab_path
+            "testline_type": regression_filter.testline_type.name,
+            "test_set": regression_filter.test_set.name,
+            "test_lab_path": regression_filter.test_set.test_lab_path
         }
         data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
         for test_run in data:
             try:
-                create_testrun_obj_based_on_rp_data(test_run)
+                tr = create_testrun_obj_based_on_rp_data(test_run)
+                tr_list.append(tr.rp_id)
             except TestRunWithSuchRPIDAlreadyExists as e:
-                logging.info(str(e))
-        # content = {'message': str(data)}
-        return Response(data)
+                logging.info(f"{type(e).__name__} was raised for rp_id={e}")
+        content = {'Loaded to DB new testruns: rp_ids': str(tr_list)}
+        return Response(content)
+
+
+class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)   
+    
+    def get(self, request):
+        regression_filters = RegressionFilter.objects.all()
+        tr_by_rf = {regression_filter.id: [] for regression_filter in regression_filters} 
+        for regression_filter in regression_filters:
+            filters = {
+                "result": "not analyzed",
+                "testline_type": regression_filter.testline_type.name,
+                "test_set": regression_filter.test_set.name,
+                "test_lab_path": regression_filter.test_set.test_lab_path
+            }
+            data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
+            for test_run in data:
+                try:
+                    tr = create_testrun_obj_based_on_rp_data(test_run)
+                    tr_by_rf[regression_filter.id].append(tr.rp_id)
+                except TestRunWithSuchRPIDAlreadyExists as e:
+                    logging.info(f"{type(e).__name__} was raised for rp_id={e}")
+        content = {'Loaded to DB new testruns: rp_ids': str(tr_by_rf)}
+        return Response(content)
 
 
 
@@ -233,9 +399,9 @@ class HelloView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)   
     
-    def get(self, request):
-        content = {'message': 'Hello, World! {}'.format(str(HelloView.authentication_classes))}
-        return Response(content)
+    def get(self, request, lol):
+        # lol = kwargs.get("lol")
+        return Response(str(lol))
 
 
 class TestAuthView(APIView):

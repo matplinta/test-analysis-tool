@@ -24,20 +24,6 @@ class ListFiltersWithFilterSetView(generics.ListAPIView):
         return queryset.filter(filter_set=filter_set)
 
 
-class GetChartForFailAnalysis(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
-    
-    def get(self, request, filterset_id):
-        filter_set = FilterSet.objects.get(pk=filterset_id)
-        filters = Filter.objects.filter(filter_set=filter_set)
-        fail_message_types = FailMessageType.objects.filter(user=self.request.user)
-        analyzer = Analyzer(fail_message_types, filters)
-        data = analyzer.plot_runs_by_exception_types()
-        return Response(data)
-
-
-
 class FilterSetView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)   
     serializer_class = FilterSetSerializer
@@ -59,9 +45,23 @@ class FilterView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)   
     serializer_class = FilterSerializer
     queryset = Filter.objects.all()
+    pagination_class = None
 
 
 class FilterFieldView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = FilterFieldSerializer
     queryset = FilterField.objects.all()
+
+
+class GetChartForFailAnalysis(APIView):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)   
+    
+    def get(self, request, filterset_id):
+        filter_set = FilterSet.objects.get(pk=filterset_id)
+        filters = Filter.objects.filter(filter_set=filter_set)
+        fail_message_types = FailMessageType.objects.filter(user=self.request.user)
+        analyzer = Analyzer(fail_message_types, filters)
+        data = analyzer.plot_runs_by_exception_types()
+        return Response(data)

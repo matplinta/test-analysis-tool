@@ -12,10 +12,11 @@ class FilterField(models.Model):
         return self.name
 
 class FilterSet(models.Model):
-    name = models.CharField(max_length=100, blank=False, null=False, help_text="Name of filter set")
+    name   = models.CharField(max_length=100, blank=False, null=False, help_text="Name of the filter set")
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
+        constraints = [models.UniqueConstraint(fields=["name", "author"], name='name_author_uniq')]
         ordering = ['id']
 
     def __str__(self):
@@ -27,7 +28,7 @@ class Filter(models.Model):
     value = models.CharField(max_length=200, blank=True, null=False, help_text="Value")
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["field", "filter_set", "value"], name='filter_constraint')]
+        constraints = [models.UniqueConstraint(fields=["field", "filter_set"], name='filter_constraint')]
         ordering = ['id']
 
     def __str__(self):

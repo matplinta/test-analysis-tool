@@ -41,6 +41,7 @@ class RepPortal():
             'test_line', 
             'result', 
             'env_issue_type', 
+            'comment', 
             'builds',
             'fail_message', 
             'start',
@@ -55,7 +56,9 @@ class RepPortal():
             "testline_type": "test_col__testline_type__pos_neg",
             "test_lab_path": "qc_test_instance__m_path__pos_neg_empty_str",
             "fail_message": "fail_message__pos_neg",
-            "result": "result__name__pos_neg"
+            "result": "result__name__pos_neg",
+            "env_issue_type": "envIssueType",
+            "comment": "comment"
         }
 
 
