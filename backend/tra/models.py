@@ -97,8 +97,6 @@ class FailMessageTypeGroup(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "author"], name='fmtg_name_author_uniq')]
-        # unique_together = ('name', 'author',)
-
 
     def __str__(self):
         return self.name
@@ -175,6 +173,8 @@ class TestRun(models.Model):
 class RegressionFilter(models.Model):
     id                       = models.BigAutoField(primary_key=True)
     name                     = models.CharField(max_length=50, blank=False, null=True, help_text="Name of test filter")
+    limit                    = models.IntegerField(blank=False, default=50, 
+                                                   help_text="Number of test runs pulled from Reporting Portal during every refresh")
     test_set                 = models.ForeignKey(TestSet, on_delete=models.CASCADE, blank=False, help_text="Test set")
     testline_type            = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline type")
     owners                   = models.ManyToManyField(User, related_name="owned_reg_filters", blank=True)

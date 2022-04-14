@@ -85,6 +85,7 @@ class TestInstanceAdmin(admin.ModelAdmin):
 
 class TestRunAdmin(admin.ModelAdmin):
     list_display = [
+        'id', 
         'rp_id', 
         'fb', 
         'test_instance', 
@@ -105,12 +106,12 @@ class TestRunAdmin(admin.ModelAdmin):
         'start_time', 
         'end_time'
     ]
-    list_filter = ['result', 'test_instance', 'testline_type', 'test_suite', 'fb']
+    list_filter = ['result', 'fb', 'testline_type', 'test_suite', 'test_instance']
     search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
 
 
 class RegressionFilterAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'test_set', 'testline_type']
+    list_display = ['id', 'name', 'limit', 'test_set', 'testline_type']
     list_filter = ['test_set', 'testline_type']
     search_fields = ['name', 'test_set']
 
