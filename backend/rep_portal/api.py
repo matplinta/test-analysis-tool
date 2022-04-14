@@ -5,6 +5,7 @@
 :contact: mateusz.plinta@.com
 :description:
 """
+from numpy import isin
 from rep_api import RepApi
 from urllib.parse import quote
 import json
@@ -40,6 +41,7 @@ class RepPortal():
             'test_line', 
             'result', 
             'env_issue_type', 
+            'comment', 
             'builds',
             'fail_message', 
             'start',
@@ -54,7 +56,9 @@ class RepPortal():
             "testline_type": "test_col__testline_type__pos_neg",
             "test_lab_path": "qc_test_instance__m_path__pos_neg_empty_str",
             "fail_message": "fail_message__pos_neg",
-            "result": "result__name__pos_neg"
+            "result": "result__name__pos_neg",
+            "env_issue_type": "envIssueType",
+            "comment": "comment"
         }
 
 
@@ -77,6 +81,8 @@ class RepPortal():
         filters_list = []
         for key, value in filters.items():
             try:
+                if isinstance(value, list):
+                    value = ",".join(value)
                 value_url_parsed = quote(value)
                 filter_str = f"{self.filter_dict[key]}={value_url_parsed}"
                 filters_list.append(filter_str)
