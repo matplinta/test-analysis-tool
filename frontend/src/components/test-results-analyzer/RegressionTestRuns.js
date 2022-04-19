@@ -3,24 +3,52 @@ import { useState, useEffect } from 'react';
 import { Card } from 'primereact/card';
 import { ScrollPanel } from 'primereact/scrollpanel';
 import { Checkbox } from 'primereact/checkbox';
+import { MultiStateCheckbox } from 'primereact/multistatecheckbox';
+import { Tree } from 'primereact/tree';
 
 import { getTestFilters } from '../../services/test-results-analyzer/test-filters.service';
 
 import './RegressionTestRuns.css'
+import { Button } from 'primereact/button';
 
 let RegressionTestRuns = () => {
 
     const [testFilters, setTestFilters] = useState([]);
     const [selectedTestFilters, setSelectedTestFilters] = useState([]);
 
+    const [nodes, setNodes] = useState([]);
+    const [expandedKeys, setExpandedKeys] = useState({});
+
+    const [selectedKeys3, setSelectedKeys3] = useState(null);
+
     let fetchTestFilters = () => {
         getTestFilters().then(
             (response) => {
-                const testFiltersParsed = response.data.results.map(item => {
-                    return { name: item.name, key: item.id }
-                });
-                setTestFilters(testFiltersParsed);
-                setSelectedTestFilters(testFiltersParsed);
+                if (nodes.length === 0) {
+                    let filters = {
+                        key: 'regression_filters',
+                        label: 'Regression filters',
+                        data: 'Regression Filters',
+                        children: []
+                    }
+
+                    const filterChildren = response.data.results.map((item, index) => {
+                        return { key: item.name + index, label: item.name, data: item.name, children: [] }
+                    })
+                    filters.children = filterChildren;
+
+                    let nodesTmp = [...nodes];
+                    nodesTmp.push(filters);
+                    setNodes(nodesTmp)
+
+                    const testFiltersParsed = response.data.results.map((item) => {
+                        return { name: item.name, key: item.id }
+                    });
+
+                    setTestFilters(testFiltersParsed);
+                    setSelectedTestFilters(testFiltersParsed);
+                }
+
             },
             (error) => {
                 console.log(error);
@@ -47,19 +75,28 @@ let RegressionTestRuns = () => {
         setSelectedTestFilters(_selectedFilters);
     }
 
+    const searchTestRuns = () => {
+        console.log(selectedKeys3)
+    }
+
     const testFiltersCheckboxList = (
-        testFilters.map((filter) => {
-            return (
-
-                <div key={filter.key} className="p-field-checkbox">
-                    <Checkbox inputId={filter.key} name="regression-filter" value={filter} onChange={onTestFilterChange} checked={selectedTestFilters.some((item) => item.key === filter.key)} />
-                    <label htmlFor={filter.key}>{filter.name}</label>
-                </div>
-
-            )
-        })
+        <div>
+            <Tree value={nodes} expandedKeys={expandedKeys} selectionMode="checkbox" selectionKeys={selectedKeys3} onSelectionChange={e => setSelectedKeys3(e.value)} />
+            <br />
+            <Button onClick={searchTestRuns}>Search</Button>
+        </div>
     )
 
+    const onTestFilterAllChange = (e) => {
+
+    }
+
+    // const testFiltersAllCheckbox = (
+    // <div className="p-field-checkbox p-m-0">
+    //     <MultiStateCheckbox value={value} options={options} optionValue="value" onChange={(e) => setValue(e.value)} />
+    //     <label>{value}</label>
+    // </div>
+    // )
 
     useEffect(() => {
         fetchTestFilters();
@@ -69,12 +106,13 @@ let RegressionTestRuns = () => {
 
         <div className="wrapper">
             <aside>
-                <ScrollPanel style={{ width: '100%', height: '70vh' }} className="custombar1">
+                {/* <ScrollPanel style={{ width: '100%', height: '70vh' }} className="custombar1">
                     <p><strong>Filters</strong></p>
-                    <div>
-                        {testFiltersCheckboxList}
-                    </div>
-                </ScrollPanel>
+                    <div> */}
+                {/* {testFiltersAllCheckbox} */}
+                {testFiltersCheckboxList}
+                {/* </div> */}
+                {/* </ScrollPanel> */}
 
 
             </aside>

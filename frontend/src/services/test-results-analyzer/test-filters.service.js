@@ -3,15 +3,15 @@ import API_URL from '../../server-settings';
 import authHeader from "../auth-header";
 
 export const getTestFilters = async () => {
-    return (await axios.get(API_URL + 'api/tests_filters/', { headers: authHeader() }));
+    return (await axios.get(API_URL + 'api/regression_filters/', { headers: authHeader() }));
 }
 
 export const postTestFilter = async (testFilter) => {
-    return (await axios.post(API_URL + 'api/tests_filters/', testFilter, { headers: authHeader() }));
+    return (await axios.post(API_URL + 'api/regression_filters/', testFilter, { headers: authHeader() }));
 }
 
 export const deleteTestFilter = async (id) => {
-    return (await axios.delete(API_URL + 'api/tests_filters/' + id, { headers: authHeader() }));
+    return (await axios.delete(API_URL + 'api/regression_filters/' + id, { headers: authHeader() }));
 }
 
 export const getTestSets = async () => {

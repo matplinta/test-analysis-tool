@@ -1,6 +1,6 @@
 .wrapper {
     display: grid;
-    grid-template-columns: 230px minmax(10px, 1fr);
+    grid-template-columns: 260px minmax(10px, 1fr);
     grid-gap: 1rem;
     align-items: start;
     margin: 10px;
@@ -56,4 +56,21 @@ aside {
     transition-duration: 0.2s;
     color: #ffffff;
     font-size: 9px;
+}
+
+.p-treenode-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content {
+    padding: 0;
+}
+
+.p-tree {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+    margin-right: 0;
 }

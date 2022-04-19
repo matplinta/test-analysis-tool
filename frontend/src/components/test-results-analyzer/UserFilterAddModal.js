@@ -31,11 +31,13 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
     let fetchTestSets = () => {
         getTestSets().then(
             (response) => {
-                setTestSets(response.data.results);
-                setTestSetsOptions((response.data.results.map(item => {
-                    return { label: item.branch + " " + item.name, value: item.id }
-                })))
-                console.log(response.data.results);
+                if (response.data.results.length > 0) {
+                    setTestSets(response.data.results);
+                    const testSetsOptionsValue = response.data.results.map(item => {
+                        return { label: item.branch + " " + item.name, value: item.id }
+                    })
+                    setTestSetsOptions(testSetsOptionsValue);
+                }
             },
             (error) => {
                 console.log(error);
@@ -45,9 +47,15 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
     let fetchTestLines = () => {
         getTestLineTypes().then(
             (response) => {
-                setTestLinesTypes(response.data.results.map(item => {
-                    return { label: item.name, value: item.name }
-                }))
+                console.log(response.data)
+                if (response.data.length > 0) {
+                    const testLinesTypesValue = response.data.map(item => {
+                        return { label: item.name, value: item.name }
+                    })
+                    console.log("tutaj")
+                    console.log(testLinesTypesValue)
+                    setTestLinesTypes(testLinesTypesValue);
+                }
             },
             (error) => {
                 console.log(error)
@@ -79,7 +87,8 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
                 "name": "",
                 "test_lab_path": ""
             },
-            "testline_type": null
+            "testline_type": null,
+            "fail_message_type_groups": []
         }
         let testSetToAdd = testSets.find(item => item.id == testSetId);
         filterToAdd.name = filterName;
