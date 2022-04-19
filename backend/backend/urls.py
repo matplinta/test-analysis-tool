@@ -30,7 +30,6 @@ urlpatterns = [
     path('stats/', include('stats.urls'), name="stats"),
 
 
-    path('load/', views.LoadTestRunsToDBView.as_view(), name='load'),
     path('hello/', views.HelloView.as_view(), name='hello'),
     path('check/', views.CheckView.as_view(), name='check'),
     path('test/', views.TestAuthView.as_view(), name='test'),

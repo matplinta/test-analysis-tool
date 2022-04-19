@@ -76,11 +76,12 @@ class FeatureBuild(models.Model):
 
 
 class FailMessageType(models.Model):
-    id          = models.BigAutoField(primary_key=True)
-    author      = models.ForeignKey(User, on_delete=models.CASCADE)
-    name        = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
-    regex       = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
-    description = models.TextField(max_length=500, blank=True, null=False, help_text="Description", unique=True)
+    id              = models.BigAutoField(primary_key=True)
+    author          = models.ForeignKey(User, on_delete=models.CASCADE)
+    name            = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
+    regex           = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
+    description     = models.TextField(max_length=500, blank=True, null=False, help_text="Description")
+    env_issue_type  = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Environment issue type to set during analysis")
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["regex", "author"], name='regex_author_uniq')]
@@ -97,8 +98,6 @@ class FailMessageTypeGroup(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "author"], name='fmtg_name_author_uniq')]
-        # unique_together = ('name', 'author',)
-
 
     def __str__(self):
         return self.name
@@ -137,6 +136,7 @@ class TestInstance(models.Model):
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
+        ordering = ['-id']
 
     def __str__(self):
         return f"{self.test_case_name[:40]}... on {self.test_set.branch}"
@@ -175,6 +175,8 @@ class TestRun(models.Model):
 class RegressionFilter(models.Model):
     id                       = models.BigAutoField(primary_key=True)
     name                     = models.CharField(max_length=50, blank=False, null=True, help_text="Name of test filter")
+    limit                    = models.IntegerField(blank=False, default=50, 
+                                                   help_text="Number of test runs pulled from Reporting Portal during every refresh")
     test_set                 = models.ForeignKey(TestSet, on_delete=models.CASCADE, blank=False, help_text="Test set")
     testline_type            = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline type")
     owners                   = models.ManyToManyField(User, related_name="owned_reg_filters", blank=True)

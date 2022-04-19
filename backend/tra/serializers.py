@@ -162,7 +162,7 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RegressionFilter
-        fields = ('id', 'name', 'test_set', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
+        fields = ('id', 'name', 'limit', 'test_set', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
         read_only_fields = ('owners', 'subscribers',)
         extra_kwargs = {
             'fail_message_type_groups': {'validators': []},

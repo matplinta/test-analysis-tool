@@ -22,9 +22,9 @@ class FeatureBuildAdmin(admin.ModelAdmin):
 
 
 class FailMessageTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'regex', 'author']
-    list_filter = ['name', 'author']
-    search_fields = ['name', 'regex', 'author']
+    list_display = ['id', 'name', 'regex', 'author', 'env_issue_type']
+    list_filter = ['name', 'author', 'env_issue_type']
+    search_fields = ['name', 'regex', 'author', 'env_issue_type']
 
 
 class FailMessageTypeInline(admin.TabularInline):
@@ -35,9 +35,9 @@ class FailMessageTypeInline(admin.TabularInline):
 
 
 class FailMessageTypeGroupAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id', 'author']
+    list_display = ['name', 'id', 'author',]
     list_filter = ['name', 'author']
-    search_fields = ['name',]
+    search_fields = ['name']
     inlines = [FailMessageTypeInline]
 
 
@@ -78,13 +78,14 @@ class TestSetAdmin(admin.ModelAdmin):
 
 
 class TestInstanceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'test_set', 'test_case_name', 'execution_suspended']
-    list_filter = ['execution_suspended']
+    list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
+    list_filter = ['execution_suspended', 'test_set']
     search_fields = ['test_set', 'test_case_name']
 
 
 class TestRunAdmin(admin.ModelAdmin):
     list_display = [
+        'id', 
         'rp_id', 
         'fb', 
         'test_instance', 
@@ -105,12 +106,12 @@ class TestRunAdmin(admin.ModelAdmin):
         'start_time', 
         'end_time'
     ]
-    list_filter = ['result', 'test_instance', 'testline_type', 'test_suite', 'fb']
+    list_filter = ['result', 'fb', 'testline_type', 'test_suite', 'test_instance']
     search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
 
 
 class RegressionFilterAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'test_set', 'testline_type']
+    list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
     list_filter = ['test_set', 'testline_type']
     search_fields = ['name', 'test_set']
 
