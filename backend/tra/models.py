@@ -76,11 +76,12 @@ class FeatureBuild(models.Model):
 
 
 class FailMessageType(models.Model):
-    id          = models.BigAutoField(primary_key=True)
-    author      = models.ForeignKey(User, on_delete=models.CASCADE)
-    name        = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
-    regex       = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
-    description = models.TextField(max_length=500, blank=True, null=False, help_text="Description")
+    id              = models.BigAutoField(primary_key=True)
+    author          = models.ForeignKey(User, on_delete=models.CASCADE)
+    name            = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
+    regex           = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
+    description     = models.TextField(max_length=500, blank=True, null=False, help_text="Description")
+    env_issue_type  = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Environment issue type to set during analysis")
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["regex", "author"], name='regex_author_uniq')]
@@ -135,6 +136,7 @@ class TestInstance(models.Model):
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
+        ordering = ['-id']
 
     def __str__(self):
         return f"{self.test_case_name[:40]}... on {self.test_set.branch}"
