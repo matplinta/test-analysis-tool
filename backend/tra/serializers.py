@@ -1,3 +1,4 @@
+from unittest import TestResult
 from .models import (
     FailMessageTypeGroup,
     Organization, 
@@ -56,9 +57,27 @@ class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
     #     return fail_message_type_group_instance
 
 
+class FeatureBuildSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FeatureBuild
+        fields = ('name',)
+
+
+class TestRunResultSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestRunResult
+        fields = ('name',)
+
+
 class TestlineTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestlineType
+        fields = ('name',)
+
+
+class EnvIssueTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EnvIssueType
         fields = ('name',)
 
 

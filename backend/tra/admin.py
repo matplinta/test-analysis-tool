@@ -106,7 +106,7 @@ class TestRunAdmin(admin.ModelAdmin):
         'start_time', 
         'end_time'
     ]
-    list_filter = ['result', 'fb', 'testline_type', 'test_suite', 'test_instance']
+    list_filter = ['result', 'fb', 'testline_type', 'analyzed_by', 'test_suite', 'test_instance']
     search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
 
 
