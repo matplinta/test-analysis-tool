@@ -1,0 +1,3340 @@
+[
+    {
+        "model": "admin.logentry",
+        "pk": 1,
+        "fields": {
+            "action_time": "2022-04-11T13:51:32.845Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "1",
+            "object_repr": "regr filter 1",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 2,
+        "fields": {
+            "action_time": "2022-04-11T13:53:26.027Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "2",
+            "object_repr": "regr filter 1",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Subscribers\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 3,
+        "fields": {
+            "action_time": "2022-04-11T14:26:29.173Z",
+            "user": 1,
+            "content_type": 11,
+            "object_id": "2",
+            "object_repr": "scccc",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 4,
+        "fields": {
+            "action_time": "2022-04-11T15:38:27.867Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "9",
+            "object_repr": "awd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 5,
+        "fields": {
+            "action_time": "2022-04-11T15:40:03.859Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "10",
+            "object_repr": "awd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 6,
+        "fields": {
+            "action_time": "2022-04-11T15:53:37.294Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "12",
+            "object_repr": "awd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 7,
+        "fields": {
+            "action_time": "2022-04-11T15:53:37.301Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "11",
+            "object_repr": "awd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 8,
+        "fields": {
+            "action_time": "2022-04-12T09:07:58.507Z",
+            "user": 1,
+            "content_type": 16,
+            "object_id": "CLOUD_5G_I_E_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "object_repr": "CLOUD_5G_I_E_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 9,
+        "fields": {
+            "action_time": "2022-04-12T09:10:03.123Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "3",
+            "object_repr": "reg filtr 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 10,
+        "fields": {
+            "action_time": "2022-04-12T09:13:37.072Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "4",
+            "object_repr": "reg filtr 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 11,
+        "fields": {
+            "action_time": "2022-04-12T09:22:06.242Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "5",
+            "object_repr": "reg filtr 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 12,
+        "fields": {
+            "action_time": "2022-04-12T09:24:55.145Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "6",
+            "object_repr": "reg filtr 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 13,
+        "fields": {
+            "action_time": "2022-04-12T09:25:32.152Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "7",
+            "object_repr": "reg filtr 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 14,
+        "fields": {
+            "action_time": "2022-04-12T15:19:26.142Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "9",
+            "object_repr": "awd",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 15,
+        "fields": {
+            "action_time": "2022-04-12T15:20:57.649Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "9",
+            "object_repr": "awd",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Subscribers\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 16,
+        "fields": {
+            "action_time": "2022-04-12T15:21:08.544Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "9",
+            "object_repr": "awd",
+            "action_flag": 2,
+            "change_message": "[]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 17,
+        "fields": {
+            "action_time": "2022-04-13T11:13:33.160Z",
+            "user": 1,
+            "content_type": 18,
+            "object_id": "4",
+            "object_repr": "5GC002175-QB... on 22R2",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 18,
+        "fields": {
+            "action_time": "2022-04-13T11:14:22.413Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "10",
+            "object_repr": "2175",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 19,
+        "fields": {
+            "action_time": "2022-04-14T14:59:12.763Z",
+            "user": 1,
+            "content_type": 21,
+            "object_id": "10",
+            "object_repr": "limit",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 20,
+        "fields": {
+            "action_time": "2022-04-14T14:59:47.330Z",
+            "user": 1,
+            "content_type": 21,
+            "object_id": "11",
+            "object_repr": "comment",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 21,
+        "fields": {
+            "action_time": "2022-04-14T14:59:53.875Z",
+            "user": 1,
+            "content_type": 21,
+            "object_id": "12",
+            "object_repr": "env_issue_type",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 22,
+        "fields": {
+            "action_time": "2022-04-14T15:03:50.485Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "10",
+            "object_repr": "2175-QB 22R2 LO_LO",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Name\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 23,
+        "fields": {
+            "action_time": "2022-04-14T15:04:00.002Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "10",
+            "object_repr": "2175-QB 22R2 LO_LO",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Fail message type groups\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 24,
+        "fields": {
+            "action_time": "2022-04-14T15:04:20.421Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "9",
+            "object_repr": "1085-B Trunk LO_LO",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Name\", \"Fail message type groups\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 25,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.464Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "10",
+            "object_repr": "aoij9042u5423089",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 26,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.471Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "9",
+            "object_repr": "awdawdwadawdawdawd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 27,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.477Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "8",
+            "object_repr": "awdawdaolko",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 28,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.482Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "7",
+            "object_repr": "ciekawe",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 29,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.486Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "6",
+            "object_repr": "oba",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 30,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.491Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "5",
+            "object_repr": "awdawdwad",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 31,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.499Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "4",
+            "object_repr": "xxxx",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 32,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.504Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "3",
+            "object_repr": "awd",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 33,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.510Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "2",
+            "object_repr": "fmtg 2",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 34,
+        "fields": {
+            "action_time": "2022-04-14T15:05:22.515Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "1",
+            "object_repr": "fail msg type group 1",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 35,
+        "fields": {
+            "action_time": "2022-04-14T15:05:31.176Z",
+            "user": 1,
+            "content_type": 11,
+            "object_id": "2",
+            "object_repr": "scccc",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 36,
+        "fields": {
+            "action_time": "2022-04-14T15:05:31.182Z",
+            "user": 1,
+            "content_type": 11,
+            "object_id": "1",
+            "object_repr": ".* awd \\\\d lol",
+            "action_flag": 3,
+            "change_message": ""
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 37,
+        "fields": {
+            "action_time": "2022-04-14T15:15:43.120Z",
+            "user": 1,
+            "content_type": 12,
+            "object_id": "11",
+            "object_repr": "Default regexes",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 38,
+        "fields": {
+            "action_time": "2022-04-15T08:09:17.104Z",
+            "user": 1,
+            "content_type": 10,
+            "object_id": "Other",
+            "object_repr": "Other",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 39,
+        "fields": {
+            "action_time": "2022-04-21T15:04:19.973Z",
+            "user": 1,
+            "content_type": 18,
+            "object_id": "1",
+            "object_repr": "5GC001085-B_Intra-frequency_inter-gNB_ne... on Trunk",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 40,
+        "fields": {
+            "action_time": "2022-04-21T15:04:37.917Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "1",
+            "object_repr": "1085-B Trunk LO_LO",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 41,
+        "fields": {
+            "action_time": "2022-04-21T15:04:55.141Z",
+            "user": 1,
+            "content_type": 18,
+            "object_id": "2",
+            "object_repr": "5GC002175-QB... on 22R2",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 42,
+        "fields": {
+            "action_time": "2022-04-21T15:05:52.115Z",
+            "user": 1,
+            "content_type": 20,
+            "object_id": "2",
+            "object_repr": "2175 QB",
+            "action_flag": 1,
+            "change_message": "[{\"added\": {}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 43,
+        "fields": {
+            "action_time": "2022-04-21T15:53:33.504Z",
+            "user": 1,
+            "content_type": 19,
+            "object_id": "1",
+            "object_repr": "5GC001085_B_003_Empty_gnbIdLengthConfig_ from Trunk",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Env issue type\", \"Fail message\", \"Analyzed by\"]}}]"
+        }
+    },
+    {
+        "model": "admin.logentry",
+        "pk": 44,
+        "fields": {
+            "action_time": "2022-04-21T15:56:38.406Z",
+            "user": 1,
+            "content_type": 19,
+            "object_id": "2",
+            "object_repr": "5GC001085_B_003_Empty_gnbIdLengthConfig_ from Trunk",
+            "action_flag": 2,
+            "change_message": "[{\"changed\": {\"fields\": [\"Result\", \"Env issue type\", \"Fail message\", \"Analyzed\", \"Analyzed by\"]}}]"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 1,
+        "fields": {
+            "name": "Can add log entry",
+            "content_type": 1,
+            "codename": "add_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 2,
+        "fields": {
+            "name": "Can change log entry",
+            "content_type": 1,
+            "codename": "change_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 3,
+        "fields": {
+            "name": "Can delete log entry",
+            "content_type": 1,
+            "codename": "delete_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 4,
+        "fields": {
+            "name": "Can view log entry",
+            "content_type": 1,
+            "codename": "view_logentry"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 5,
+        "fields": {
+            "name": "Can add permission",
+            "content_type": 2,
+            "codename": "add_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 6,
+        "fields": {
+            "name": "Can change permission",
+            "content_type": 2,
+            "codename": "change_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 7,
+        "fields": {
+            "name": "Can delete permission",
+            "content_type": 2,
+            "codename": "delete_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 8,
+        "fields": {
+            "name": "Can view permission",
+            "content_type": 2,
+            "codename": "view_permission"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 9,
+        "fields": {
+            "name": "Can add group",
+            "content_type": 3,
+            "codename": "add_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 10,
+        "fields": {
+            "name": "Can change group",
+            "content_type": 3,
+            "codename": "change_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 11,
+        "fields": {
+            "name": "Can delete group",
+            "content_type": 3,
+            "codename": "delete_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 12,
+        "fields": {
+            "name": "Can view group",
+            "content_type": 3,
+            "codename": "view_group"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 13,
+        "fields": {
+            "name": "Can add user",
+            "content_type": 4,
+            "codename": "add_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 14,
+        "fields": {
+            "name": "Can change user",
+            "content_type": 4,
+            "codename": "change_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 15,
+        "fields": {
+            "name": "Can delete user",
+            "content_type": 4,
+            "codename": "delete_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 16,
+        "fields": {
+            "name": "Can view user",
+            "content_type": 4,
+            "codename": "view_user"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 17,
+        "fields": {
+            "name": "Can add content type",
+            "content_type": 5,
+            "codename": "add_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 18,
+        "fields": {
+            "name": "Can change content type",
+            "content_type": 5,
+            "codename": "change_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 19,
+        "fields": {
+            "name": "Can delete content type",
+            "content_type": 5,
+            "codename": "delete_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 20,
+        "fields": {
+            "name": "Can view content type",
+            "content_type": 5,
+            "codename": "view_contenttype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 21,
+        "fields": {
+            "name": "Can add session",
+            "content_type": 6,
+            "codename": "add_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 22,
+        "fields": {
+            "name": "Can change session",
+            "content_type": 6,
+            "codename": "change_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 23,
+        "fields": {
+            "name": "Can delete session",
+            "content_type": 6,
+            "codename": "delete_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 24,
+        "fields": {
+            "name": "Can view session",
+            "content_type": 6,
+            "codename": "view_session"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 25,
+        "fields": {
+            "name": "Can add Token",
+            "content_type": 7,
+            "codename": "add_token"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 26,
+        "fields": {
+            "name": "Can change Token",
+            "content_type": 7,
+            "codename": "change_token"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 27,
+        "fields": {
+            "name": "Can delete Token",
+            "content_type": 7,
+            "codename": "delete_token"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 28,
+        "fields": {
+            "name": "Can view Token",
+            "content_type": 7,
+            "codename": "view_token"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 29,
+        "fields": {
+            "name": "Can add token",
+            "content_type": 8,
+            "codename": "add_tokenproxy"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 30,
+        "fields": {
+            "name": "Can change token",
+            "content_type": 8,
+            "codename": "change_tokenproxy"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 31,
+        "fields": {
+            "name": "Can delete token",
+            "content_type": 8,
+            "codename": "delete_tokenproxy"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 32,
+        "fields": {
+            "name": "Can view token",
+            "content_type": 8,
+            "codename": "view_tokenproxy"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 33,
+        "fields": {
+            "name": "Can add branch",
+            "content_type": 9,
+            "codename": "add_branch"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 34,
+        "fields": {
+            "name": "Can change branch",
+            "content_type": 9,
+            "codename": "change_branch"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 35,
+        "fields": {
+            "name": "Can delete branch",
+            "content_type": 9,
+            "codename": "delete_branch"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 36,
+        "fields": {
+            "name": "Can view branch",
+            "content_type": 9,
+            "codename": "view_branch"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 37,
+        "fields": {
+            "name": "Can add env issue type",
+            "content_type": 10,
+            "codename": "add_envissuetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 38,
+        "fields": {
+            "name": "Can change env issue type",
+            "content_type": 10,
+            "codename": "change_envissuetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 39,
+        "fields": {
+            "name": "Can delete env issue type",
+            "content_type": 10,
+            "codename": "delete_envissuetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 40,
+        "fields": {
+            "name": "Can view env issue type",
+            "content_type": 10,
+            "codename": "view_envissuetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 41,
+        "fields": {
+            "name": "Can add fail message type",
+            "content_type": 11,
+            "codename": "add_failmessagetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 42,
+        "fields": {
+            "name": "Can change fail message type",
+            "content_type": 11,
+            "codename": "change_failmessagetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 43,
+        "fields": {
+            "name": "Can delete fail message type",
+            "content_type": 11,
+            "codename": "delete_failmessagetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 44,
+        "fields": {
+            "name": "Can view fail message type",
+            "content_type": 11,
+            "codename": "view_failmessagetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 45,
+        "fields": {
+            "name": "Can add fail message type group",
+            "content_type": 12,
+            "codename": "add_failmessagetypegroup"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 46,
+        "fields": {
+            "name": "Can change fail message type group",
+            "content_type": 12,
+            "codename": "change_failmessagetypegroup"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 47,
+        "fields": {
+            "name": "Can delete fail message type group",
+            "content_type": 12,
+            "codename": "delete_failmessagetypegroup"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 48,
+        "fields": {
+            "name": "Can view fail message type group",
+            "content_type": 12,
+            "codename": "view_failmessagetypegroup"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 49,
+        "fields": {
+            "name": "Can add feature build",
+            "content_type": 13,
+            "codename": "add_featurebuild"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 50,
+        "fields": {
+            "name": "Can change feature build",
+            "content_type": 13,
+            "codename": "change_featurebuild"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 51,
+        "fields": {
+            "name": "Can delete feature build",
+            "content_type": 13,
+            "codename": "delete_featurebuild"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 52,
+        "fields": {
+            "name": "Can view feature build",
+            "content_type": 13,
+            "codename": "view_featurebuild"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 53,
+        "fields": {
+            "name": "Can add organization",
+            "content_type": 14,
+            "codename": "add_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 54,
+        "fields": {
+            "name": "Can change organization",
+            "content_type": 14,
+            "codename": "change_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 55,
+        "fields": {
+            "name": "Can delete organization",
+            "content_type": 14,
+            "codename": "delete_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 56,
+        "fields": {
+            "name": "Can view organization",
+            "content_type": 14,
+            "codename": "view_organization"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 57,
+        "fields": {
+            "name": "Can add test instance",
+            "content_type": 15,
+            "codename": "add_testinstance"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 58,
+        "fields": {
+            "name": "Can change test instance",
+            "content_type": 15,
+            "codename": "change_testinstance"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 59,
+        "fields": {
+            "name": "Can delete test instance",
+            "content_type": 15,
+            "codename": "delete_testinstance"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 60,
+        "fields": {
+            "name": "Can view test instance",
+            "content_type": 15,
+            "codename": "view_testinstance"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 61,
+        "fields": {
+            "name": "Can add testline type",
+            "content_type": 16,
+            "codename": "add_testlinetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 62,
+        "fields": {
+            "name": "Can change testline type",
+            "content_type": 16,
+            "codename": "change_testlinetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 63,
+        "fields": {
+            "name": "Can delete testline type",
+            "content_type": 16,
+            "codename": "delete_testlinetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 64,
+        "fields": {
+            "name": "Can view testline type",
+            "content_type": 16,
+            "codename": "view_testlinetype"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 65,
+        "fields": {
+            "name": "Can add test run result",
+            "content_type": 17,
+            "codename": "add_testrunresult"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 66,
+        "fields": {
+            "name": "Can change test run result",
+            "content_type": 17,
+            "codename": "change_testrunresult"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 67,
+        "fields": {
+            "name": "Can delete test run result",
+            "content_type": 17,
+            "codename": "delete_testrunresult"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 68,
+        "fields": {
+            "name": "Can view test run result",
+            "content_type": 17,
+            "codename": "view_testrunresult"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 69,
+        "fields": {
+            "name": "Can add test set",
+            "content_type": 18,
+            "codename": "add_testset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 70,
+        "fields": {
+            "name": "Can change test set",
+            "content_type": 18,
+            "codename": "change_testset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 71,
+        "fields": {
+            "name": "Can delete test set",
+            "content_type": 18,
+            "codename": "delete_testset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 72,
+        "fields": {
+            "name": "Can view test set",
+            "content_type": 18,
+            "codename": "view_testset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 73,
+        "fields": {
+            "name": "Can add test run",
+            "content_type": 19,
+            "codename": "add_testrun"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 74,
+        "fields": {
+            "name": "Can change test run",
+            "content_type": 19,
+            "codename": "change_testrun"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 75,
+        "fields": {
+            "name": "Can delete test run",
+            "content_type": 19,
+            "codename": "delete_testrun"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 76,
+        "fields": {
+            "name": "Can view test run",
+            "content_type": 19,
+            "codename": "view_testrun"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 77,
+        "fields": {
+            "name": "Can add regression filter",
+            "content_type": 20,
+            "codename": "add_regressionfilter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 78,
+        "fields": {
+            "name": "Can change regression filter",
+            "content_type": 20,
+            "codename": "change_regressionfilter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 79,
+        "fields": {
+            "name": "Can delete regression filter",
+            "content_type": 20,
+            "codename": "delete_regressionfilter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 80,
+        "fields": {
+            "name": "Can view regression filter",
+            "content_type": 20,
+            "codename": "view_regressionfilter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 81,
+        "fields": {
+            "name": "Can add filter field",
+            "content_type": 21,
+            "codename": "add_filterfield"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 82,
+        "fields": {
+            "name": "Can change filter field",
+            "content_type": 21,
+            "codename": "change_filterfield"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 83,
+        "fields": {
+            "name": "Can delete filter field",
+            "content_type": 21,
+            "codename": "delete_filterfield"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 84,
+        "fields": {
+            "name": "Can view filter field",
+            "content_type": 21,
+            "codename": "view_filterfield"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 85,
+        "fields": {
+            "name": "Can add filter set",
+            "content_type": 22,
+            "codename": "add_filterset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 86,
+        "fields": {
+            "name": "Can change filter set",
+            "content_type": 22,
+            "codename": "change_filterset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 87,
+        "fields": {
+            "name": "Can delete filter set",
+            "content_type": 22,
+            "codename": "delete_filterset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 88,
+        "fields": {
+            "name": "Can view filter set",
+            "content_type": 22,
+            "codename": "view_filterset"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 89,
+        "fields": {
+            "name": "Can add filter",
+            "content_type": 23,
+            "codename": "add_filter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 90,
+        "fields": {
+            "name": "Can change filter",
+            "content_type": 23,
+            "codename": "change_filter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 91,
+        "fields": {
+            "name": "Can delete filter",
+            "content_type": 23,
+            "codename": "delete_filter"
+        }
+    },
+    {
+        "model": "auth.permission",
+        "pk": 92,
+        "fields": {
+            "name": "Can view filter",
+            "content_type": 23,
+            "codename": "view_filter"
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$320000$JjFBYIQudPaJ1y9qVbsh5p$cEOW7xeLCEbIV4lFIfE3lqu67fV+C1jrhY0E7lVQ+/c=",
+            "last_login": "2022-04-21T15:00:58.680Z",
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2022-04-11T13:25:19.436Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "!Ttz71DunwLrmCPrS5Vvcg5y4SiYzoQ9mCDPw2Jqn",
+            "last_login": "2022-04-11T13:49:07.574Z",
+            "is_superuser": false,
+            "username": "plinta",
+            "first_name": "",
+            "last_name": "",
+            "email": "mateusz.plinta@.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-04-11T13:49:07.557Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 1,
+        "fields": {
+            "app_label": "admin",
+            "model": "logentry"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 2,
+        "fields": {
+            "app_label": "auth",
+            "model": "permission"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 3,
+        "fields": {
+            "app_label": "auth",
+            "model": "group"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 4,
+        "fields": {
+            "app_label": "auth",
+            "model": "user"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 5,
+        "fields": {
+            "app_label": "contenttypes",
+            "model": "contenttype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 6,
+        "fields": {
+            "app_label": "sessions",
+            "model": "session"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 7,
+        "fields": {
+            "app_label": "authtoken",
+            "model": "token"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 8,
+        "fields": {
+            "app_label": "authtoken",
+            "model": "tokenproxy"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 9,
+        "fields": {
+            "app_label": "tra",
+            "model": "branch"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 10,
+        "fields": {
+            "app_label": "tra",
+            "model": "envissuetype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 11,
+        "fields": {
+            "app_label": "tra",
+            "model": "failmessagetype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 12,
+        "fields": {
+            "app_label": "tra",
+            "model": "failmessagetypegroup"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 13,
+        "fields": {
+            "app_label": "tra",
+            "model": "featurebuild"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 14,
+        "fields": {
+            "app_label": "tra",
+            "model": "organization"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 15,
+        "fields": {
+            "app_label": "tra",
+            "model": "testinstance"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 16,
+        "fields": {
+            "app_label": "tra",
+            "model": "testlinetype"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 17,
+        "fields": {
+            "app_label": "tra",
+            "model": "testrunresult"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 18,
+        "fields": {
+            "app_label": "tra",
+            "model": "testset"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 19,
+        "fields": {
+            "app_label": "tra",
+            "model": "testrun"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 20,
+        "fields": {
+            "app_label": "tra",
+            "model": "regressionfilter"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 21,
+        "fields": {
+            "app_label": "stats",
+            "model": "filterfield"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 22,
+        "fields": {
+            "app_label": "stats",
+            "model": "filterset"
+        }
+    },
+    {
+        "model": "contenttypes.contenttype",
+        "pk": 23,
+        "fields": {
+            "app_label": "stats",
+            "model": "filter"
+        }
+    },
+    {
+        "model": "sessions.session",
+        "pk": "3qelluswbp7wqtgwrnb1pi7byi5fpqtd",
+        "fields": {
+            "session_data": ".eJxVjDsOwjAQBe_iGlnrD9mEkj5niOzdNQ4gW4qTCnF3iJQC2jcz76WmsK152pos08zqoow6_W4x0EPKDvgeyq1qqmVd5qh3RR-06bGyPK-H-3eQQ8vf2iFGhMH2iRhSB5YQmM_GhBiTA07BJmcd4CBCQr0XB50n8QadRGPV-wPoHzgb:1neJ0s:ldR00CPxio_9xFwuuI5NQ5v8zcF-XPS92-zdvleeqZM",
+            "expire_date": "2022-04-26T16:05:06.024Z"
+        }
+    },
+    {
+        "model": "sessions.session",
+        "pk": "b94qifoulq60v6v2swzjw6dlyu6e1gzb",
+        "fields": {
+            "session_data": ".eJxVjDsOwjAQBe_iGlnrD9mEkj5niOzdNQ4gW4qTCnF3iJQC2jcz76WmsK152pos08zqoow6_W4x0EPKDvgeyq1qqmVd5qh3RR-06bGyPK-H-3eQQ8vf2iFGhMH2iRhSB5YQmM_GhBiTA07BJmcd4CBCQr0XB50n8QadRGPV-wPoHzgb:1nduPt:UQZc5llk3ryGGPcnsBaK5te1aVpOAybsUSnTAxBBpa4",
+            "expire_date": "2022-04-25T13:49:17.121Z"
+        }
+    },
+    {
+        "model": "sessions.session",
+        "pk": "oz61fgjgmu61uy8daj1xy1uaxz7n8a7f",
+        "fields": {
+            "session_data": ".eJxVjDsOwjAQBe_iGlnrD9mEkj5niOzdNQ4gW4qTCnF3iJQC2jcz76WmsK152pos08zqoow6_W4x0EPKDvgeyq1qqmVd5qh3RR-06bGyPK-H-3eQQ8vf2iFGhMH2iRhSB5YQmM_GhBiTA07BJmcd4CBCQr0XB50n8QadRGPV-wPoHzgb:1neIzO:-5JdDJ0dkCef-LQ-MurxRc4Zx6Z86ZvI1IgOEhXa_70",
+            "expire_date": "2022-04-26T16:03:34.964Z"
+        }
+    },
+    {
+        "model": "sessions.session",
+        "pk": "tzc0o1d9ftgz33pr94u7svqwynxm706r",
+        "fields": {
+            "session_data": ".eJxVjDsOwjAQBe_iGlnrD9mEkj5niOzdNQ4gW4qTCnF3iJQC2jcz76WmsK152pos08zqoow6_W4x0EPKDvgeyq1qqmVd5qh3RR-06bGyPK-H-3eQQ8vf2iFGhMH2iRhSB5YQmM_GhBiTA07BJmcd4CBCQr0XB50n8QadRGPV-wPoHzgb:1nhYIk:XnZbGYljBV_QAuJw5GmVMoP_ccgQx4gZZQQUPSKwYJU",
+            "expire_date": "2022-05-05T15:00:58.683Z"
+        }
+    },
+    {
+        "model": "authtoken.token",
+        "pk": "450b728dfc4dcd3d03b6f01829651eb6cc9f25c6",
+        "fields": {
+            "user": 1,
+            "created": "2022-04-12T16:03:34.944Z"
+        }
+    },
+    {
+        "model": "authtoken.token",
+        "pk": "8a2515efa829f99a77246fac4441265e4516e7d2",
+        "fields": {
+            "user": 2,
+            "created": "2022-04-11T13:49:07.564Z"
+        }
+    },
+    {
+        "model": "tra.organization",
+        "pk": "RAN_L2_SW_KRK_2_SG02",
+        "fields": {}
+    },
+    {
+        "model": "tra.envissuetype",
+        "pk": "",
+        "fields": {}
+    },
+    {
+        "model": "tra.envissuetype",
+        "pk": "Other",
+        "fields": {}
+    },
+    {
+        "model": "tra.envissuetype",
+        "pk": "iphy padl",
+        "fields": {}
+    },
+    {
+        "model": "tra.branch",
+        "pk": "22R2",
+        "fields": {}
+    },
+    {
+        "model": "tra.branch",
+        "pk": "Trunk",
+        "fields": {}
+    },
+    {
+        "model": "tra.testrunresult",
+        "pk": "environment issue",
+        "fields": {}
+    },
+    {
+        "model": "tra.testrunresult",
+        "pk": "not analyzed",
+        "fields": {}
+    },
+    {
+        "model": "tra.testlinetype",
+        "pk": "CLOUD_5G_I_E_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "fields": {}
+    },
+    {
+        "model": "tra.testlinetype",
+        "pk": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+        "fields": {}
+    },
+    {
+        "model": "tra.featurebuild",
+        "pk": "FB2204",
+        "fields": {
+            "start_time": "2022-02-16T00:00:00Z",
+            "end_time": "2022-03-01T23:59:59Z"
+        }
+    },
+    {
+        "model": "tra.featurebuild",
+        "pk": "FB2205",
+        "fields": {
+            "start_time": "2022-03-02T00:00:00Z",
+            "end_time": "2022-03-15T23:59:59Z"
+        }
+    },
+    {
+        "model": "tra.featurebuild",
+        "pk": "FB2206",
+        "fields": {
+            "start_time": "2022-03-16T00:00:00Z",
+            "end_time": "2022-03-29T23:59:59Z"
+        }
+    },
+    {
+        "model": "tra.featurebuild",
+        "pk": "FB2207",
+        "fields": {
+            "start_time": "2022-03-30T00:00:00Z",
+            "end_time": "2022-04-12T23:59:59Z"
+        }
+    },
+    {
+        "model": "tra.featurebuild",
+        "pk": "FB2208",
+        "fields": {
+            "start_time": "2022-04-13T00:00:00Z",
+            "end_time": "2022-04-26T23:59:59Z"
+        }
+    },
+    {
+        "model": "tra.testset",
+        "pk": 1,
+        "fields": {
+            "name": "5GC001085-B_Intra-frequency_inter-gNB_neighbor_NRREL_addition_-_Previously_established_Xn",
+            "test_lab_path": "Root\\Test_Sets\\Trunk\\RAN_L2_SW_KRK_2\\5GC001085_ANR_for_SA_intra-NR_intra-frequency_UE_based",
+            "branch": "Trunk"
+        }
+    },
+    {
+        "model": "tra.testset",
+        "pk": 2,
+        "fields": {
+            "name": "5GC002175-QB",
+            "test_lab_path": "Root\\Test_Sets\\22R2\\Regression\\RAN_L2_SW_KRK_2\\5GC002175_Spillover_from_SA_Mobility_(5GC000704_5GC000708)",
+            "branch": "22R2"
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 1,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_003_Empty_gnbIdLengthConfig_object_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 2,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_001_Feature_flag_activation_and_deactivation",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 3,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_018_Measurement_Report_with_cgi-info_does_not_contain_TrackingAreaCode",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 4,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_023_Multiple_supported_PLMNs_in_cgi-info_for_cellDepType_set_to_both_SA_NSA",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 5,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_017_Unsupported_PLMN_received_in_cgi-info",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 6,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_015_NRADJNRCELL_object_already_exists_with_the_same_CGI_but_different_PCI_-_replace_PCI",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 7,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_014_NRADJNRCELL_object_already_exists_with_the_same_CGI_and_PCI_-_no_action_required",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 8,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_009_Both_NCI_Range_and_PLMN_ID_in_gnbIdLengthConfig_object_-_match_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 9,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_008_Both_NCI_Range_and_PLMN_ID_in_gnbIdLengthConfig_object_-_no_match_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 10,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_007_Only_PLMN_ID_in_gnbIdLengthConfig_object_-_match_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 11,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_005_Only_NCI_range_in_gnbIdLengthConfig_object_-_match_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 12,
+        "fields": {
+            "test_set": 1,
+            "test_case_name": "5GC001085_B_002_No_gnbIdLengthConfig_configured_-_trigger_ANR",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 13,
+        "fields": {
+            "test_set": 2,
+            "test_case_name": "5GC002175-QB-0002_NGAP_UE_Context_Release_Command_protocol_error",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testinstance",
+        "pk": 14,
+        "fields": {
+            "test_set": 2,
+            "test_case_name": "5GC002175-QB-0001_NGAP_Error_Indication",
+            "execution_suspended": false
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 1,
+        "fields": {
+            "rp_id": 64888094,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "iphy padl",
+            "fb": "FB2208",
+            "fail_message": "Setup failed:\r\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1843",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220420_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14132689/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14132689/execution_for_preparation_af186805-f7ad-4a92-b972-bb9ddbcbb8bd/test_results/log.html",
+            "log_file_url_ext": "",
+            "start_time": "2022-04-20T22:28:02Z",
+            "end_time": "2022-04-20T23:54:36Z",
+            "analyzed": false,
+            "analyzed_by": 1
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 2,
+        "fields": {
+            "rp_id": 64844665,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "environment issue",
+            "env_issue_type": "Other",
+            "fb": "FB2208",
+            "fail_message": "Setup failed:\r\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2383",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B-CIT.robot",
+            "builds": "SBTS00_ENB_9999_220420_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14131460/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14131460/execution_for_preparation_19c07b17-35ab-4221-807c-efbfd6f79de7/test_results/log.html",
+            "log_file_url_ext": "",
+            "start_time": "2022-04-20T20:08:53Z",
+            "end_time": "2022-04-20T21:34:39Z",
+            "analyzed": true,
+            "analyzed_by": 1
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 3,
+        "fields": {
+            "rp_id": 64762706,
+            "test_instance": 2,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1802",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220419_000002",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14123897/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14123897/execution_for_preparation_4a2396e2-97bc-4f7f-84dd-0a340a451959/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-20T00:21:28Z",
+            "end_time": "2022-04-20T01:47:50Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 4,
+        "fields": {
+            "rp_id": 64454579,
+            "test_instance": 3,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1453",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220416_000010",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14102223/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14102223/execution_for_preparation_786fb8b1-4229-4faf-81c7-e36af9eda8d7/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-17T16:32:52Z",
+            "end_time": "2022-04-17T18:00:33Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 5,
+        "fields": {
+            "rp_id": 64373819,
+            "test_instance": 4,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T13:45:18Z",
+            "end_time": "2022-04-16T15:12:33Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 6,
+        "fields": {
+            "rp_id": 64373816,
+            "test_instance": 5,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_017_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T13:12:27Z",
+            "end_time": "2022-04-16T13:36:05Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 7,
+        "fields": {
+            "rp_id": 64373814,
+            "test_instance": 6,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_015_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T12:31:03Z",
+            "end_time": "2022-04-16T13:12:27Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 8,
+        "fields": {
+            "rp_id": 64373813,
+            "test_instance": 7,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_014_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T12:07:57Z",
+            "end_time": "2022-04-16T12:31:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 9,
+        "fields": {
+            "rp_id": 64373812,
+            "test_instance": 8,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_009_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T11:03:09Z",
+            "end_time": "2022-04-16T12:07:57Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 10,
+        "fields": {
+            "rp_id": 64373811,
+            "test_instance": 9,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_008_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T10:40:37Z",
+            "end_time": "2022-04-16T11:03:09Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 11,
+        "fields": {
+            "rp_id": 64373809,
+            "test_instance": 10,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_007_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T09:34:34Z",
+            "end_time": "2022-04-16T10:40:37Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 12,
+        "fields": {
+            "rp_id": 64373807,
+            "test_instance": 11,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_005_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T09:06:48Z",
+            "end_time": "2022-04-16T09:34:34Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 13,
+        "fields": {
+            "rp_id": 64373806,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_003_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T08:19:55Z",
+            "end_time": "2022-04-16T09:06:48Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 14,
+        "fields": {
+            "rp_id": 64373804,
+            "test_instance": 12,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_002_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2425",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078978/execution_for_preparation_a6072adf-fa0f-404e-b563-7055a09826ad/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-16T07:39:44Z",
+            "end_time": "2022-04-16T08:19:55Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 15,
+        "fields": {
+            "rp_id": 64225981,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_003_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1745",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B-CIT.robot",
+            "builds": "SBTS00_ENB_9999_220415_000003",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14078785/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14078785/execution_for_preparation_befe1fdc-fe20-4516-9576-0ecfdbd16d4c/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-15T11:42:23Z",
+            "end_time": "2022-04-15T12:10:04Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 16,
+        "fields": {
+            "rp_id": 64156055,
+            "test_instance": 7,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_014_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "5G_Paris-Saclay_UTE5GCLASSTL009",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220414_000005",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14077348/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14077348/execution_for_preparation_c97817e0-9e17-465c-9138-20d7e4188da5/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-14T21:43:45Z",
+            "end_time": "2022-04-14T22:24:47Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 17,
+        "fields": {
+            "rp_id": 64132435,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2208",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status pciIdentified Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_003_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1726",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B-CIT.robot",
+            "builds": "SBTS00_ENB_9999_220414_000005",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14065906/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14065906/execution_for_preparation_be87d021-0c41-49d3-ad18-b94980acb924/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-14T18:14:35Z",
+            "end_time": "2022-04-14T18:43:07Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 18,
+        "fields": {
+            "rp_id": 63896849,
+            "test_instance": 7,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2207",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 15.0 secs to match regexp (Received REGISTRATION COMPLETE from UE with RAN UE NGAP ID) in output\n(\nEGATE> 21:29:43.525 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_GEN_TESTMODE_NR for testMode type=7 profileId=1 delete=0 CQI  PARAMS modeCqi = 1 variationPeriodCqi=0 numOfCqi=1 cqi= 15 cqiMin=0 cqiMax=0 cqiS\ntepSize= 0 overheatingCqiCount= 0 PMI PARAMS modePmi = 1 variationPeriodPmi= 0 numOfPmi= 1 pmi= 0 RI PARAMS modeRi = 1 variationPeriodRi= 0 numOfRi= 1 ri= 0 CRI PARAMS modeCri = 1 variationPeriodCri= \n0 numOfCri= 1 cri= 0 LI PARAMS modeLi = 1 variationPeriodLi= 0 numOfLi= 1 li= 0\nEGATE> 21:29:43.526 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_UE_TESTMODE_SET_NR for users=1 present_pscell_mask=0xffffffff numtestModes=1 testmode_list[testmode,profileId]=[7,1] action=0 numUsers=1 beam_a\nction=0\nEGATE> 21:29:43.573 INF: UEC-1: UE1: Starting SUCI based Registration.\nEGATE> 21:29:43.574 TRC: UEC-1: UE1[NR-RRC]: ->UL-CCCH-NR\nvalue UL-CCCH-Message ::= \n{\n  message c1 : rrcSetupRequest : \n    [ Message content over the limit has been removed. ]\n... L2: <RANDOM ACCESS> [UeId:0,PhyCellId:50][RNTI:0x88]RAR Timer has expired;\n\nEGATE> 21:29:43.815 ACR: UEC-1: L2: <RANDOM ACCESS> [UeId:0,PhyCellId:50][RNTI:0x88]RAR Timer has expired;\n\nEGATE> 21:29:43.875 ACR: UEC-1: L2: <RANDOM ACCESS> [UeId:0,PhyCellId:50][RNTI:0x88]RAR Timer has expired;\n\nEGATE> 21:29:43.935 ACR: UEC-1: L2: <RANDOM ACCESS> [UeId:0,PhyCellId:50][RNTI:0x88]RAR Timer has expired;\n\nEGATE> 21:29:43.974 ACR: UEC-1: UE1: T300 expiration: No response to RRCSetupRequest\n\nEGATE> 21:29:43.995 ACR: UEC-1: L2: <RANDOM ACCESS> [UeId:0,PhyCellId:50][RNTI:0x88]RAR Timer has expired;\n\nEGATE> 21:29:44.039 INF: UEC-1: UE1: detached\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2091",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220412_000005",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14041919/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14041919/execution_for_preparation_986de093-99a3-48ba-b295-6d8b085eb2e3/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-12T20:46:01Z",
+            "end_time": "2022-04-12T21:43:55Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 19,
+        "fields": {
+            "rp_id": 63202624,
+            "test_instance": 6,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2207",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 10 secs to match regexp (UE1: Inter-eNB handover from EXT_ENB-2.1 to ENB-3.1 performed) in output\n(\nEGATE> 01:48:56.579 TRC: UEC-1: UE1[NR-RRC]: <-UL-DCCH-NR\nvalue UL-DCCH-Message ::= \n{\n  message c1 : measurementReport : \n  {\n    criticalExtensions measurementReport : \n    {\n      measResults \n      {\n        measId 1,\n        measResultServingMOList \n        {\n          {\n            servCellId 0,\n            measResultServingCell \n            {\n              physCellId 50,\n    [ Message content over the limit has been removed. ]\n\n              }\n\n            }\n\n          }\n\n        }\n\n      }\n\n    }\n\n  }\n\n}\n\n\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2113",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220405_000005",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13978381/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13978381/execution_for_preparation_51a7dd16-7dda-4289-b970-dd08bd242f89/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-06T01:05:08Z",
+            "end_time": "2022-04-06T02:02:41Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 20,
+        "fields": {
+            "rp_id": 62683701,
+            "test_instance": 4,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2207",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 10 secs to match regexp (UE1: Inter-eNB handover from EXT_ENB-2.1 to ENB-3.1 performed) in output\n(\nEGATE> 23:35:30.307 TRC: UEC-1: UE1[NR-RRC]: <-UL-DCCH-NR\nvalue UL-DCCH-Message ::= \n{\n  message c1 : measurementReport : \n  {\n    criticalExtensions measurementReport : \n    {\n      measResults \n      {\n        measId 1,\n        measResultServingMOList \n        {\n          {\n            servCellId 0,\n            measResultServingCell \n            {\n              physCellId 50,\n    [ Message content over the limit has been removed. ]\n\n              }\n\n            }\n\n          }\n\n        }\n\n      }\n\n    }\n\n  }\n\n}\n\n\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1741",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220401_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13934569/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13934569/execution_for_preparation_fa705d5b-af4f-47aa-9d49-346745290b6a/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-01T23:09:14Z",
+            "end_time": "2022-04-01T23:49:11Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 21,
+        "fields": {
+            "rp_id": 62218164,
+            "test_instance": 5,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 15.0 secs to match regexp (Received REGISTRATION COMPLETE from UE with RAN UE NGAP ID) in output\n(\nEGATE> 07:44:48.191 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_GEN_TESTMODE_NR for testMode type=7 profileId=1 delete=0 CQI  PARAMS modeCqi = 1 variationPeriodCqi=0 numOfCqi=1 cqi= 15 cqiMin=0 cqiMax=0 cqiS\ntepSize= 0 overheatingCqiCount= 0 PMI PARAMS modePmi = 1 variationPeriodPmi= 0 numOfPmi= 1 pmi= 0 RI PARAMS modeRi = 1 variationPeriodRi= 0 numOfRi= 1 ri= 0 CRI PARAMS modeCri = 1 variationPeriodCri= \n0 numOfCri= 1 cri= 0 LI PARAMS modeLi = 1 variationPeriodLi= 0 numOfLi= 1 li= 0\nEGATE> 07:44:48.191 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_UE_TESTMODE_SET_NR for users=1 present_pscell_mask=0xffffffff numtestModes=1 testmode_list[testmode,profileId]=[7,1] action=0 numUsers=1 beam_a\nction=0\nEGATE> 07:44:48.258 INF: UEC-1: UE1: Starting SUCI based Registration.\nEGATE> 07:44:48.259 TRC: UEC-1: UE1[NR-RRC]: ->UL-CCCH-NR\nvalue UL-CCCH-Message ::= \n{\n  message c1 : rrcSetupRequest : \n    [ Message content over the limit has been removed. ]\n\n    criticalExtensions rrcSetupComplete : \n\n    {\n\n      selectedPLMN-Identity 1,\n\n      dedicatedNAS-Message '7E004171000D0113918400000000206154 ...'H\n\n    }\n\n  }\n\n}\n\n\n\nEGATE> 07:44:48.313 INF: UEC-1: UE1: RrcState: NR CONNECTED\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1744",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220328_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13895211/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13895211/execution_for_preparation_7dd36446-285b-4e0d-b7f3-3555ee9ffd5c/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-29T07:18:09Z",
+            "end_time": "2022-03-29T07:57:41Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 22,
+        "fields": {
+            "rp_id": 61728757,
+            "test_instance": 4,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 23,
+        "fields": {
+            "rp_id": 61728756,
+            "test_instance": 3,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 24,
+        "fields": {
+            "rp_id": 61728754,
+            "test_instance": 5,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 25,
+        "fields": {
+            "rp_id": 61728753,
+            "test_instance": 6,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 26,
+        "fields": {
+            "rp_id": 61728752,
+            "test_instance": 7,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 27,
+        "fields": {
+            "rp_id": 61728750,
+            "test_instance": 8,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 28,
+        "fields": {
+            "rp_id": 61728749,
+            "test_instance": 9,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 29,
+        "fields": {
+            "rp_id": 61728748,
+            "test_instance": 10,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 30,
+        "fields": {
+            "rp_id": 61728746,
+            "test_instance": 11,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 31,
+        "fields": {
+            "rp_id": 61728745,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 32,
+        "fields": {
+            "rp_id": 61728743,
+            "test_instance": 12,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 33,
+        "fields": {
+            "rp_id": 61728740,
+            "test_instance": 2,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1464",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13848656/execution_for_preparation_6f42f71e-dcc7-463a-b7e9-52c4b878fe17/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T23:17:03Z",
+            "end_time": "2022-03-24T23:17:03Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 34,
+        "fields": {
+            "rp_id": 61688811,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1831",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B-CIT.robot",
+            "builds": "SBTS00_ENB_9999_220324_000008",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13847133/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13847133/execution_for_preparation_12d7296d-9757-4f01-9c9c-e6f66ba4f6fe/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T15:46:36Z",
+            "end_time": "2022-03-24T15:46:36Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 35,
+        "fields": {
+            "rp_id": 61284757,
+            "test_instance": 12,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 15.0 secs to match regexp (Received REGISTRATION COMPLETE from UE with RAN UE NGAP ID) in output\n(\nEGATE> 21:13:57.439 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_GEN_TESTMODE_NR for testMode type=7 profileId=1 delete=0 CQI  PARAMS modeCqi = 1 variationPeriodCqi=0 numOfCqi=1 cqi= 15 cqiMin=0 cqiMax=0 cqiS\ntepSize= 0 overheatingCqiCount= 0 PMI PARAMS modePmi = 1 variationPeriodPmi= 0 numOfPmi= 1 pmi= 0 RI PARAMS modeRi = 1 variationPeriodRi= 0 numOfRi= 1 ri= 0 CRI PARAMS modeCri = 1 variationPeriodCri= \n0 numOfCri= 1 cri= 0 LI PARAMS modeLi = 1 variationPeriodLi= 0 numOfLi= 1 li= 0\nEGATE> 21:13:57.439 INF: GNB-3: RECVD CELL-3.1 [ACTIVE]:CTRL_AP_UE_TESTMODE_SET_NR for users=1 present_pscell_mask=0xffffffff numtestModes=1 testmode_list[testmode,profileId]=[7,1] action=0 numUsers=1 beam_a\nction=0\nEGATE> 21:13:57.498 INF: UEC-1: UE1: Starting SUCI based Registration.\nEGATE> 21:13:57.500 TRC: UEC-1: UE1[NR-RRC]: ->UL-CCCH-NR\nvalue UL-CCCH-Message ::= \n{\n  message c1 : rrcSetupRequest : \n    [ Message content over the limit has been removed. ]\n    rrcSetupRequest \n    {\n      ue-Identity randomValue : '01010101 01000101 00000000 00000001 010 ...'B,\n      establishmentCause mo-Signalling,\n      spare '0'B\n    }\n\n  }\n\n}\n\n\n\nEGATE> 21:13:57.900 ACR: UEC-1: UE1: T300 expiration: No response to RRCSetupRequest\n\nEGATE> 21:13:58.453 INF: UEC-1: UE1: detached\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL2421",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220319_000014",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13797656/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13797656/execution_for_preparation_d28cc4b0-9eb4-4007-b1cf-ac29d47592b9/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-20T20:48:21Z",
+            "end_time": "2022-03-20T21:27:56Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 36,
+        "fields": {
+            "rp_id": 60989267,
+            "test_instance": 4,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T06:37:45Z",
+            "end_time": "2022-03-18T07:00:21Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 37,
+        "fields": {
+            "rp_id": 60989265,
+            "test_instance": 3,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T06:17:14Z",
+            "end_time": "2022-03-18T06:37:45Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 38,
+        "fields": {
+            "rp_id": 60989264,
+            "test_instance": 5,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T05:53:21Z",
+            "end_time": "2022-03-18T06:17:14Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 39,
+        "fields": {
+            "rp_id": 60989262,
+            "test_instance": 6,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T05:31:28Z",
+            "end_time": "2022-03-18T05:53:21Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 40,
+        "fields": {
+            "rp_id": 60989261,
+            "test_instance": 7,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T05:09:22Z",
+            "end_time": "2022-03-18T05:31:28Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 41,
+        "fields": {
+            "rp_id": 60989260,
+            "test_instance": 8,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T04:43:35Z",
+            "end_time": "2022-03-18T05:09:22Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 42,
+        "fields": {
+            "rp_id": 60989258,
+            "test_instance": 9,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T04:03:31Z",
+            "end_time": "2022-03-18T04:43:35Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 43,
+        "fields": {
+            "rp_id": 60989257,
+            "test_instance": 10,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T03:18:49Z",
+            "end_time": "2022-03-18T04:03:31Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 44,
+        "fields": {
+            "rp_id": 60989256,
+            "test_instance": 11,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T02:50:41Z",
+            "end_time": "2022-03-18T03:18:49Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 45,
+        "fields": {
+            "rp_id": 60989254,
+            "test_instance": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T01:31:35Z",
+            "end_time": "2022-03-18T02:50:41Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 46,
+        "fields": {
+            "rp_id": 60989253,
+            "test_instance": 12,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T01:09:29Z",
+            "end_time": "2022-03-18T01:31:35Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 47,
+        "fields": {
+            "rp_id": 60989251,
+            "test_instance": 2,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1493",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220317_000004",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13762383/execution_for_preparation_89cb2b48-7546-4008-a2c7-377aa17a4a2f/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-18T00:30:03Z",
+            "end_time": "2022-03-18T01:09:29Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 48,
+        "fields": {
+            "rp_id": 59613960,
+            "test_instance": 5,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2205",
+            "fail_message": "NoRegexpMatch: It was not possible to find string after 10 secs to match regexp (NgAP Link with GUAMI .* not found) in output\n(\nEGATE> 20:04:01.370 TRC: UEC-1: UE1[NR-RRC]: <-UL-DCCH-NR\nvalue UL-DCCH-Message ::= \n{\n  message c1 : measurementReport : \n  {\n    criticalExtensions measurementReport : \n    {\n      measResults \n      {\n        measId 1,\n        measResultServingMOList \n        {\n          {\n            servCellId 0,\n            measResultServingCell \n            {\n              physCellId 50,\n    [ Message content over the limit has been removed. ]\n\n              }\n\n            }\n\n          }\n\n        }\n\n      }\n\n    }\n\n  }\n\n}\n\n\n\nEGATE> )",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1651",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220304_000006",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/execution_for_preparation_fdc6d0b2-73e3-4e02-95d9-68d66a4e1576/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-04T19:50:48Z",
+            "end_time": "2022-03-04T20:18:46Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 49,
+        "fields": {
+            "rp_id": 59613950,
+            "test_instance": 9,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2205",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status hoFailed Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_008_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1651",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220304_000006",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/execution_for_preparation_fdc6d0b2-73e3-4e02-95d9-68d66a4e1576/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-04T17:13:03Z",
+            "end_time": "2022-03-04T17:39:36Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 50,
+        "fields": {
+            "rp_id": 59613943,
+            "test_instance": 12,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2205",
+            "fail_message": "ParsingFailed: Cannot find any string to match regexp (with status hoFailed Received NeighbourStatusUpdateInd) in file (/home/ute/test_results/syslog/syslog_gnb_1085_B_002_127.0.0.1.log)",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1651",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC001085/5GC001085-B.robot",
+            "builds": "SBTS00_ENB_9999_220304_000006",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13635864/execution_for_preparation_fdc6d0b2-73e3-4e02-95d9-68d66a4e1576/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-04T15:05:47Z",
+            "end_time": "2022-03-04T15:51:02Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 51,
+        "fields": {
+            "rp_id": 63676020,
+            "test_instance": 13,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2207",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1435",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_001200_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/14026271/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/14026271/execution_for_preparation_bad555aa-464b-48eb-af6f-000c351184b9/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-04-11T01:48:39Z",
+            "end_time": "2022-04-11T03:13:01Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 52,
+        "fields": {
+            "rp_id": 61723001,
+            "test_instance": 13,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1843",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_001062_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13839453/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13839453/execution_for_preparation_a351d6b3-fdaf-4a0f-becd-c37ba77f5301/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T22:13:35Z",
+            "end_time": "2022-03-24T22:13:35Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 53,
+        "fields": {
+            "rp_id": 61722999,
+            "test_instance": 14,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Parent suite setup failed:\nAttributeError: type object 'SwConfigModifier' has no attribute 'get_capability_unit_name'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1843",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_001062_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13839453/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13839453/execution_for_preparation_a351d6b3-fdaf-4a0f-becd-c37ba77f5301/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-24T22:13:35Z",
+            "end_time": "2022-03-24T22:13:35Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 54,
+        "fields": {
+            "rp_id": 60951637,
+            "test_instance": 13,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nAttributeError: 'NoneType' object has no attribute 'group'",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1512",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_000995_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13765154/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13765154/execution_for_preparation_f856bd29-fc5d-40de-9263-98ed7c539634/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-17T21:20:51Z",
+            "end_time": "2022-03-17T21:40:45Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 55,
+        "fields": {
+            "rp_id": 60951636,
+            "test_instance": 14,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2206",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "MN Trunk Engine_Wroclaw_UTE5GCLASSICAL1512",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_000995_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13765154/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13765154/execution_for_preparation_f856bd29-fc5d-40de-9263-98ed7c539634/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-17T19:56:46Z",
+            "end_time": "2022-03-17T21:20:51Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.testrun",
+        "pk": 56,
+        "fields": {
+            "rp_id": 59490112,
+            "test_instance": 14,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "organization": "RAN_L2_SW_KRK_2_SG02",
+            "result": "not analyzed",
+            "env_issue_type": "",
+            "fb": "FB2205",
+            "fail_message": "Setup failed:\nMibSibAcquisitionFailed: MIB-SIB Acquisition failed over 4 retries",
+            "comment": "",
+            "test_line": "5G_Ulm_UTE5GTL308",
+            "test_suite": "testsuite/Krakow/RRM/MN_RAN_L2/5GC002175/5GC002175.robot",
+            "builds": "SBTS22R2_ENB_0000_000768_000000",
+            "ute_exec_url": "['http://logs.ute.nsn-rdnet.net/cloud/execution/13624436/']",
+            "log_file_url": "http://logs.ute.nsn-rdnet.net/cloud/execution/13624436/execution_for_preparation_aae51999-f330-4371-b860-1150bcf147a0/test_results/log.html",
+            "log_file_url_ext": null,
+            "start_time": "2022-03-03T12:24:51Z",
+            "end_time": "2022-03-03T13:49:08Z",
+            "analyzed": false,
+            "analyzed_by": null
+        }
+    },
+    {
+        "model": "tra.regressionfilter",
+        "pk": 1,
+        "fields": {
+            "name": "1085-B Trunk LO_LO",
+            "limit": 50,
+            "test_set": 1,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "owners": [
+                1
+            ],
+            "subscribers": [
+                1,
+                2
+            ],
+            "fail_message_type_groups": []
+        }
+    },
+    {
+        "model": "tra.regressionfilter",
+        "pk": 2,
+        "fields": {
+            "name": "2175 QB",
+            "limit": 50,
+            "test_set": 2,
+            "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
+            "owners": [
+                1
+            ],
+            "subscribers": [
+                1,
+                2
+            ],
+            "fail_message_type_groups": []
+        }
+    }
+]
