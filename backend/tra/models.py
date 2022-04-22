@@ -136,7 +136,7 @@ class TestInstance(models.Model):
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
-        ordering = ['-id']
+        # ordering = ['-id']
 
     def __str__(self):
         return f"{self.test_case_name[:40]}... on {self.test_set.branch}"

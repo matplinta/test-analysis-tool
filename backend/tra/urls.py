@@ -32,6 +32,7 @@ urlpatterns = [
     #     - reg_filters, fb, test_instance, result, env_issue_type, analyzed_by, analyzed, testline_type,
     # All fields should be referenced by their primary keys
     path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='byquery'),
+    path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
     # path('test_runs/by_reg_filter/', views.TestRunsBasedOnAllSubscribedRegressionFiltersView.as_view(), name='by_reg_filter'),
     path('test_runs/by_reg_filter/<int:rfid>/', views.TestRunsBasedOnRegressionFiltersView.as_view(), name='by_reg_filter_pk'),
 

@@ -16,6 +16,7 @@ django-filter
 # mysqlclient
 # django-bootstrap3
 # django_compressor
+psycopg2
 
 # FOR ReportingPortal API
 rep-api
