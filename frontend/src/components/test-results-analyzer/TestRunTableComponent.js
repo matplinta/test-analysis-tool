@@ -7,33 +7,34 @@ import { Button } from 'react-bootstrap';
 
 import { getTestRuns, getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
 
-let TestRunTableComponent = (filterUrl) => {
+let TestRunTableComponent = ({ filterUrl }) => {
 
     const [testRuns, setTestRuns] = useState([]);
 
-    let fetchTestRuns = (fiterUrl, page) => {
-        if (!filterUrl) {
-            getTestRuns(page).then(
-                (response) => {
-                    if (response.data.results.length > 0) {
-                        setTestRuns(response.data.results);
-                    }
-                },
-                (error) => {
-                    console.log(error);
-                })
-        } else {
-            getTestRunsUsingFilter(filterUrl, page).then(
-                (response) => {
-                    if (response.data.results.length > 0) {
-                        setTestRuns(response.data.results);
-                    }
-                },
-                (error) => {
-                    console.log(error);
-                })
-        }
+    let fetchTestRuns = (page) => {
+        console.log("tuuuuuuuuuuuuuu1")
+        getTestRuns(page).then(
+            (response) => {
+                if (response.data.results.length > 0) {
+                    setTestRuns(response.data.results);
+                }
+            },
+            (error) => {
+                console.log(error);
+            })
+    }
 
+    let fetchTestRunsByFilter = (filter, page) => {
+        console.log("tuuuuuuuuuuuuuu2")
+        getTestRunsUsingFilter(filter, page).then(
+            (response) => {
+                if (response.data.results.length > 0) {
+                    setTestRuns(response.data.results);
+                }
+            },
+            (error) => {
+                console.log(error);
+            })
     }
 
     let logLinkBodyTemplate = (rowData) => {
@@ -50,9 +51,12 @@ let TestRunTableComponent = (filterUrl) => {
         return <p>{parseDate(rowData.start_time)}</p>
     }
 
-    useEffect(() => {
-        fetchTestRuns(1);
-    }, [])
+    useEffect(
+        () => {
+            console.log(filterUrl)
+            fetchTestRunsByFilter(filterUrl, 1);
+        }, [filterUrl]
+    )
 
     return (
         <div className="datatable-doc-demo">
@@ -76,7 +80,7 @@ let TestRunTableComponent = (filterUrl) => {
                     <Column field="env_issue_type" header="Env issue type" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} />
                     <Column field="comment" header="Comment" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} />
                     {/* <Column field="fail_message" header="Fail Message" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    {/* <Column field="analyzed_by" header="Analyzed by" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
+                    <Column field="analyzed_by" header="Analyzed by" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} />
                     <Column field="result" header="Result" sortable filter filterPlaceholder="Search by result" style={{ maxWidth: '100px', fontSize: '12px' }} />
                 </DataTable>
             </div>

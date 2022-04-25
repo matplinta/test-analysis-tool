@@ -25,4 +25,3 @@ export const postTestSet = async (testSet) => {
 export const getTestLineTypes = async () => {
     return (await axios.get(API_URL + 'api/testline_types/', { headers: authHeader() }));
 }
-
