@@ -12,15 +12,16 @@ dj-rest-auth
 django-tables2
 django-filter
 
-# django_currentuser
-# mysqlclient
-# django-bootstrap3
-# django_compressor
+# FOR postgresql
 psycopg2
+
+# FOR async tasks using celery
+celery
+redis
 
 # FOR ReportingPortal API
 rep-api
 
-# FOR DATA ANALYSIS
+# FOR data analysis
 pandas
 matplotlib

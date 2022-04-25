@@ -8,6 +8,8 @@
 from numpy import isin
 from rep_api import RepApi
 from urllib.parse import quote
+import datetime
+import time
 import json
 import re
 
@@ -16,7 +18,9 @@ class RepPortalError(Exception):
     pass
 
 class RepPortal():
-
+    minute = 0
+    post_count = 0
+    POST_THROTTLE_LIMIT = 60
 
     def __init__(self):
         self.user = 'sc'
@@ -114,6 +118,55 @@ class RepPortal():
             print(url)
             data = api.get(url, params=None)
         return data.json()['results']
+
+
+    def _generate_analyze_json(self, runs, result, comment, env_issue_type=None, common_build="", suggested_prontos=[], pronto="", 
+                               default_blocked=True, send_to_qc=False, suspend=None, suspension_end = None):
+        if result == "environment issue" and not env_issue_type:
+            raise TypeError(f"Result if {result}, but env_issue_type is not defined!")
+        data = {
+            "common_build": common_build,
+            "suggested_prontos": [],
+            "pronto": pronto,
+            "default_blocked": default_blocked,
+            "runs": runs,
+            "send_to_qc": send_to_qc,
+            "result": result,
+            "comment": comment,
+        }
+        if env_issue_type:
+            data["env_issue_type"] = env_issue_type
+        if suspend:
+            data["suspend"] = suspend
+        if suspension_end:
+            data["suspension_end"] = suspension_end
+        return data
+
+
+    def analyze_testruns(self, runs, comment, result="environment issue", env_issue_type=None):
+        data = self._generate_analyze_json(runs=runs, comment=comment, result=result, env_issue_type=env_issue_type)
+        url = "https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/runs-analyze/"
+        with RepApi(username=self.user, password=self.log, config='rep-prod-one') as api:
+            retry = 3
+            while retry > 0:
+                resp = api.post(url, params=None, data=data)
+                if resp.status_code == 200:
+                    break
+                elif resp.status_code == 429:
+                    wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                    time.sleep(wait_sec_until_new_minute_starts)
+                    retry -= 1
+                    continue
+                else:
+                    print(resp)
+                    print(resp.text)
+                    print(resp.status_code)
+                    break
+        return resp
+
+
+
+
 
     # def get_data(self, url):
     #     with RepApi(username=self.user, password=self.log, config='rep-prod-one') as api:
