@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
-
+import os
 
 # -----------------------------------------------------------------------------
 # LDAP
@@ -143,11 +143,11 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trs_database',
-        'USER': 'trs_user',
-        'PASSWORD': 'trs',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.environ.get('POSTGRES_NAME'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
