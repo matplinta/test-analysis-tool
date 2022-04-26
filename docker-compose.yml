@@ -9,11 +9,12 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+
   web:
-    build: .
-    command: python backend/manage.py runserver 0.0.0.0:8000
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/code
+      - ./backend:/code
     ports:
       - "8000:8000"
     environment:
@@ -21,5 +22,40 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     depends_on:
+      - db
+      - redis
+  
+  redis:
+    image: redis:6-alpine
+
+  celery_worker:
+    build: ./backend
+    command: celery -A backend worker -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  celery_beat:
+    container_name: celery_beat
+    build: ./backend
+    command: celery -A backend beat -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+  
+  flower:
+    container_name: celery_flower
+    build: ./backend
+    command: /start-flower
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
       - db
 

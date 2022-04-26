@@ -11,6 +11,9 @@ ENV ftp_proxy=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+ENV CELERY_BROKER=redis://redis:6379/0
+ENV CELERY_BACKEND=redis://redis:6379/0
+
 WORKDIR /code
 
 RUN apt-get update  --yes
@@ -23,8 +26,11 @@ RUN echo "[global]\n" \
 "extra-index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/rep-pypi-remote/simple\n" \
 "                  https://pypi.org/simple/\n" > /root/.pip/pip.conf 
 
-COPY ./backend /code/
-COPY ./requirements_freeze.txt /code/
+COPY . /code/
+COPY ./requirements.txt /code/
 
-RUN pip install -r requirements_freeze.txt
+RUN pip install -r requirements.txt
+
+COPY ./celery_flower_start.sh /start-flower
+RUN chmod +x /start-flower
 
