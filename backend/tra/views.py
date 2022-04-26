@@ -57,6 +57,8 @@ from datetime import datetime
 import pytz
 import logging
 
+from .tasks import pull_tcs
+
 
 class AccessingRestrictedDataError(Exception):
     pass
@@ -271,15 +273,7 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
 #                                test_instance__test_set=regression_filter.test_set)
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
-    """
-    {
-        "Feature Build": [
-            {"pk": "FB08", "name": "FB08"}, 
-            {"pk": "FB09", "name": "FB09"}, 
-        ]
-    }
-    """
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
     serializer_class = TestRunSerializer
 
     def get(self, request):
@@ -301,20 +295,16 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
                                                test_instance__test_set=reg_filter.test_set), regfilters, Q())
         )
-        # serializer = RegressionFilterSerializer(regfilters, many=True)
-        # fields_dict['regfilters'] = serializer.data
 
-        data = serialize("json", regfilters)
-        fields_dict["regfilters"] = json.loads(data)
-
+        fields_dict["regfilters"] = json.loads(serialize("json", regfilters))
+        fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
         get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer) #, "test_instance__id")
         get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer)
         get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
         get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
         get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
-        analyzed_values = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
-        fields_dict['analyzed'] = analyzed_values
+        
         return Response(fields_dict)
 
 
@@ -470,9 +460,10 @@ class HelloView(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
     # permission_classes = (IsAuthenticated,)   
     
-    def get(self, request, lol):
+    def get(self, request):
         # lol = kwargs.get("lol")
-        return Response(str(lol))
+        pull_tcs.delay()
+        return Response(200)
 
 
 class TestAuthView(APIView):
