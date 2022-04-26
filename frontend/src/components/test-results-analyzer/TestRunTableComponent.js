@@ -6,34 +6,45 @@ import { Column } from 'primereact/column';
 import { Button } from 'react-bootstrap';
 
 import { getTestRuns, getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+
 
 let TestRunTableComponent = ({ filterUrl }) => {
 
     const [testRuns, setTestRuns] = useState([]);
+    const [firstPage, setFirstPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
 
-    let fetchTestRuns = (page) => {
-        console.log("tuuuuuuuuuuuuuu1")
-        getTestRuns(page).then(
-            (response) => {
-                if (response.data.results.length > 0) {
-                    setTestRuns(response.data.results);
-                }
-            },
-            (error) => {
-                console.log(error);
-            })
-    }
+    const [testRunsCount, setTestRunsCount] = useState(null);
+    const [pagesCount, setPagesCount] = useState(null);
+
+    const [loading, setLoading] = useState(false);
+    const [lazyParams, setLazyParams] = useState({
+        first: 0,
+        rows: 10,
+        page: 1,
+        sortField: null,
+        sortOrder: null,
+        filters: {}
+    });
+
+    const rowsPerPage = 5;
 
     let fetchTestRunsByFilter = (filter, page) => {
-        console.log("tuuuuuuuuuuuuuu2")
+        setLoading(true);
         getTestRunsUsingFilter(filter, page).then(
             (response) => {
                 if (response.data.results.length > 0) {
                     setTestRuns(response.data.results);
+                    setTestRunsCount(response.data.count);
+                    setPagesCount(Math.round(response.data.count / rowsPerPage));
+                    setLoading(false);
+                    setCurrentPage(1);
                 }
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.GET_TEST_RUNS, AlertTypes.error);
+                setLoading(true);
             })
     }
 
@@ -51,19 +62,44 @@ let TestRunTableComponent = ({ filterUrl }) => {
         return <p>{parseDate(rowData.start_time)}</p>
     }
 
+    let onPageChange = (e) => {
+        setFirstPage(e.first)
+        setLazyParams(e);
+        setCurrentPage(e.page + 1);
+    }
+
+    // const convertUrl = (paramsEntry) => {
+    //     let serverUrl = "";
+    //     for (let key in paramsEntry) {
+    //         if (!paramsEntry[key].indexOf(',')) {
+    //             let valueArray = paramsEntry[key].split(',');
+    //             for (let value of valueArray) {
+    //                 serverUrl += key + "=" + value + "&";
+    //             }
+    //         } else {
+    //             serverUrl += key + "=" + paramsEntry[key] + "&"
+    //         }
+    //     }
+
+    //     return serverUrl.slice(0, -1);
+    // }
+
     useEffect(
         () => {
-            console.log(filterUrl)
-            fetchTestRunsByFilter(filterUrl, 1);
+            if (filterUrl !== "") {
+                fetchTestRunsByFilter(filterUrl, currentPage);
+            } else {
+                fetchTestRunsByFilter("", currentPage);
+            }
         }, [filterUrl]
     )
 
     return (
         <div className="datatable-doc-demo">
             <div className="card">
-                <DataTable value={testRuns} paginator className="p-datatable-test-runs" rows={10} size="small"
-                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[10, 25, 50]}
-                    dataKey="id" rowHover filterDisplay="menu" responsiveLayout="scroll">
+                <DataTable value={testRuns} lazy paginator className="p-datatable-test-runs" pageCount={pagesCount} rows={10} first={firstPage} totalRecords={testRunsCount} size="small" onPage={(e) => onPageChange(e)}
+                    paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
+                    dataKey="id" rowHover responsiveLayout="scroll" loading={loading}>
                     <Column field="rp_id" header="RP id" sortable filter filterPlaceholder="Search by test case name" style={{ maxWidth: '100px', fontSize: '12px' }} />
                     <Column field="test_instance.test_set.name" header="Test Set" sortable filter filterPlaceholder="Search by test case name" style={{ maxWidth: '100px', fontSize: '12px' }} />
 

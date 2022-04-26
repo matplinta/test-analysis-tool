@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, createSearchParams, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { Card } from 'primereact/card';
 import { ScrollPanel } from 'primereact/scrollpanel';
@@ -9,9 +11,11 @@ import { Tree } from 'primereact/tree';
 import TestRunTableComponent from './TestRunTableComponent';
 
 import { getTestRunsFilters } from '../../services/test-results-analyzer/test-runs.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import './RegressionTestRuns.css'
 import { Button } from 'primereact/button';
+import { filter } from 'rxjs';
 
 let RegressionTestRuns = () => {
 
@@ -33,7 +37,11 @@ let RegressionTestRuns = () => {
     const [expandedFbKeys, setExpandedFbKeys] = useState({});
     const [selectedFbKeys, setSelectedFbKeys] = useState(null);
 
-    const [filterUrl, setFilterUrl] = useState("");
+    const [apiFilterUrl, setApiFilterUrl] = useState("");
+
+    const [searchParams] = useSearchParams();
+
+    const navigate = useNavigate();
 
 
     const expandAll = (nodesList, setExpanded) => {
@@ -151,11 +159,12 @@ let RegressionTestRuns = () => {
             },
             (error) => {
                 console.log(error);
+                Notify.sendNotification(Errors.GET_TEST_RUNS, AlertTypes.error);
             }
         )
     }
 
-    const defineUrlFromSelectedFilter = (selectedKeys, filterName) => {
+    const defineApiUrlFromSelectedFilter = (selectedKeys, filterName) => {
         let filterUrl = ""
         for (let key in selectedKeys) {
             if (key !== filterName) {
@@ -165,14 +174,45 @@ let RegressionTestRuns = () => {
         return filterUrl;
     }
 
-    const searchTestRuns = () => {
+    const defineWebUrlFromSelectedFilter = (selectedKeys, filterName) => {
+        let filterList = []
+        for (let key in selectedKeys) {
+            if (key !== filterName) {
+                filterList.push(key);
+            }
+        }
+        if (filterList.length === 0) return "";
+        else return (filterName + "=" + filterList.toString() + "&");
+    }
+
+    const defineApiUrl = () => {
         let filterUrl = "";
-        filterUrl += defineUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
-        filterUrl += defineUrlFromSelectedFilter(selectedStatusKeys, "result");
-        filterUrl += defineUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
-        filterUrl += defineUrlFromSelectedFilter(selectedFbKeys, "fb");
-        filterUrl.slice(0, -1);
-        setFilterUrl(filterUrl);
+        filterUrl += defineApiUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedStatusKeys, "result");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedFbKeys, "fb");
+        return filterUrl;
+    }
+
+    const defineWebUrl = () => {
+        let filter = "";
+        filter += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        filter += defineWebUrlFromSelectedFilter(selectedStatusKeys, "result");
+        filter += defineWebUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
+        filter += defineWebUrlFromSelectedFilter(selectedFbKeys, "fb");
+        return filter;
+    }
+
+    const searchTestRuns = () => {
+        let apiUrl = defineApiUrl().slice(0, -1);
+        setApiFilterUrl(apiUrl);
+
+        let webUrl = defineWebUrl().slice(0, -1);
+        navigate({
+            pathname: "",
+            search: webUrl
+        });
+        console.log(selectedFilterKeys)
     }
 
     const testFiltersCheckboxList = (
@@ -199,8 +239,30 @@ let RegressionTestRuns = () => {
         </div>
     )
 
+    const convertUrl = (paramsEntry) => {
+        let serverUrl = "";
+        for (let key in paramsEntry) {
+            if (paramsEntry[key].indexOf(',')) {
+                let valueArray = paramsEntry[key].split(',');
+                for (let value of valueArray) {
+                    serverUrl += key + "=" + value + "&";
+                }
+            } else {
+                serverUrl += key + "=" + paramsEntry[key] + "&"
+            }
+        }
+
+        return serverUrl.slice(0, -1);
+    }
+
     useEffect(() => {
         fetchTestRunsFilters();
+
+        const currentParams = Object.fromEntries([...searchParams]);
+        if (Object.keys(currentParams).length !== 0) {
+            let url = convertUrl(currentParams)
+            setApiFilterUrl(url);
+        }
     }, [])
 
     return (
@@ -215,7 +277,7 @@ let RegressionTestRuns = () => {
             </aside>
             <main>
                 <Card>
-                    <TestRunTableComponent filterUrl={filterUrl}></TestRunTableComponent>
+                    <TestRunTableComponent filterUrl={apiFilterUrl}></TestRunTableComponent>
                 </Card>
 
             </main>
