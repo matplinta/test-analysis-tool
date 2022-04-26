@@ -1,0 +1,84 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: 260px minmax(10px, 1fr);
+    grid-gap: 1rem;
+    align-items: start;
+    margin: 10px;
+}
+
+aside {
+    position: sticky;
+    top: 0;
+    align-self: start;
+}
+
+.scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-wrapper {
+    border-right: 10px solid var(--surface-b);
+}
+
+.scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-bar {
+    background-color: var(--primary-color);
+    opacity: 1;
+    transition: background-color .2s;
+}
+
+.scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-bar:hover {
+    background-color: #007ad9;
+}
+
+.p-checkbox {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+}
+
+.p-field-checkbox>label,
+.p-field-radiobutton>label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+.p-checkbox .p-checkbox-box {
+    width: 15px;
+    height: 15px;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #004c9a;
+    background: #004c9a;
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+}
+
+.p-checkbox .p-checkbox-box .p-checkbox-icon {
+    transition-duration: 0.2s;
+    color: #ffffff;
+    font-size: 9px;
+}
+
+.p-treenode-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.p-tree .p-tree-container {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content {
+    padding: 0;
+}
+
+.p-tree {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+    margin-right: 0;
+}

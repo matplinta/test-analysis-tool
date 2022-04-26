@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+
+import Notify from './../services/Notify';
+import AuthService from './../services/auth.service.js';
 
 import NOKIA_LOGO_WHITE_50px from './../assets/NOKIA_LOGO_WHITE_50px.png';
 import GoToAdminComponent from './home/GoToAdminComponent';
@@ -12,6 +16,8 @@ import TestLineListComponent from './test-line-manager/TestLineListComponent';
 import MyTestLineComponentList from './test-line-manager/MyTestLineComponentList';
 import LoginComponent from './home/authorization/LoginComponent';
 import LogoutComponent from './home/authorization/LogoutComponent';
+import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
+import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 
 import './App.css';
 
@@ -19,6 +25,11 @@ import './App.css';
 const App = () => {
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(undefined);
+
+  useEffect(() => {
+    Notify.notifications.subscribe((alert) => alert instanceof Function && alert());
+    setIsUserLoggedIn(AuthService.checkUserLoggedIn());
+  }, [])
 
   return (
     <BrowserRouter>
@@ -32,8 +43,8 @@ const App = () => {
               <GoBackHomeComponent />
             </div>
             <div className="buttons-div">
-              {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} /> }
-              {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} /> }
+              {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
+              {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
               <GoToAdminComponent />
             </div>
           </div>
@@ -47,8 +58,12 @@ const App = () => {
               <Route path="test-lines" element={<TestLineListComponent />} />
               <Route path="my-test-lines" element={<MyTestLineComponentList />} />
             </Route>
-            <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} />
+            <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
+              <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
+              <Route path="user-filters" index element={<UserFiltersComponent />} />
+            </Route>
           </Routes>
+          <ToastContainer autoClose={2500} />
         </section>
       </>
     </BrowserRouter>
