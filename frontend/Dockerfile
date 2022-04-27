@@ -1,4 +1,4 @@
-FROM python:3.8-buster 
+FROM node:16.14.2
 
 ENV HTTP_PROXY=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 ENV http_proxy=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
@@ -8,28 +8,15 @@ ENV HTTPS_PROXY=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 ENV https_proxy=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 ENV ftp_proxy=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ENV BACKEND_API_URL=http://web:8000/
 
-ENV CELERY_BROKER=redis://redis:6379/0
-ENV CELERY_BACKEND=redis://redis:6379/0
+WORKDIR /frontend
 
-WORKDIR /code
+COPY ./package.json /frontend/
+COPY ./package-lock.json /frontend/
+RUN npm install
 
-RUN apt-get update  --yes
-RUN apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev  --yes
-RUN mkdir -p /root/.pip
-RUN echo "[global]\n" \
-"trusted-host = artifactory-espoo1.ext.net.com\n" \
-"               pypi.org\n" \
-"index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/rep-pypi-local/simple\n" \
-"extra-index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/rep-pypi-remote/simple\n" \
-"                  https://pypi.org/simple/\n" > /root/.pip/pip.conf 
-
-COPY ./requirements.txt /code/
-RUN pip install -r requirements.txt
-
-COPY ./celery_flower_start.sh /start-flower
-RUN chmod +x /start-flower
-COPY . /code/
-
+COPY . /frontend/
+# RUN unset  HTTP_PROXY http_proxy FTP_PROXY no_proxy HTTPS_PROXY https_proxy ftp_proxy
+# EXPOSE 3000
+ 

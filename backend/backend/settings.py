@@ -79,7 +79,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -99,8 +98,11 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [    
-'http://localhost:3000'
+    'http://test-result-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
+# CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
