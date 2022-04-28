@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, createSearchParams, useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
-import { ScrollPanel } from 'primereact/scrollpanel';
-import { Checkbox } from 'primereact/checkbox';
-import { MultiStateCheckbox } from 'primereact/multistatecheckbox';
 import { Tree } from 'primereact/tree';
 
 import TestRunTableComponent from './TestRunTableComponent';
@@ -15,11 +10,8 @@ import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js'
 
 import './RegressionTestRuns.css'
 import { Button } from 'primereact/button';
-import { filter } from 'rxjs';
 
 let RegressionTestRuns = () => {
-
-    const [testRunsFilters, setTestRunsFilters] = useState({});
 
     const [regressionFiltersNodes, setRegressionFiltersNodes] = useState([]);
     const [expandedFilterKeys, setExpandedFilterKeys] = useState({});
@@ -37,9 +29,10 @@ let RegressionTestRuns = () => {
     const [expandedFbKeys, setExpandedFbKeys] = useState({});
     const [selectedFbKeys, setSelectedFbKeys] = useState(null);
 
-    const [apiFilterUrl, setApiFilterUrl] = useState("");
+    const [apiFilterUrl, setApiFilterUrl] = useState(null);
 
     const [searchParams] = useSearchParams();
+    const [searchParamsEntry] = useState(Object.fromEntries([...searchParams]));
 
     const navigate = useNavigate();
 
@@ -62,6 +55,21 @@ let RegressionTestRuns = () => {
         }
     }
 
+    const selectCheckboxesUsingUrlParams = (nodes, paramsEntry, setSelectedNodesKeys) => {
+        let selectedFilters = {}
+        let filterName = nodes[0].key;
+        let filterValues = paramsEntry[filterName].split(',');
+        for (let value of filterValues) {
+            selectedFilters[value] = { "checked": true, "parialChecked": false }
+        }
+        if (nodes[0].children.length === filterValues.length) {
+            selectedFilters[filterName] = { "checked": true, "parialChecked": true }
+        } else {
+            selectedFilters[filterName] = { "checked": false, "parialChecked": true }
+        }
+        setSelectedNodesKeys(selectedFilters)
+    }
+
     let fetchTestFilters = (data) => {
         if (regressionFiltersNodes.length === 0) {
             let filters = {
@@ -80,13 +88,18 @@ let RegressionTestRuns = () => {
 
             nodesTmp.push(filters);
             expandAll(nodesTmp, setExpandedFilterKeys);
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedFilterKeys);
+            }
+
             setRegressionFiltersNodes(nodesTmp)
         }
     }
 
     const fetchStatuses = (data) => {
         if (statusFilterNodes.length === 0) {
-            let statusFilters = {
+            let filters = {
                 key: 'result',
                 label: 'Result filters',
                 data: 'Result Filters',
@@ -96,18 +109,23 @@ let RegressionTestRuns = () => {
             const filterChildren = data.map((item, index) => {
                 return { key: item.pk, label: item.pk, data: item.pk, children: [] }
             })
-            statusFilters.children = filterChildren;
+            filters.children = filterChildren;
 
             let nodesTmp = [...statusFilterNodes];
-            nodesTmp.push(statusFilters);
+            nodesTmp.push(filters);
             expandAll(nodesTmp, setExpandedStatusKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedStatusKeys);
+            }
+
             setStatusFiltersNode(nodesTmp);
         }
     }
 
     const fetchAnalyzers = (data) => {
         if (analyzerFilterNodes.length === 0) {
-            let analyzerFilters = {
+            let filters = {
                 key: 'analyzed_by',
                 label: 'Analyzed By',
                 data: 'Analyzed By',
@@ -117,18 +135,23 @@ let RegressionTestRuns = () => {
             const filterChildren = data.map((item, index) => {
                 return { key: item.fields.username, label: item.fields.username, data: item.fields.username, children: [] }
             })
-            analyzerFilters.children = filterChildren;
+            filters.children = filterChildren;
 
             let nodesTmp = [...analyzerFilterNodes];
-            nodesTmp.push(analyzerFilters);
+            nodesTmp.push(filters);
             expandAll(nodesTmp, setExpandedAnalyzerKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedAnalyzerKeys);
+            }
+
             setAnalyzerFilterNodes(nodesTmp);
         }
     }
 
     const fetchFBs = (data) => {
         if (fbFilterNodes.length === 0) {
-            let fbFilters = {
+            let filters = {
                 key: 'fb',
                 label: 'Feature build',
                 data: 'Feature build',
@@ -138,11 +161,15 @@ let RegressionTestRuns = () => {
             const filterChildren = data.map((item, index) => {
                 return { key: item.pk, label: item.pk, data: item.pk, children: [] }
             })
-            fbFilters.children = filterChildren;
+            filters.children = filterChildren;
 
             let nodesTmp = [...fbFilterNodes];
-            nodesTmp.push(fbFilters);
+            nodesTmp.push(filters);
             expandAll(nodesTmp, setExpandedFbKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedFbKeys);
+            }
             setFbFilterNodes(nodesTmp);
         }
     }
@@ -151,7 +178,6 @@ let RegressionTestRuns = () => {
         getTestRunsFilters().then(
             (response) => {
                 const data = response.data;
-                setTestRunsFilters(data);
                 fetchTestFilters(data['regfilters']);
                 fetchStatuses(data['result']);
                 fetchAnalyzers(data['analyzed_by']);
@@ -212,7 +238,6 @@ let RegressionTestRuns = () => {
             pathname: "",
             search: webUrl
         });
-        console.log(selectedFilterKeys)
     }
 
     const testFiltersCheckboxList = (
@@ -251,19 +276,18 @@ let RegressionTestRuns = () => {
                 serverUrl += key + "=" + paramsEntry[key] + "&"
             }
         }
-
         return serverUrl.slice(0, -1);
     }
 
     useEffect(() => {
         fetchTestRunsFilters();
-
-        const currentParams = Object.fromEntries([...searchParams]);
-        if (Object.keys(currentParams).length !== 0) {
-            let url = convertUrl(currentParams)
+        if (Object.keys(searchParamsEntry).length !== 0) {
+            let url = convertUrl(searchParamsEntry)
             setApiFilterUrl(url);
+        } else {
+            setApiFilterUrl("");
         }
-    }, [])
+    }, [searchParamsEntry])
 
     return (
 
