@@ -1,0 +1,79 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    build: ./backend
+    command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+  
+  redis:
+    image: redis:6-alpine
+
+  celery_worker:
+    build: ./backend
+    command: celery -A backend worker -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  celery_beat:
+    container_name: celery_beat
+    build: ./backend
+    command: celery -A backend beat -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+  
+  flower:
+    container_name: celery_flower
+    build: ./backend
+    command: /start-flower
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/frontend
+    stdin_open: true
+    command: npm start
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
+      - db
+      - web
+    

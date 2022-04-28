@@ -7,3 +7,4 @@ __pycache__/
 migrations
 req.txt
 data
+backend/static

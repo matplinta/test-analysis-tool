@@ -73,9 +73,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2'
+# SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = bool(os.environ.get("DEBUG", default=''))
 
 ALLOWED_HOSTS = ['*']
 
@@ -141,7 +143,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_NAME', 'trs_database'),
         'USER': os.environ.get('POSTGRES_USER', 'trs_user'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'trs'),
-        'HOST': 'db',
+        'HOST': 'db' if os.environ.get('POSTGRES_NAME') else 'localhost',
         'PORT': 5432,
     }
 }
@@ -190,8 +192,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
