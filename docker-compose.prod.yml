@@ -1,0 +1,85 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    build: 
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: /app/wsgi-entrypoint.sh
+    volumes:
+      - static_volume:/app/django_static
+    expose:
+      - 8000
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+      - redis
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/nginx/Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - static_volume:/app/django_static
+      - ./docker/nginx/production:/etc/nginx/conf.d
+    depends_on:
+      - web
+  
+  redis:
+    image: redis:6-alpine
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: celery -A backend worker -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  celery_beat:
+    container_name: celery_beat
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: celery -A backend beat -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+  
+  flower:
+    container_name: celery_flower
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: /start-flower
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+volumes:
+  postgres_db:
+  static_volume:

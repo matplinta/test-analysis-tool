@@ -13,6 +13,40 @@ extra-index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/re
                   https://pypi.org/simple/
 
 
+# system req
+redis, postgresql
+
+# backend requirements
+```
+# FOR DJANGO
+
+django
+djangorestframework  # tools needed to serialize data and turn our Django application into a RESTful API
+django-cors-headers
+django-rest-auth     # logic, and endpoints needed for user authentication. Saves a lot of time vs writing everything from scratch
+django-auth-ldap
+django-allauth
+requests
+python-ldap==3.2.0
+dj-rest-auth
+django-tables2
+django-filter
+
+# FOR postgresql
+psycopg2
+
+# FOR async tasks using celery
+celery
+redis
+
+# FOR ReportingPortal API
+rep-api
+
+# FOR data analysis
+pandas
+matplotlib
+```
+
 # Postgre SQL installation
 ## Tutorial
 https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
@@ -48,3 +82,11 @@ To start task scheduler (needs to be daemonized in production)
 ```sh
 celery -A backend beat -l info
 ```
+
+
+
+# Authentication
+'rest_framework.authentication.SessionAuthentication',
+'rest_framework.authentication.TokenAuthentication',
+
+# only POST requires CSRF tokens, get does not

@@ -6,3 +6,6 @@ __pycache__/
 .vscode
 migrations
 req.txt
+data
+postgres_db
+backend/static
