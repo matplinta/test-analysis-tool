@@ -41,6 +41,7 @@ let TestRunTableComponent = ({ filterUrl }) => {
     }
 
     let onPageChange = (event) => {
+        console.log(event)
         setFirst(event.first)
         setLazyParams(event);
         setCurrentPage(event.page);
@@ -48,17 +49,21 @@ let TestRunTableComponent = ({ filterUrl }) => {
     }
 
     const onPageInputKeyDown = (event, options) => {
-        console.log(currentPage)
+        console.log("!!!!!!!!!!!!!")
         if (event.key === 'Enter') {
             const page = parseInt(currentPage);
+            console.log(page)
             if (page < 0 || page > options.totalPages) {
                 setPageInputTooltip(`Value must be between 1 and ${options.totalPages}.`);
             }
             else {
+                console.log("event enter")
                 const first = currentPage ? options.rows * (page - 1) : 0;
                 setFirst(first);
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
-                onPageChange(event);
+                setLazyParams(event);
+                setCurrentPage(page);
+                fetchTestRunsByFilter(filterUrl, page);
             }
         }
     }

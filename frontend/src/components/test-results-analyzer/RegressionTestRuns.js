@@ -287,7 +287,7 @@ let RegressionTestRuns = () => {
         } else {
             setApiFilterUrl("");
         }
-    }, [searchParamsEntry])
+    }, [])
 
     return (
 
