@@ -312,6 +312,32 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
     filterset_class = TestRunFilter
+    ordering_fields = (
+        'id', 
+        'rp_id', 
+        'test_instance', 
+        'testline_type', 
+        'organization', 
+        'result', 
+        'env_issue_type', 
+        'fb', 
+        'fail_message', 
+        'comment', 
+        'test_line', 
+        'test_suite', 
+        'builds', 
+        'ute_exec_url', 
+        'log_file_url', 
+        'log_file_url_ext', 
+        'start_time', 
+        'end_time', 
+        'analyzed',
+
+        "test_instance__test_case_name", 
+        "test_set__name",
+        "test_set__branch",
+        "test_set__test_lab_path",
+    )
 
     def get_queryset(self):
         queryset = TestRun.objects.all()
