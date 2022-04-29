@@ -4,17 +4,19 @@ services:
   db:
     image: postgres
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - postgres_db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
   web:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./backend:/code
+      - ./backend:/app
     ports:
       - "8000:8000"
     environment:
@@ -29,7 +31,9 @@ services:
     image: redis:6-alpine
 
   celery_worker:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
     command: celery -A backend worker -l info
     depends_on:
       - redis
@@ -42,7 +46,9 @@ services:
 
   celery_beat:
     container_name: celery_beat
-    build: ./backend
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
     command: celery -A backend beat -l info
     depends_on:
       - redis
@@ -51,7 +57,9 @@ services:
   
   flower:
     container_name: celery_flower
-    build: ./backend
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
     command: /start-flower
     ports:
       - 5557:5555
@@ -60,7 +68,9 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
     volumes:
       - ./frontend:/frontend
     stdin_open: true
@@ -71,4 +81,6 @@ services:
       - redis
       - db
       - web
-    
+
+volumes:
+  postgres_db:

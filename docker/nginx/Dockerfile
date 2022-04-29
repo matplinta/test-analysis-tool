@@ -1,4 +1,4 @@
-FROM node:16.14.2
+FROM node:16.14.2 as build
 
 ENV HTTP_PROXY=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
 ENV http_proxy=http://lab-proxy.krk-lab.nsn-rdnet.net:8080/
@@ -14,9 +14,11 @@ WORKDIR /frontend
 
 COPY ./package.json /frontend/
 COPY ./package-lock.json /frontend/
-RUN npm install
-
+RUN npm ci --silent
 COPY . /frontend/
-# RUN unset  HTTP_PROXY http_proxy FTP_PROXY no_proxy HTTPS_PROXY https_proxy ftp_proxy
-# EXPOSE 3000
+RUN npm run build
+
+FROM nginx:stable-alpine
+COPY --from=build /frontend/build /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
  

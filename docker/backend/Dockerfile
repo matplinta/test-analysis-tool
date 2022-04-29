@@ -14,7 +14,7 @@ ENV PYTHONUNBUFFERED=1
 ENV CELERY_BROKER=redis://redis:6379/0
 ENV CELERY_BACKEND=redis://redis:6379/0
 
-WORKDIR /code
+WORKDIR /app
 
 RUN apt-get update  --yes
 RUN apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev  --yes
@@ -26,10 +26,11 @@ RUN echo "[global]\n" \
 "extra-index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/rep-pypi-remote/simple\n" \
 "                  https://pypi.org/simple/\n" > /root/.pip/pip.conf 
 
-COPY ./requirements.txt /code/
+COPY ./requirements.txt /app/
 RUN pip install -r requirements.txt
 
 COPY ./celery_flower_start.sh /start-flower
 RUN chmod +x /start-flower
-COPY . /code/
+COPY ./wsgi-entrypoint.sh /app/
+COPY . /app/
 

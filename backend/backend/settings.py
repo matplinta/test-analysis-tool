@@ -192,10 +192,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/django_static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+CSRF_TRUSTED_ORIGINS = ["http://localhost:1337", "http://test-result-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337"]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
