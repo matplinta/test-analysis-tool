@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import axios from "axios";
 
 import Notify from './../services/Notify';
 import AuthService from './../services/auth.service.js';
@@ -25,6 +26,14 @@ import './App.css';
 const App = () => {
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(undefined);
+
+  if (window.location.origin === "http://localhost:3000") {
+    console.log("localhost")
+    axios.defaults.baseURL = "http://127.0.0.1:8000";
+  } else {
+    console.log("nie localhost")
+    axios.defaults.baseURL = window.location.origin;
+  }
 
   useEffect(() => {
     Notify.notifications.subscribe((alert) => alert instanceof Function && alert());
