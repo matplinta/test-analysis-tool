@@ -12,8 +12,8 @@ services:
 
   web:
     build:
-      context: .
-      dockerfile: ./docker/backend/Dockerfile
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
@@ -32,8 +32,8 @@ services:
 
   celery_worker:
     build:
-      context: .
-      dockerfile: ./docker/backend/Dockerfile
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend worker -l info
     depends_on:
       - redis
@@ -47,8 +47,8 @@ services:
   celery_beat:
     container_name: celery_beat
     build:
-      context: .
-      dockerfile: ./docker/backend/Dockerfile
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend beat -l info
     depends_on:
       - redis
@@ -58,8 +58,8 @@ services:
   flower:
     container_name: celery_flower
     build:
-      context: .
-      dockerfile: ./docker/backend/Dockerfile
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
     command: /start-flower
     ports:
       - 5557:5555
@@ -69,8 +69,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: ./docker/frontend/Dockerfile
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile
     volumes:
       - ./frontend:/frontend
     stdin_open: true
