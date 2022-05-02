@@ -57,78 +57,8 @@ from datetime import datetime
 import pytz
 import logging
 
+from .test_runs_processing import *
 from .tasks import pull_tcs
-
-
-class AccessingRestrictedDataError(Exception):
-    pass
-
-class TestRunWithSuchRPIDAlreadyExists(Exception):
-    pass
-
-
-def create_testrun_obj_based_on_rp_data(rp_test_run):
-    def return_empty_if_none(elem):
-        return elem if elem is not None else ""
-
-    rp_id = rp_test_run["id"]
-    if TestRun.objects.filter(rp_id=rp_id).exists():
-        raise TestRunWithSuchRPIDAlreadyExists(rp_id)
-    timezone = pytz.timezone(settings.TIME_ZONE)
-    start = datetime.strptime(rp_test_run["start"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
-    start = timezone.localize(start)
-    end = datetime.strptime(rp_test_run["end"].split(".")[0], '%Y-%m-%dT%H:%M:%S')
-    end = timezone.localize(end)
-
-    fb_name, fb_start, fb_end = get_fb_info_based_on_date(end)
-    fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
-    
-    test_set, _ = TestSet.objects.get_or_create(
-        name=rp_test_run["qc_test_set"],
-        test_lab_path=rp_test_run["qc_test_instance"].get("m_path", "")
-    )
-    test_instance, _ = TestInstance.objects.get_or_create(
-        test_set=test_set,
-        test_case_name=rp_test_run["test_case"]["name"]
-    )
-    testline_type, _ = TestlineType.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
-    )
-    organization, _ = Organization.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
-    )
-    env_issue_type, _ = EnvIssueType.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run["env_issue_type"])
-    )
-    result, _ = TestRunResult.objects.get_or_create(name=rp_test_run["result"])
-    hyperlink_set = rp_test_run.get("hyperlink_set", "")
-    if hyperlink_set:
-        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", "")
-        log_file_url=rp_test_run["hyperlink_set"].get("log_file_url", "")
-    else:
-        ute_exec_url, log_file_url = "", ""
-    tr = TestRun(
-        rp_id=rp_id,
-        fb=fb,
-        test_instance=test_instance,
-        testline_type=testline_type,
-        organization=organization,
-        result=result,
-        env_issue_type=env_issue_type,
-        comment=rp_test_run["comment"],
-        fail_message=rp_test_run["fail_message"],
-        test_line=rp_test_run["test_line"],
-        test_suite=rp_test_run["test_suite"],
-        builds=rp_test_run["builds"],
-        ute_exec_url=ute_exec_url,
-        log_file_url=log_file_url,
-        # log_file_url_ext
-        start_time=start,
-        end_time=end,
-        # analyzed
-        )
-    tr.save()
-    return tr
 
 
 class LogoutViewEx(LogoutView):
@@ -143,8 +73,8 @@ class FailMessageTypeView(viewsets.ModelViewSet):
 
     @action(detail=False, url_path="my")
     def my(self, request):
-        regfilters = FailMessageType.objects.filter(author=request.user)
-        serializer = self.get_serializer(regfilters, many=True)
+        fmts = FailMessageType.objects.filter(author=request.user)
+        serializer = self.get_serializer(fmts, many=True)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
@@ -412,29 +342,9 @@ class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     permission_classes = (IsAuthenticated,)   
     
     def get(self, request, rfid):
-        tr_list = []
-        tr_skipped_list = []
         regression_filter = RegressionFilter.objects.get(pk=rfid)
-        limit = self.request.query_params.get('limit')
-        limit = regression_filter.limit if limit is None else limit
-        filters = {
-            "result": "not analyzed",
-            "testline_type": regression_filter.testline_type.name,
-            "test_set": regression_filter.test_set.name,
-            "test_lab_path": regression_filter.test_set.test_lab_path
-        }
-        data = RepPortal().get_data_from_testruns(limit=limit, filters=filters)
-        for test_run in data:
-            try:
-                tr = create_testrun_obj_based_on_rp_data(test_run)
-                tr_list.append(tr.rp_id)
-            except TestRunWithSuchRPIDAlreadyExists as e:
-                tr_skipped_list.append(str(e))
-                logging.info(f"{type(e).__name__} was raised for rp_id={e}")
-        content = {
-            'loaded_new_runs': tr_list,
-            'skipped_runs': tr_skipped_list
-        }
+        limit = self.request.query_params.get('limit', None)
+        content = pull_test_runs_by_regfilter(regression_filter, limit)
         return Response(content)
 
 
@@ -443,32 +353,9 @@ class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
     permission_classes = (IsAuthenticated,)   
     
     def get(self, request):
-        regression_filters = RegressionFilter.objects.all()
-        tr_by_rf = {regression_filter.id: [] for regression_filter in regression_filters} 
-        tr_by_rf_skipped = {regression_filter.id: [] for regression_filter in regression_filters} 
-        for regression_filter in regression_filters:
-            filters = {
-                "result": "not analyzed",
-                "testline_type": regression_filter.testline_type.name,
-                "test_set": regression_filter.test_set.name,
-                "test_lab_path": regression_filter.test_set.test_lab_path
-            }
-            data = RepPortal().get_data_from_testruns(limit=regression_filter.limit, filters=filters)
-            for test_run in data:
-                try:
-                    tr = create_testrun_obj_based_on_rp_data(test_run)
-                    tr_by_rf[regression_filter.id].append(tr.rp_id)
-                except TestRunWithSuchRPIDAlreadyExists as e:
-                    tr_by_rf_skipped[regression_filter.id].append(str(e))
-                    logging.info(f"{type(e).__name__} was raised for rp_id={e}")
-        content = {
-            'loaded_new_runs': tr_by_rf,
-            'skipped_runs': tr_by_rf_skipped
-        }
+        limit = self.request.query_params.get('limit', None)
+        content = pull_test_runs_by_all_regfilters(limit)
         return Response(content)
-
-
-
 
 
 

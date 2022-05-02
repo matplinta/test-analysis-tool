@@ -32,7 +32,7 @@ class RepPortal():
         self._test_run_results = ["passed", "failed", "blocked", "environment issue"]
         self._env_issue_type = ["Precondition", "TA_SCRIPT", "Other", "BTS", "TOOLS", "UTE",
                                 "TA_FRAMEWORK", "iPHY", "LMTS", "RealUE", "TM500", "Robustness",
-                                "Env_gNB", "Pre Check", "iphy", "RTG", "Renesas"]
+                                "Env_gNB", "Pre Check", "iphy", "UE", "RTG", "Renesas", "Core", "SCF", "TestLine", "Lib", "Software", "PowerSupply"]
         self.basic_fields_list = [
             'id', 
             'qc_test_set', 

@@ -9,3 +9,5 @@ req.txt
 data
 postgres_db
 backend/static
+backend/celerybeat-schedule
+dump.rdb
