@@ -3,12 +3,24 @@ version: "3.9"
 services:
   db:
     image: postgres
+    container_name: postgres_db
     volumes:
       - postgres_db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
 
   web:
     build: 
@@ -37,6 +49,7 @@ services:
     volumes:
       - static_volume:/app/django_static
       - ./docker/nginx/production:/etc/nginx/conf.d
+      - /home/ute/ssl:/etc/ssl
     depends_on:
       - web
   

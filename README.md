@@ -90,3 +90,8 @@ celery -A backend beat -l info
 'rest_framework.authentication.TokenAuthentication',
 
 # only POST requires CSRF tokens, get does not
+
+
+
+
+@hourly /home/ute/web-tools/backup_postgres_db.sh >> /home/ute/backup_db_cron_log.txt 2>&1
