@@ -11,7 +11,6 @@ import re
 from django.contrib.auth.models import User
 
 from .models import (
-    FailMessageTypeGroup,
     FeatureBuild,
     get_fb_info_based_on_date,
     Organization, 
@@ -47,9 +46,13 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
     return None, None
 
 
-def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType]):
+def analyze_testrun_in_rp(test_run):
+    pass
+
+
+def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType], first_lines_to_match: int = 3):
     fail_message_type, line_no = match_fail_message_type(fail_message=test_run.fail_message, fail_message_types=fail_message_types)
-    if fail_message_type and line_no <= 3:
+    if fail_message_type and line_no <= first_lines_to_match:
         env_issue, created = TestRunResult.objects.get_or_create(name="environment issue")
         test_run.result = env_issue
         test_run.env_issue_type = fail_message_type.env_issue_type
@@ -57,6 +60,9 @@ def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMess
         test_run.analyzed = True
         autouser, created = User.objects.get_or_create(username="autoanalyzer")
         test_run.analyzed_by = autouser
+
+        analyze_testrun_in_rp(test_run)
+
     return test_run
 
 
@@ -119,21 +125,20 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, analyze=False):
         # log_file_url_ext
         start_time=start,
         end_time=end,
-        # analyzed
         )
 
     return tr
 
 
-def pull_test_runs_from_rp_to_db(limit, filters, analyze: boolean=False, regfilter: RegressionFilter=None):
+def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, regfilter: RegressionFilter=None):
     tr_list, tr_skipped_list = [], []
-    if analyze and regfilter:
+    if try_to_analyze and regfilter:
         fail_message_types = get_fail_message_types_from_regfilter(regfilter)
     data = RepPortal().get_data_from_testruns(limit=limit, filters=filters)
     for test_run in data:
         try:
             tr = create_testrun_obj_based_on_rp_data(test_run)
-            if analyze:
+            if try_to_analyze and regfilter:
                 tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types)
             tr.save()
             tr_list.append(tr.rp_id)
@@ -144,30 +149,25 @@ def pull_test_runs_from_rp_to_db(limit, filters, analyze: boolean=False, regfilt
     return {'loaded_new_runs': tr_list, 'skipped_runs': tr_skipped_list}
 
 
-def pull_test_runs_by_regfilter(regression_filter: RegressionFilter, query_limit: int):
-    
-    limit = regression_filter.limit if query_limit is None else query_limit
+def pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id: int, query_limit: int=None):
+    regression_filter = RegressionFilter.objects.get(id=regression_filter_id)
     filters = {
         "result": "not analyzed",
         "testline_type": regression_filter.testline_type.name,
         "test_set": regression_filter.test_set.name,
         "test_lab_path": regression_filter.test_set.test_lab_path
     }
-    return pull_test_runs_from_rp_to_db(limit=query_limit, filters=filters, analyze=True, regfilter=regression_filter)
+    if not query_limit:
+        query_limit = regression_filter.limit
+    return pull_test_runs_from_rp_to_db(limit=query_limit, filters=filters, try_to_analyze=True, regfilter=regression_filter)
 
 
-def pull_test_runs_by_all_regfilters(query_limit: int):
+def pull_and_analyze_notanalyzed_testruns_by_all_regfilters(query_limit: int=None):
     regression_filters = RegressionFilter.objects.all()
     tr_by_rf = {regression_filter.id: [] for regression_filter in regression_filters} 
     tr_by_rf_skipped = {regression_filter.id: [] for regression_filter in regression_filters} 
     for regression_filter in regression_filters:
-        filters = {
-            "result": "not analyzed",
-            "testline_type": regression_filter.testline_type.name,
-            "test_set": regression_filter.test_set.name,
-            "test_lab_path": regression_filter.test_set.test_lab_path
-        }
-        pull_stats = pull_test_runs_from_rp_to_db(limit=query_limit, filters=filters, analyze=True, regfilter=regression_filter)
+        pull_stats = pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id=regression_filter.id, query_limit=query_limit)
         tr_by_rf[regression_filter.id] = pull_stats["loaded_new_runs"]
         tr_by_rf_skipped[regression_filter.id] = pull_stats["skipped_runs"]
 

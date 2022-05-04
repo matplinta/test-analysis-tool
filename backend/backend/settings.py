@@ -75,6 +75,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2'
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
+RP_USER = 'sc'
+RP_PASSWORD = 'Pico1234^'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # DEBUG = bool(os.environ.get("DEBUG", default=''))
@@ -167,6 +170,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
+# https://docs.djangoproject.com/en/4.0/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'CET' # UTC
+USE_I18N = True
+USE_TZ = True
 
 # CELERY STUFF
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
@@ -174,20 +184,7 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/

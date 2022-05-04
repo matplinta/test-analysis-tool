@@ -71,6 +71,9 @@ class FeatureBuild(models.Model):
     start_time = models.DateTimeField(blank=False, null=False, verbose_name='Start', help_text="Start time of the feature build")
     end_time   = models.DateTimeField(blank=False, null=False, verbose_name='End', help_text="End time of the feature build")
 
+    class Meta:
+         ordering = ['-name']
+
     def __str__(self):
         return self.name
 
