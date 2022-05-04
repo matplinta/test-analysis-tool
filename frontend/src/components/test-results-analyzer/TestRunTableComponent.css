@@ -1,41 +1,5 @@
-.datatable-doc-demo .p-paginator .p-paginator-current {
-    margin-left: 2px;
-}
-
-.datatable-doc-demo .p-progressbar {
-    height: 0.5rem;
-    background-color: #d8dadc;
-}
-
-.datatable-doc-demo .p-progressbar .p-progressbar-value {
-    background-color: #607d8b;
-}
-
-.datatable-doc-demo .p-datepicker {
-    min-width: 25rem;
-}
-
-.datatable-doc-demo .p-datepicker td {
-    font-weight: 400;
-}
-
-.datatable-doc-demo .p-datatable.p-datatable-test-runs .p-datatable-header {
-    padding: 1rem;
-    text-align: left;
-    font-size: 1.5rem;
-}
-
-.datatable-doc-demo .p-datatable.p-datatable-test-runs .p-paginator {
-    padding: 1rem;
-}
-
-.datatable-doc-demo .p-datatable.p-datatable-test-runs .p-datatable-thead>tr>th {
-    text-align: left;
-    font-size: xx-small;
-}
-
-.datatable-doc-demo .p-datatable.p-datatable-test-runs .p-dropdown-label:not(.p-placeholder) {
-    text-transform: uppercase;
+.p-card .p-card-content {
+    padding: 0;
 }
 
 .p-datatable .p-datatable-tbody>tr>td {
@@ -45,4 +9,29 @@
 .column-font-style {
     max-width: 100px;
     font-size: 5px;
+}
+
+.result-badge {
+    border-radius: 2px;
+    padding: .25em .35rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.result-badge.result-not-analyzed {
+    background-color: #fafc7d;
+    color: #656622;
+}
+
+.result-badge.result-environment-issue {
+    background-color: #ECCFFF;
+    color: #694382;
+}
+
+.p-card .p-card-body {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
