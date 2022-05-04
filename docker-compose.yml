@@ -1,0 +1,86 @@
+version: "3.9"
+   
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+      - redis
+  
+  redis:
+    image: redis:6-alpine
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: celery -A backend worker -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  celery_beat:
+    container_name: celery_beat
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: celery -A backend beat -l info
+    depends_on:
+      - redis
+      - db
+    restart: on-failure
+  
+  flower:
+    container_name: celery_flower
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    command: /start-flower
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile
+    volumes:
+      - ./frontend:/frontend
+    stdin_open: true
+    command: npm start
+    ports:
+      - 3000:3000
+    depends_on:
+      - redis
+      - db
+      - web
+
+volumes:
+  postgres_db:

@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import ldap
 from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
-
+import os
 
 # -----------------------------------------------------------------------------
 # LDAP
@@ -73,12 +73,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2'
+# SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = bool(os.environ.get("DEBUG", default=''))
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -99,8 +100,11 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [    
-'http://localhost:3000'
+    'http://test-result-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
+# CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -133,22 +137,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'trs_database',
-        'USER': 'trs_user',
-        'PASSWORD': 'trs',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.environ.get('POSTGRES_NAME', 'trs_database'),
+        'USER': os.environ.get('POSTGRES_USER', 'trs_user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'trs'),
+        'HOST': 'db' if os.environ.get('POSTGRES_NAME') else 'localhost',
+        'PORT': 5432,
     }
 }
 
@@ -173,8 +169,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # CELERY STUFF
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379")
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -196,9 +192,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
+STATIC_URL = '/django_static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net"
+    "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
+    "http://localhost:1337", 
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
