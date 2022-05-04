@@ -1,19 +1,18 @@
 import { useState, useEffect } from 'react';
 
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'react-bootstrap';
-import { Ripple } from 'primereact/ripple';
-import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
-import { classNames } from 'primereact/utils';
+import { MultiSelect } from 'primereact/multiselect';
 
-import { getTestRuns, getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
+import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
+import './TestRunTableComponent.css';
 
-let TestRunTableComponent = ({ filterUrl }) => {
+
+let TestRunTableComponent = ({ filterUrl, onSort }) => {
 
     const [testRuns, setTestRuns] = useState([]);
     const [first, setFirst] = useState(0);
@@ -21,6 +20,30 @@ let TestRunTableComponent = ({ filterUrl }) => {
 
     const [testRunsCount, setTestRunsCount] = useState(null);
     const [pagesCount, setPagesCount] = useState(null);
+
+    const columns = [
+        // { field: 'id', header: 'ID' },
+        // { field: 'rp_id', header: 'RP ID' },
+        // { field: 'fb', header: 'FB' },
+        // { field: 'test_instance.test_case_name', header: 'Test Case' },
+        // { field: 'test_instance.test_set.branch', header: 'Branch' },
+        { field: 'test_instance.test_set.test_lab_path', header: 'Test Lab Path' },
+        // { field: 'testline_type', header: 'Test Line Type' },
+        { field: 'test_line', header: 'Test Line' },
+        { field: 'test_suite', header: 'Test Suite' },
+        { field: 'organization', header: 'Organization' },
+        // { field: 'result', header: 'Result' },
+        // { field: 'env_issue_type', header: 'Env Issue Type' },
+        // { field: 'comment', header: 'Comment' },
+        // { field: 'builds', header: 'Builds' },
+        // { field: 'log_file_url', header: 'Logs' },
+        { field: 'start_time', header: 'Start time' },
+        { field: 'end_time', header: 'End time' },
+        { field: 'analyzed_by', header: 'Analyzed by' },
+        { field: 'fail_message', header: 'Fail Message' }
+    ];
+
+    const [selectedColumns, setSelectedColumns] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [lazyParams, setLazyParams] = useState({
@@ -41,7 +64,6 @@ let TestRunTableComponent = ({ filterUrl }) => {
     }
 
     let onPageChange = (event) => {
-        console.log(event)
         setFirst(event.first)
         setLazyParams(event);
         setCurrentPage(event.page);
@@ -49,7 +71,6 @@ let TestRunTableComponent = ({ filterUrl }) => {
     }
 
     const onPageInputKeyDown = (event, options) => {
-        console.log("!!!!!!!!!!!!!")
         if (event.key === 'Enter') {
             const page = parseInt(currentPage);
             console.log(page)
@@ -77,8 +98,8 @@ let TestRunTableComponent = ({ filterUrl }) => {
                         Go to <InputText size="2" className="p-ml-1" value={currentPage} tooltip={pageInputTooltip}
                             onKeyDown={(e) => onPageInputKeyDown(e, options)} onChange={onPageInputChange} />
                     </span>
-                    <span style={{ color: 'var(--text-color)', userSelect: 'none', width: '120px', textAlign: 'center' }}>
-                        {options.first} - {options.last} of {options.totalRecords}
+                    <span style={{ color: 'var(--text-color)', userSelect: 'none', textAlign: 'center' }}>
+                        {options.first} - {options.last} of {options.totalRecords} rows
                     </span>
                 </>
             )
@@ -111,57 +132,72 @@ let TestRunTableComponent = ({ filterUrl }) => {
 
     let logLinkBodyTemplate = (rowData) => {
         return (
-            <Button variant="link" href={rowData.log_file_url} style={{ fontSize: '12px' }}>Logs</Button>
+            <Button variant="link" href={rowData.log_file_url} style={{ fontSize: '11px' }}>Logs</Button>
         )
     }
 
-    let parseDate = (dateToParse) => {
-        return Date.parse(dateToParse);
+    let resultBodyTemplate = (rowData) => {
+        let resultCssName = "result-badge result-" + rowData.result.replace(' ', '-');
+        return <span className={resultCssName}>{rowData.result}</span>;
     }
 
-    let startDateBodyTemplate = (rowData) => {
-        return <p>{parseDate(rowData.start_time)}</p>
+    let dateBodyTemplate = (rowData) => {
+        return <p>{rowData.start_time.replace('T', ' ').replace('Z', '')}</p>
     }
+
+    const onColumnToggle = (event) => {
+        let selectedColumns = event.value;
+        let orderedSelectedColumns = columns.filter(col => selectedColumns.some(sCol => sCol.field === col.field));
+        setSelectedColumns(orderedSelectedColumns);
+    }
+
+    const header = (
+        <div style={{ textAlign: 'left' }}>
+            <MultiSelect value={selectedColumns} options={columns} optionLabel="header" onChange={onColumnToggle} style={{ width: '40em' }}
+                placeholder="Select additional columns to show" />
+        </div>
+    );
+
+    const columnComponents = selectedColumns.map(col => {
+        if (col.field === 'start_time' || col.field == 'end_time') {
+            return <Column key={col.field} body={dateBodyTemplate} header={col.header} sortable style={{ fontSize: '11px' }} />;
+        } else {
+            return <Column key={col.field} field={col.field} header={col.header} sortable style={{ fontSize: '11px' }} />;
+        }
+
+    });
 
     useEffect(
         () => {
             if (filterUrl === "" && filterUrl !== null) {
                 fetchTestRunsByFilter("", currentPage);
             } else if (filterUrl !== "" && filterUrl !== null) {
-                fetchTestRunsByFilter(filterUrl, currentPage);
+                fetchTestRunsByFilter(filterUrl, 1);
             }
         }, [filterUrl]
     )
 
     return (
-        <div className="datatable-doc-demo">
-            <div className="card">
-                <DataTable value={testRuns} lazy paginator className="p-datatable-test-runs" size="small" stripedRows
-                    pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
-                    paginatorTemplate={templateCurrentPageReport}
-                    dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
-                    emptyMessage="No test runs found! Please change your selected filters.">
-                    <Column field="rp_id" header="RP id" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    <Column field="test_instance.test_set.name" header="Test Set" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
+        <DataTable value={testRuns} lazy paginator className="p-datatable-test-runs" size="small" stripedRows
+            pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
+            paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
+            dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
+            resizableColumns columnResizeMode="fit"
+            emptyMessage="No test runs found! Please change your selected filters."
+            onSort={(e) => onSort(e)} >
 
-                    <Column field="test_instance.test_case_name" header="Test Case" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    {/* <Column field="test_instance.test_set.test_lab_path" header="Lab Path" sortable filter filterPlaceholder="Search by test case name" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    {/* <Column field="test_instance.test_set.branch" header="Branch" sortable filter filterPlaceholder="Search by test case name" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    {/* <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    {/* <Column field="test_line" header="Testline" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    <Column field="builds" header="Build" sortable style={{ maxWidth: '160px', fontSize: '12px' }} />
-                    <Column field="fb" header="FB" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    <Column body={logLinkBodyTemplate} header="Logs" style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    {/* <Column body={startDateBodyTemplate} header="Start time" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    {/* <Column field="end_time" header="End time" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    <Column field="env_issue_type" header="Env issue type" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    <Column field="comment" header="Comment" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    {/* <Column field="fail_message" header="Fail Message" sortable filter filterPlaceholder="Search by build" style={{ maxWidth: '100px', fontSize: '12px' }} /> */}
-                    <Column field="analyzed_by" header="Analyzed by" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                    <Column field="result" header="Result" sortable style={{ maxWidth: '100px', fontSize: '12px' }} />
-                </DataTable>
-            </div>
-        </div>
+            <Column field="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
+            <Column field="test_instance.test_case_name" header="Test Case" sortable style={{ fontSize: '11px' }} />
+            <Column field="test_instance.test_set.branch" header="Branch" sortable style={{ fontSize: '11px' }} />
+            <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by build" style={{ fontSize: '11px' }} />
+            <Column field="builds" header="Build" sortable style={{ fontSize: '11px' }} />
+            <Column body={resultBodyTemplate} header="Result" sortable style={{ fontSize: '11px' }} />
+            <Column body={logLinkBodyTemplate} header="Logs" style={{ fontSize: '11px' }} />
+            <Column field="fb" header="FB" sortable style={{ fontSize: '11px' }} />
+            <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
+            <Column field="comment" header="Comment" sortable style={{ fontSize: '11px' }} />
+            {columnComponents}
+        </DataTable>
     )
 }
 

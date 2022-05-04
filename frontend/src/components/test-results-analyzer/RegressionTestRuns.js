@@ -34,6 +34,8 @@ let RegressionTestRuns = () => {
     const [searchParams] = useSearchParams();
     const [searchParamsEntry] = useState(Object.fromEntries([...searchParams]));
 
+    const [orderBy, setOrderBy] = useState(null);
+
     const navigate = useNavigate();
 
 
@@ -230,6 +232,7 @@ let RegressionTestRuns = () => {
     }
 
     const searchTestRuns = () => {
+        console.log("search")
         let apiUrl = defineApiUrl().slice(0, -1);
         setApiFilterUrl(apiUrl);
 
@@ -279,6 +282,12 @@ let RegressionTestRuns = () => {
         return serverUrl.slice(0, -1);
     }
 
+    const onSort = (e) => {
+        let orderColumn = e.sortField.replaceAll('.', '__');
+        setOrderBy(orderColumn);
+        searchTestRuns();
+    }
+
     useEffect(() => {
         fetchTestRunsFilters();
         if (Object.keys(searchParamsEntry).length !== 0) {
@@ -287,7 +296,7 @@ let RegressionTestRuns = () => {
         } else {
             setApiFilterUrl("");
         }
-    }, [])
+    }, [orderBy])
 
     return (
 
@@ -298,10 +307,11 @@ let RegressionTestRuns = () => {
                 {analyzerCheckboxList}
                 {fbCheckboxList}
                 <Button onClick={searchTestRuns} style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
+
             </aside>
             <main>
                 <Card>
-                    <TestRunTableComponent filterUrl={apiFilterUrl}></TestRunTableComponent>
+                    <TestRunTableComponent filterUrl={apiFilterUrl} onSort={onSort}></TestRunTableComponent>
                 </Card>
 
             </main>

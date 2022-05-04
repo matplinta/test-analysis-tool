@@ -28,10 +28,8 @@ const App = () => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(undefined);
 
   if (window.location.origin === "http://localhost:3000") {
-    console.log("localhost")
     axios.defaults.baseURL = "http://127.0.0.1:8000";
   } else {
-    console.log("nie localhost")
     axios.defaults.baseURL = window.location.origin;
   }
 
