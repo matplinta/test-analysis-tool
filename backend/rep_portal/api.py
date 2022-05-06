@@ -23,11 +23,12 @@ class RepPortal():
     post_count = 0
     POST_THROTTLE_LIMIT = 60
 
-    def __init__(self):
+    def __init__(self, token=None):
         self.user = settings.RP_USER
         self.passwd = settings.RP_PASSWORD
+        self.token = token
         self.basic_url = 'https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/'
-
+        
         self._default_dict = {"common_build": None, "pronto": "", "default_blocked": "true", "runs": None,
                               "send_to_qc": "false", "result": None, "comment": None}
         self._test_run_results = ["passed", "failed", "blocked", "environment issue"]
@@ -115,9 +116,14 @@ class RepPortal():
 
     def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None):
         url = self._build_get_url_for_testruns(limit, filters, fields, ordering)
-        with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
-            print(url)
-            data = api.get(url, params=None)
+        # with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
+        #     print(url)
+        #     data = api.get(url, params=None)
+        api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
+        api.session.login(token=self.token)
+        print(url)
+        data = api.get(url, params=None)
+        api.logout()
         return data.json()['results']
 
 
@@ -147,20 +153,23 @@ class RepPortal():
     def analyze_testruns(self, runs, comment, result="environment issue", env_issue_type=None):
         data = self._generate_analyze_json(runs=runs, comment=comment, result=result, env_issue_type=env_issue_type)
         url = "https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/runs-analyze/"
-        with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
-            retry = 3
-            while retry > 0:
-                resp = api.post(url, params=None, data=data)
-                if resp.status_code == 200:
-                    break
-                elif resp.status_code == 429:
-                    wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
-                    time.sleep(wait_sec_until_new_minute_starts)
-                    retry -= 1
-                    continue
-                else:
-                    print(resp)
-                    print(resp.text)
-                    print(resp.status_code)
-                    break
+        # with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
+        api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
+        api.session.login(token=self.token)
+        retry = 3
+        while retry > 0:
+            resp = api.post(url, params=None, data=data)
+            if resp.status_code == 200:
+                break
+            elif resp.status_code == 429:
+                wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                time.sleep(wait_sec_until_new_minute_starts)
+                retry -= 1
+                continue
+            else:
+                print(resp)
+                print(resp.text)
+                print(resp.status_code)
+                break
+        api.logout()
         return resp

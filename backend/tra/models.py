@@ -6,11 +6,12 @@ from django.contrib.auth.models import User
 import re
 import datetime
 from django.conf import settings
-import pytz
+# import pytz
+from dateutil import tz
 
 
 def get_fb_info_based_on_date(test_datetime):
-    fb_start = datetime.datetime(2022, 1, 5, 0, 0, 0, tzinfo=pytz.timezone(settings.TIME_ZONE))
+    fb_start = datetime.datetime(2022, 1, 5, 0, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE))
     if test_datetime.year < 2022:
         return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
     while fb_start.year != test_datetime.year:
@@ -173,6 +174,14 @@ class TestRun(models.Model):
 
     def __str__(self):
         return f"{self.test_instance.test_case_name[:40]} from {self.test_instance.test_set.branch}"
+
+
+class RepPortalUserToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="rp_token")
+    token = models.CharField(max_length=300, blank=False, null=True, help_text="RepPortal user specific token")
+
+    def __str__(self):
+        return self.user.username
 
 
 class RegressionFilter(models.Model):

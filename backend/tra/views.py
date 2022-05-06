@@ -170,19 +170,6 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
                                test_instance__test_set=regression_filter.test_set)
 
 
-# class TestRunsBasedOnAllSubscribedRegressionFiltersView(generics.ListAPIView):
-#     permission_classes = (IsAuthenticated,)   
-#     serializer_class = TestRunSerializer
-
-#     def get_queryset(self):
-#         queryset = TestRun.objects.all()
-#         rfid = self.kwargs['rfid']
-#         regression_filter = RegressionFilter.objects.get(pk=rfid)
-#         # if test_filter.user != self.request.user:
-#         #     raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={rfid}")
-#         return queryset.filter(testline_type=regression_filter.testline_type, 
-#                                test_instance__test_set=regression_filter.test_set)
-
 class TestRunsBasedOnQueryDictinctValues(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = TestRunSerializer
