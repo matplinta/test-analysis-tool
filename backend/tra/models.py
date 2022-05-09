@@ -118,7 +118,7 @@ class TestSet(models.Model):
 
 
     def __str__(self):
-        return f"{self.name[:40]}... on {self.branch}"
+        return f"{self.id}: {self.name[:40]}... on {self.branch}"
 
     def save(self, *args, **kwargs):
         match = re.search(r'Root\\+Test_Sets\\+(\w+)\\+', self.test_lab_path)

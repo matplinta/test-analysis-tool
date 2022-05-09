@@ -23,7 +23,7 @@ class FeatureBuildAdmin(admin.ModelAdmin):
 
 
 class FailMessageTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'regex', 'author', 'env_issue_type']
+    list_display = ['regex', 'id', 'name', 'author', 'env_issue_type']
     list_filter = ['name', 'author', 'env_issue_type']
     search_fields = ['name', 'regex', 'author', 'env_issue_type']
 
