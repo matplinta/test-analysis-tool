@@ -102,8 +102,20 @@ INSTALLED_APPS = [
     'stats',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
+    "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
+    "https://localhost:1337", 
+]
+
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# USE_X_FORWARDED_HOST = True
+# USE_X_FORWARDED_PORT = True
+
 CORS_ALLOWED_ORIGINS = [    
-    'http://test-result-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
+    'https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net',
+    'http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
@@ -195,11 +207,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net"
-    "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
-    "http://localhost:1337", 
-]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
