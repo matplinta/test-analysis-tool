@@ -73,7 +73,7 @@ class BranchAdmin(admin.ModelAdmin):
 
 
 class TestSetAdmin(admin.ModelAdmin):
-    list_display = ['name', 'test_lab_path', 'branch']
+    list_display = ['name', 'id', 'test_lab_path', 'branch']
     list_filter = ['branch']
     search_fields = ['name', 'test_lab_path']
 

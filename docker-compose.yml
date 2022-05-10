@@ -5,10 +5,8 @@ services:
     image: postgres
     volumes:
       - postgres_db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - ./.postgres.env
 
   web:
     build:
@@ -19,10 +17,8 @@ services:
       - ./backend:/app
     ports:
       - "8000:8000"
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - ./.postgres.env
     depends_on:
       - db
       - redis
@@ -35,6 +31,8 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend worker -l info
+    env_file:
+      - ./.postgres.env
     depends_on:
       - redis
       - db
@@ -50,6 +48,8 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend beat -l info
+    env_file:
+      - ./.postgres.env
     depends_on:
       - redis
       - db
@@ -61,6 +61,8 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
     command: /start-flower
+    env_file:
+      - ./.postgres.env
     ports:
       - 5557:5555
     depends_on:

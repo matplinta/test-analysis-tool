@@ -4,7 +4,6 @@ db.sqlite3
 __pycache__/
 *.py[cod]
 .vscode
-migrations
 req.txt
 data
 postgres_db

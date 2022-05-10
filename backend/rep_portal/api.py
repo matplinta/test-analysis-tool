@@ -114,7 +114,7 @@ class RepPortal():
         return f"{base_url}{rest_url}"
     
 
-    def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None):
+    def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None):            
         url = self._build_get_url_for_testruns(limit, filters, fields, ordering)
         # with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
         #     print(url)
@@ -123,8 +123,25 @@ class RepPortal():
         api.session.login(token=self.token)
         print(url)
         data = api.get(url, params=None)
+
+        retry = 3
+        while retry > 0:
+            resp = api.get(url, params=None)
+            if resp.status_code == 200:
+                break
+            elif resp.status_code == 429:
+                wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                time.sleep(wait_sec_until_new_minute_starts)
+                retry -= 1
+                continue
+            else:
+                print(resp)
+                print(resp.text)
+                print(resp.status_code)
+                break
+
         api.logout()
-        return data.json()['results']
+        return resp.json()['results']
 
 
     def _generate_analyze_json(self, runs, result, comment, env_issue_type=None, common_build="", suggested_prontos=[], pronto="", 
