@@ -232,9 +232,9 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         'analyzed',
 
         "test_instance__test_case_name", 
-        "test_set__name",
-        "test_set__branch",
-        "test_set__test_lab_path",
+        "test_instance__test_set__name",
+        "test_instance__test_set__branch",
+        "test_instance__test_set__test_lab_path",
     )
 
     def get_queryset(self):
