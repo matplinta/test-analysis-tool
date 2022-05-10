@@ -75,6 +75,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2'
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
+RP_USER = 'sc'
+RP_PASSWORD = 'Pico1234^'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # DEBUG = bool(os.environ.get("DEBUG", default=''))
@@ -99,8 +102,20 @@ INSTALLED_APPS = [
     'stats',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
+    "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
+    "https://localhost:1337", 
+]
+
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# USE_X_FORWARDED_HOST = True
+# USE_X_FORWARDED_PORT = True
+
 CORS_ALLOWED_ORIGINS = [    
-    'http://test-result-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
+    'https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net',
+    'http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
 ]
@@ -167,6 +182,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
+# https://docs.djangoproject.com/en/4.0/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'CET' # UTC
+USE_I18N = True
+USE_TZ = True
 
 # CELERY STUFF
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
@@ -174,20 +196,7 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://localhost:6379
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
-
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
@@ -198,11 +207,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net"
-    "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
-    "http://localhost:1337", 
-]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

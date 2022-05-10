@@ -6,10 +6,8 @@ services:
     container_name: postgres_db
     volumes:
       - postgres_db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - ./.postgres.env
   
   pgadmin:
     image: dpage/pgadmin4
@@ -31,10 +29,8 @@ services:
       - static_volume:/app/django_static
     expose:
       - 8000
-    environment:
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - ./.postgres.env
     depends_on:
       - db
       - redis
@@ -61,9 +57,12 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend worker -l info
+    env_file:
+      - ./.postgres.env
     depends_on:
       - redis
       - db
+      - flower
     restart: on-failure
     deploy:
       replicas: 2
@@ -76,9 +75,12 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
     command: celery -A backend beat -l info
+    env_file:
+      - ./.postgres.env
     depends_on:
       - redis
       - db
+      - flower
     restart: on-failure
   
   flower:
@@ -86,6 +88,8 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
+    env_file:
+      - ./.postgres.env
     command: /start-flower
     ports:
       - 5557:5555

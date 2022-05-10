@@ -9,7 +9,6 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from django.views.generic import ListView
 from dj_rest_auth.views import LogoutView
-from rest_framework.settings import api_settings
 from rest_framework import generics, mixins, views
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -36,7 +35,6 @@ from .serializers import (
 from .models import (
     FailMessageTypeGroup,
     FeatureBuild,
-    get_fb_info_based_on_date,
     Organization, 
     TestRunResult, 
     TestlineType, 
@@ -58,7 +56,6 @@ import pytz
 import logging
 
 from .test_runs_processing import *
-from .tasks import pull_tcs
 
 
 class LogoutViewEx(LogoutView):
@@ -96,30 +93,6 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class TestRunView(viewsets.ModelViewSet):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)  
-    serializer_class = TestRunSerializer
-    queryset = TestRun.objects.all()
-
-    @action(detail=True, methods=['put'], url_path="analyze")
-    def analyze(self, request, pk=None):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(analyzed=True, analyzed_by=self.request.user)
-        return Response(serializer.data)
-
-
-# class AnalyzeTestRunView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-#                          viewsets.GenericViewSet):
-#     serializer_class = TestRunSerializer
-#     queryset = TestRun.objects.all()
-
-#     def perform_update(self, serializer):
-#         serializer.save(analyzed=True, analyzed_by=self.request.user)
-
-
 class TestlineTypeView(viewsets.ModelViewSet):
     serializer_class = TestlineTypeSerializer
     queryset = TestlineType.objects.all()
@@ -136,13 +109,6 @@ class RegressionFilterView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)   
     serializer_class = RegressionFilterSerializer
     queryset = RegressionFilter.objects.all()
-
-
-    # @action(detail=False, url_path="other")
-    # def other(self, request):
-    #     regfilters = request.user.owned_reg_filters.all()
-    #     serializer = self.get_serializer(regfilters, many=True)
-    #     return Response(serializer.data)
 
 
     @action(detail=False, url_path="owned")
@@ -177,6 +143,21 @@ class RegressionFilterView(viewsets.ModelViewSet):
         instance.subscribers.add(self.request.user)
 
 
+class TestRunView(viewsets.ModelViewSet):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)  
+    serializer_class = TestRunSerializer
+    queryset = TestRun.objects.all()
+
+    @action(detail=True, methods=['put'], url_path="analyze")
+    def analyze(self, request, pk=None):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(analyzed=True, analyzed_by=self.request.user)
+        return Response(serializer.data)
+
+
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
@@ -189,19 +170,6 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
                                test_instance__test_set=regression_filter.test_set)
 
 
-# class TestRunsBasedOnAllSubscribedRegressionFiltersView(generics.ListAPIView):
-#     permission_classes = (IsAuthenticated,)   
-#     serializer_class = TestRunSerializer
-
-#     def get_queryset(self):
-#         queryset = TestRun.objects.all()
-#         rfid = self.kwargs['rfid']
-#         regression_filter = RegressionFilter.objects.get(pk=rfid)
-#         # if test_filter.user != self.request.user:
-#         #     raise AccessingRestrictedDataError(f"You {self.request.user} do not have access to TestFilter with id={rfid}")
-#         return queryset.filter(testline_type=regression_filter.testline_type, 
-#                                test_instance__test_set=regression_filter.test_set)
-
 class TestRunsBasedOnQueryDictinctValues(APIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = TestRunSerializer
@@ -211,7 +179,7 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
 
         def get_distinct_values_and_serialize(field, model, serializer, order_by_param=None):
             order_by_param = order_by_param if order_by_param else field
-            distinct_values = queryset.order_by(field).distinct(field).values_list(field, flat=True)
+            distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
             objects = model.objects.filter(pk__in=distinct_values)
             data = serialize("json", objects)
             fields_dict[field] = json.loads(data)
@@ -229,7 +197,7 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         fields_dict["regfilters"] = json.loads(serialize("json", regfilters))
         fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
         get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer) #, "test_instance__id")
-        get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer)
+        get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
         get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
         get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
@@ -264,9 +232,9 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         'analyzed',
 
         "test_instance__test_case_name", 
-        "test_set__name",
-        "test_set__branch",
-        "test_set__test_lab_path",
+        "test_instance__test_set__name",
+        "test_instance__test_set__branch",
+        "test_instance__test_set__test_lab_path",
     )
 
     def get_queryset(self):
@@ -278,64 +246,6 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         )
         return queryset
 
-    # def get_queryset(self):
-    #     queryset = TestRun.objects.all()
-    #     reg_filters = self.request.query_params.get('regression_filter')
-    #     test_instance = self.request.query_params.get('test_instance')
-    #     fb = self.request.query_params.get('fb')
-    #     result = self.request.query_params.get('result')
-    #     analyzed = self.request.query_params.get('analyzed')
-    #     analyzed_by = self.request.query_params.get('analyzed_by')
-    #     testline_type = self.request.query_params.get('testline_type')
-    #     env_issue_type = self.request.query_params.get('env_issue_type')
-    #     if reg_filters is not None:
-    #         reg_filters = [RegressionFilter.objects.get(pk=rfid) for rfid in reg_filters.split(',')]
-    #         queryset = queryset.filter(
-    #             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-    #                                                test_instance__test_set=reg_filter.test_set), reg_filters, Q())
-    #         )
-    #     if test_instance is not None:
-    #         test_instances = [TestInstance.objects.get(pk=ti_id) for ti_id in test_instance.split(',')]
-    #         queryset = queryset.filter(
-    #             reduce(lambda q, test_instance: q | Q(test_instance=test_instance), test_instances, Q())
-    #         )
-    #     if result is not None:
-    #         results = [TestRunResult.objects.get(pk=result_name) for result_name in result.split(',')]
-    #         queryset = queryset.filter(
-    #             reduce(lambda q, res: q | Q(result=res), results, Q())
-    #         )
-    #     if analyzed is not None:
-    #         analyzed = bool(distutils.util.strtobool(analyzed))
-    #         queryset = queryset.filter(analyzed=analyzed)
-    #     if analyzed_by is not None:
-    #         queryset = queryset.filter(analyzed_by__username=analyzed_by)
-    #     if fb is not None:
-    #         queryset = queryset.filter(fb__name=fb)
-    #     return queryset
-
-
-
-
-# class LoadTestRunsToDBView(APIView):
-#     # authentication_classes = (authentication.TokenAuthentication,)
-#     permission_classes = (IsAuthenticated,)   
-    
-#     def get(self, request):
-#         filters = {
-#             "result": "not analyzed",
-#             "testline_type": "CLOUD_5G_I_LO_AP_LO_SANSA_FS_ECPRI_CMWV_TDD",
-#             "test_set": "5GC001085-B_Intra-frequency_inter-gNB_neighbor_NRREL_addition_-_Previously_established_Xn",
-#             "test_lab_path": "Root\Test_Sets\Trunk\RAN_L2_SW_KRK_2\\5GC001085_ANR_for_SA_intra-NR_intra-frequency_UE_based"
-#         }
-#         data = RepPortal().get_data_from_testruns(limit=15, filters=filters)
-#         for test_run in data:
-#             try:
-#                 create_testrun_obj_based_on_rp_data(test_run)
-#             except TestRunWithSuchRPIDAlreadyExists as e:
-#                 logging.info(str(e))
-#         # content = {'message': str(data)}
-#         return Response(data)
-
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     # authentication_classes = (authentication.TokenAuthentication,)
@@ -344,7 +254,7 @@ class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     def get(self, request, rfid):
         regression_filter = RegressionFilter.objects.get(pk=rfid)
         limit = self.request.query_params.get('limit', None)
-        content = pull_test_runs_by_regfilter(regression_filter, limit)
+        content = pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter.id, limit)
         return Response(content)
 
 
@@ -354,51 +264,51 @@ class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
     
     def get(self, request):
         limit = self.request.query_params.get('limit', None)
-        content = pull_test_runs_by_all_regfilters(limit)
+        content = pull_and_analyze_notanalyzed_testruns_by_all_regfilters(limit)
         return Response(content)
 
 
 
 
-class CheckView(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)   
+# class CheckView(APIView):
+#     # authentication_classes = (authentication.TokenAuthentication,)
+#     # permission_classes = (IsAuthenticated,)   
     
-    def get(self, request):
-        content = {'message': '{}'.format(str(api_settings.DEFAULT_AUTHENTICATION_CLASSES))}
-        return Response(content)
+#     def get(self, request):
+#         content = {'message': '{}'.format(str(api_settings.DEFAULT_AUTHENTICATION_CLASSES))}
+#         return Response(content)
 
 
-class HelloView(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)   
+# class HelloView(APIView):
+#     # authentication_classes = (authentication.TokenAuthentication,)
+#     # permission_classes = (IsAuthenticated,)   
     
-    def get(self, request):
-        # lol = kwargs.get("lol")
-        pull_tcs.delay()
-        return Response(200)
+#     def get(self, request):
+#         # lol = kwargs.get("lol")
+#         pull_tcs.delay()
+#         return Response(200)
 
 
-class TestAuthView(APIView):
-    authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+# class TestAuthView(APIView):
+#     authentication_classes = (authentication.TokenAuthentication,)
+#     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, format=None):
-        return Response("Hello {0} {1}!".format(request.user, str(api_settings.DEFAULT_AUTHENTICATION_CLASSES)))
+#     def get(self, request, format=None):
+#         return Response("Hello {0} {1}!".format(request.user, str(api_settings.DEFAULT_AUTHENTICATION_CLASSES)))
 
-    def post(self, request, format=None):
-        return Response("Hello {0}! Posted!".format(request.user))
+#     def post(self, request, format=None):
+#         return Response("Hello {0}! Posted!".format(request.user))
 
 
-class TestSessView(APIView):
-    authentication_classes = (authentication.SessionAuthentication,)
-    permission_classes = (permissions.IsAuthenticated,)
+# class TestSessView(APIView):
+#     authentication_classes = (authentication.SessionAuthentication,)
+#     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, format=None):
-        return Response("Hello {0}!".format(request.user))
+#     def get(self, request, format=None):
+#         return Response("Hello {0}!".format(request.user))
 
-    def post(self, request, format=None):
-        return Response("Hello {0}! Posted!".format(request.user))
+#     def post(self, request, format=None):
+#         return Response("Hello {0}! Posted!".format(request.user))
 
 
  

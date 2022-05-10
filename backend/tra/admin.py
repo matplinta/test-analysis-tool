@@ -5,6 +5,7 @@ from .models import (
     TestlineType,
     TestRun, 
     RegressionFilter, 
+    RepPortalUserToken,
     Branch, 
     Organization, 
     EnvIssueType, 
@@ -22,7 +23,7 @@ class FeatureBuildAdmin(admin.ModelAdmin):
 
 
 class FailMessageTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'regex', 'author', 'env_issue_type']
+    list_display = ['regex', 'id', 'name', 'author', 'env_issue_type']
     list_filter = ['name', 'author', 'env_issue_type']
     search_fields = ['name', 'regex', 'author', 'env_issue_type']
 
@@ -110,6 +111,12 @@ class TestRunAdmin(admin.ModelAdmin):
     search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
 
 
+class RepPortalUserTokenAdmin(admin.ModelAdmin):
+    list_display = ['user', 'token']
+    list_filter = []
+    search_fields = ['user', 'token']
+
+
 class RegressionFilterAdmin(admin.ModelAdmin):
     list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
     list_filter = ['test_set', 'testline_type']
@@ -126,5 +133,6 @@ admin.site.register(TestlineType, TestlineTypeAdmin)
 admin.site.register(TestSet, TestSetAdmin)
 admin.site.register(TestInstance, TestInstanceAdmin)
 admin.site.register(TestRun, TestRunAdmin)
+admin.site.register(RepPortalUserToken, RepPortalUserTokenAdmin)
 admin.site.register(RegressionFilter, RegressionFilterAdmin)
 admin.site.register(FailMessageTypeGroup, FailMessageTypeGroupAdmin)
