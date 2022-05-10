@@ -12,7 +12,7 @@ import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js'
 import './TestRunTableComponent.css';
 
 
-let TestRunTableComponent = ({ filterUrl, onSort }) => {
+let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) => {
 
     const [testRuns, setTestRuns] = useState([]);
     const [first, setFirst] = useState(0);
@@ -27,6 +27,7 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
         // { field: 'fb', header: 'FB' },
         // { field: 'test_instance.test_case_name', header: 'Test Case' },
         // { field: 'test_instance.test_set.branch', header: 'Branch' },
+        { field: 'test_instance.test_set.name', header: 'Test Set Name' },
         { field: 'test_instance.test_set.test_lab_path', header: 'Test Lab Path' },
         // { field: 'testline_type', header: 'Test Line Type' },
         { field: 'test_line', header: 'Test Line' },
@@ -92,6 +93,7 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
     const templateCurrentPageReport = {
         layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport',
         'CurrentPageReport': (options) => {
+            console.log(options)
             return (
                 <>
                     <span className="p-mx-3" style={{ color: 'var(--text-color)', userSelect: 'none' }}>
@@ -99,7 +101,7 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
                             onKeyDown={(e) => onPageInputKeyDown(e, options)} onChange={onPageInputChange} />
                     </span>
                     <span style={{ color: 'var(--text-color)', userSelect: 'none', textAlign: 'center' }}>
-                        {options.first} - {options.last} of {options.totalRecords} rows
+                        of {options.totalPages} pages ({options.first} - {options.last} of {options.totalRecords} rows)
                     </span>
                 </>
             )
@@ -153,16 +155,20 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
 
     const header = (
         <div style={{ textAlign: 'left' }}>
-            <MultiSelect value={selectedColumns} options={columns} optionLabel="header" onChange={onColumnToggle} style={{ width: '40em' }}
+            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%' }}
                 placeholder="Select additional columns to show" />
         </div>
     );
 
+    const defineSortFieldNameByField = (field) => {
+        return field.replaceAll('.', '__');
+    }
+
     const columnComponents = selectedColumns.map(col => {
         if (col.field === 'start_time' || col.field == 'end_time') {
-            return <Column key={col.field} body={dateBodyTemplate} header={col.header} sortable style={{ fontSize: '11px' }} />;
+            return <Column key={col.field} body={dateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
         } else {
-            return <Column key={col.field} field={col.field} header={col.header} sortable style={{ fontSize: '11px' }} />;
+            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px' }} />;
         }
 
     });
@@ -174,7 +180,7 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
             } else if (filterUrl !== "" && filterUrl !== null) {
                 fetchTestRunsByFilter(filterUrl, 1);
             }
-        }, [filterUrl]
+        }, [filterUrl, sortField, sortOrder]
     )
 
     return (
@@ -182,16 +188,16 @@ let TestRunTableComponent = ({ filterUrl, onSort }) => {
             pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
             dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
-            resizableColumns columnResizeMode="fit"
+            resizableColumns columnResizeMode="expand"
             emptyMessage="No test runs found! Please change your selected filters."
-            onSort={(e) => onSort(e)} >
+            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} >
 
             <Column field="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
-            <Column field="test_instance.test_case_name" header="Test Case" sortable style={{ fontSize: '11px' }} />
-            <Column field="test_instance.test_set.branch" header="Branch" sortable style={{ fontSize: '11px' }} />
-            <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by build" style={{ fontSize: '11px' }} />
+            <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px' }} />
+            <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px' }} />
+            <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px' }} />
             <Column field="builds" header="Build" sortable style={{ fontSize: '11px' }} />
-            <Column body={resultBodyTemplate} header="Result" sortable style={{ fontSize: '11px' }} />
+            <Column body={resultBodyTemplate} header="Result" sortField="result" sortable style={{ fontSize: '11px' }} />
             <Column body={logLinkBodyTemplate} header="Logs" style={{ fontSize: '11px' }} />
             <Column field="fb" header="FB" sortable style={{ fontSize: '11px' }} />
             <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
