@@ -34,7 +34,8 @@ let RegressionTestRuns = () => {
     const [searchParams] = useSearchParams();
     const [searchParamsEntry] = useState(Object.fromEntries([...searchParams]));
 
-    const [orderBy, setOrderBy] = useState(null);
+    const [sortField, setSortField] = useState(null);
+    const [sortOrder, setSortOrder] = useState(null);
 
     const navigate = useNavigate();
 
@@ -213,26 +214,33 @@ let RegressionTestRuns = () => {
         else return (filterName + "=" + filterList.toString() + "&");
     }
 
-    const defineApiUrl = () => {
+    const defineApiUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
         filterUrl += defineApiUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
         filterUrl += defineApiUrlFromSelectedFilter(selectedStatusKeys, "result");
         filterUrl += defineApiUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
         filterUrl += defineApiUrlFromSelectedFilter(selectedFbKeys, "fb");
+
+        if (sortOrderValue === 1) filterUrl += "ordering=" + sortFieldValue;
+        else if (sortOrderValue === -1) filterUrl += "ordering=-" + sortFieldValue;
+
         return filterUrl;
     }
 
-    const defineWebUrl = () => {
-        let filter = "";
-        filter += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
-        filter += defineWebUrlFromSelectedFilter(selectedStatusKeys, "result");
-        filter += defineWebUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
-        filter += defineWebUrlFromSelectedFilter(selectedFbKeys, "fb");
-        return filter;
+    const defineWebUrl = (sortFieldValue = null, sortOrderValue = null) => {
+        let filterUrl = "";
+        filterUrl += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedStatusKeys, "result");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedFbKeys, "fb");
+
+        if (sortOrderValue === 1) filterUrl += "ordering=" + sortFieldValue;
+        else if (sortOrderValue === -1) filterUrl += "ordering=-" + sortFieldValue;
+
+        return filterUrl;
     }
 
     const searchTestRuns = () => {
-        console.log("search")
         let apiUrl = defineApiUrl().slice(0, -1);
         setApiFilterUrl(apiUrl);
 
@@ -241,6 +249,8 @@ let RegressionTestRuns = () => {
             pathname: "",
             search: webUrl
         });
+        setSortField(null);
+        setSortOrder(null);
     }
 
     const testFiltersCheckboxList = (
@@ -268,6 +278,7 @@ let RegressionTestRuns = () => {
     )
 
     const convertUrl = (paramsEntry) => {
+        console.log(paramsEntry)
         let serverUrl = "";
         for (let key in paramsEntry) {
             if (paramsEntry[key].indexOf(',')) {
@@ -278,14 +289,31 @@ let RegressionTestRuns = () => {
             } else {
                 serverUrl += key + "=" + paramsEntry[key] + "&"
             }
+            if (key === "ordering") {
+                console.log(paramsEntry[key].indexOf('-'))
+                paramsEntry[key].indexOf('-') === 0 ? setSortOrder(-1) : setSortOrder(1);
+                setSortField(paramsEntry[key].replace('-', ''));
+            }
         }
+
         return serverUrl.slice(0, -1);
     }
 
-    const onSort = (e) => {
-        let orderColumn = e.sortField.replaceAll('.', '__');
-        setOrderBy(orderColumn);
-        searchTestRuns();
+    const onSortColumn = (e) => {
+        let sortFieldValue = e.sortField.replaceAll('.', '__');
+        let orderFieldValue = e.sortOrder;
+
+        setSortField(sortFieldValue);
+        setSortOrder(orderFieldValue);
+
+        let webUrl = defineWebUrl(sortFieldValue, orderFieldValue);
+        navigate({
+            pathname: "",
+            search: webUrl
+        });
+
+        let apiUrl = defineApiUrl(sortFieldValue, orderFieldValue);
+        setApiFilterUrl(apiUrl);
     }
 
     useEffect(() => {
@@ -296,7 +324,7 @@ let RegressionTestRuns = () => {
         } else {
             setApiFilterUrl("");
         }
-    }, [orderBy])
+    }, [])
 
     return (
 
@@ -311,7 +339,7 @@ let RegressionTestRuns = () => {
             </aside>
             <main>
                 <Card>
-                    <TestRunTableComponent filterUrl={apiFilterUrl} onSort={onSort}></TestRunTableComponent>
+                    <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
                 </Card>
 
             </main>

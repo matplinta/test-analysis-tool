@@ -6,9 +6,8 @@
     padding: 8px 5px;
 }
 
-.column-font-style {
-    max-width: 100px;
-    font-size: 5px;
+.p-datatable .p-column-title {
+    font-size: 13px;
 }
 
 .result-badge {
