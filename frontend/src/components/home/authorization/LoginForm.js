@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 
 import AuthService from "../../../services/auth.service.js";
 
-let LoginForm = ({handleSuccess, handleFail, handleClose}) => {
+let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -13,14 +13,14 @@ let LoginForm = ({handleSuccess, handleFail, handleClose}) => {
         event.preventDefault();
         try {
             await AuthService.login(username, password).then(
-            (response) => {
-                handleSuccess();
-            },
-            (error) => {
-                handleFail();
-                setUsername('');
-                setPassword('');
-            })
+                (response) => {
+                    handleSuccess();
+                },
+                (error) => {
+                    handleFail();
+                    setUsername('');
+                    setPassword('');
+                })
         } catch (err) {
             console.log(err);
         }
@@ -36,11 +36,11 @@ let LoginForm = ({handleSuccess, handleFail, handleClose}) => {
         }
     }
 
-    return(
+    return (
         <Form onSubmit={handleLoginClick} onClose={handleClose}>
             <Form.Group className="mb-3" controlId="formBasicUsername">
                 <Form.Label>Username</Form.Label>
-                <Form.Control required value={username} onChange={handleInputChange} type="username" placeholder="Enter username" />
+                <Form.Control required value={username} onChange={handleInputChange} type="text" placeholder="Enter username" />
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
