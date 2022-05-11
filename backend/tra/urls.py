@@ -38,7 +38,8 @@ urlpatterns = [
 
     # additional parameter limit=<int> can be provided to override default limit specified by regression filter
     path('test_runs/load_by_reg_filter/<int:rfid>/', views.LoadTestRunsToDBBasedOnRegressionFilter.as_view(), name='load_filtered_trs'),
-    path('test_runs/load_by_all_reg_filter/', views.LoadTestRunsToDBBasedOnAllRegressionFilters.as_view(), name='load_filtered_trs'),
+    path('test_runs/load_by_all_reg_filter/', views.LoadTestRunsToDBBasedOnAllRegressionFilters.as_view(), name='load_filtered_trs_by_all_rf'),
+    path('test_runs/load_by_all_reg_filter_celery/', views.LoadTestRunsToDBBasedOnAllRegressionFiltersCelery.as_view(), name='load_filtered_trs_by_all_rf_celery'),
     path('', include(router.urls)),
     # API to get TestRuns matching RegressionFilter by RegressionFilter.id
     # path('api/test_runs/analyze/<int:run_id>/', views.AnalyzeTestRunView.as_view(), name='load_filtered_trs'),

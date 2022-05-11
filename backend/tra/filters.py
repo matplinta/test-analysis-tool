@@ -12,6 +12,7 @@ from .models import (
     TestSet, 
     TestInstance, 
     TestRun, 
+    Branch, 
     RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
@@ -33,6 +34,9 @@ class TestRunFilter(filters.FilterSet):
         )
         return queryset
 
+    test_set_name = filters.ModelMultipleChoiceFilter(field_name='test_instance__test_set__name', queryset=TestSet.objects.all(), to_field_name="name")
+    branch = filters.ModelMultipleChoiceFilter(field_name='test_instance__test_set__branch__name', queryset=Branch.objects.all(), to_field_name="name")
+    test_instance = filters.ModelMultipleChoiceFilter(field_name='test_instance', queryset=TestInstance.objects.all())
     test_instance = filters.ModelMultipleChoiceFilter(field_name='test_instance', queryset=TestInstance.objects.all())
     fb = filters.ModelMultipleChoiceFilter(field_name='fb', queryset=FeatureBuild.objects.all())
     result = filters.ModelMultipleChoiceFilter(field_name='result', queryset=TestRunResult.objects.all())
@@ -43,4 +47,6 @@ class TestRunFilter(filters.FilterSet):
 
     class Meta:
         model = TestRun
-        fields = ["test_instance", "fb", "result", "testline_type", "env_issue_type", "analyzed", "analyzed_by"] 
+        fields = ["test_instance", "fb", "result", "testline_type", "env_issue_type", "analyzed", "analyzed_by",
+            'test_set_name', 'branch', 
+        ] 

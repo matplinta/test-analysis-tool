@@ -13,8 +13,7 @@ logger = get_task_logger(__name__)
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(300.0, test.s('hello AWD AWD AWD AWD'), name='Testing periodic tasks every 5 min')
     sender.add_periodic_task(crontab(hour=18, day_of_week=3), remove_old_feature_builds.s(), name='Delete older than last 3 FBs')
-    # sender.add_periodic_task(crontab(minute=30, hour="*/6"), 
-    sender.add_periodic_task(crontab(minute=24), 
+    sender.add_periodic_task(crontab(minute=30, hour="*/6"), 
                              celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters.s(), 
                              name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
 
