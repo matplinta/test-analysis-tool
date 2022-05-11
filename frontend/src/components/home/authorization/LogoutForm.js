@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { RiErrorWarningLine } from "react-icons/ri";
@@ -8,15 +9,18 @@ import AuthService from "../../../services/auth.service.js";
 import './LoginComponent.css';
 
 
-let LogoutComponent = ({handleSuccess}) => {
+let LogoutComponent = ({ handleSuccess }) => {
+
+    const navigate = useNavigate();
 
     let handleLogoutClick = async (event) => {
         event.preventDefault();
         AuthService.logout();
         handleSuccess();
+        navigate({ pathname: "" });
     }
 
-    return(
+    return (
         <>
             <Form className="text-center" onSubmit={handleLogoutClick}>
                 <RiErrorWarningLine size='150' centered="true" />
@@ -29,7 +33,7 @@ let LogoutComponent = ({handleSuccess}) => {
                     Cancel
                 </Button>
             </Form>
-        </> 
+        </>
     )
 }
 
