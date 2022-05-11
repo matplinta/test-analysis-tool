@@ -58,7 +58,7 @@ const App = () => {
         </nav>
         <section>
           <Routes>
-            <Route index element={<GridApplications />} />
+            <Route index element={<GridApplications isUserLoggedIn={isUserLoggedIn} />} />
             <Route path="test-line-reservation-scheduler" element={<TestLineReservationSchedulerApp />} />
             <Route path="test-line-manager" element={<TestLineManagerApp />} >
               <Route index element={<TestLineListComponent />} />
