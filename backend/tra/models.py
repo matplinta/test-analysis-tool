@@ -48,6 +48,7 @@ class Branch(models.Model):
 
     class Meta:
         verbose_name_plural = 'Branches'
+        ordering = ['-name']
 
     def __str__(self):
         return self.name
@@ -115,6 +116,7 @@ class TestSet(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["name", "test_lab_path"], name='testset_uniq')]
+        ordering = ['name']
 
 
     def __str__(self):

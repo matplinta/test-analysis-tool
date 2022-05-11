@@ -33,6 +33,7 @@ from .serializers import (
 )
 
 from .models import (
+    Branch,
     FailMessageTypeGroup,
     FeatureBuild,
     Organization, 
@@ -178,12 +179,13 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
     def get(self, request):
         fields_dict = {}
 
-        def get_distinct_values_and_serialize(field, model, serializer, order_by_param=None):
+        def get_distinct_values_and_serialize(field, model, serializer=None, order_by_param=None, key_override=None):
             order_by_param = order_by_param if order_by_param else field
             distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
             objects = model.objects.filter(pk__in=distinct_values)
             data = serialize("json", objects)
-            fields_dict[field] = json.loads(data)
+            key = field if not key_override else key_override
+            fields_dict[key] = json.loads(data)
 
             # serializer = serializer(objects, many=True)
             # fields_dict[field] = serializer.data
@@ -203,6 +205,13 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
         get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
         get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
+        get_distinct_values_and_serialize('test_instance__test_set__branch', Branch, key_override="branch",
+                                          order_by_param="test_instance__test_set__branch__name")
+        distinct_values = queryset.order_by("test_instance__test_set__id").distinct("test_instance__test_set").values_list("test_instance__test_set", flat=True)
+        objects = TestSet.objects.filter(pk__in=distinct_values).distinct("name").values_list("name", flat=True)
+        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(objects)]
+        # get_distinct_values_and_serialize('test_instance__test_set', TestSet, key_override="test_set__name",
+        #                                   order_by_param="test_instance__test_set__id")
         
         return Response(fields_dict)
 
