@@ -116,13 +116,8 @@ class RepPortal():
 
     def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None):            
         url = self._build_get_url_for_testruns(limit, filters, fields, ordering)
-        # with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
-        #     print(url)
-        #     data = api.get(url, params=None)
         api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
         api.session.login(token=self.token)
-        print(url)
-        data = api.get(url, params=None)
 
         retry = 3
         while retry > 0:
@@ -135,13 +130,13 @@ class RepPortal():
                 retry -= 1
                 continue
             else:
-                print(resp)
-                print(resp.text)
-                print(resp.status_code)
-                break
-
+                raise RepPortalError(f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}")
+        
         api.logout()
-        return resp.json()['results']
+        results = resp.json().get('results', None)
+        if results is None:
+            raise RepPortalError(f"Last response: {resp}, {resp.text}. No results for url: {url}")
+        return results
 
 
     def _generate_analyze_json(self, runs, result, comment, env_issue_type=None, common_build="", suggested_prontos=[], pronto="", 

@@ -56,6 +56,7 @@ import pytz
 import logging
 
 from .test_runs_processing import *
+from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters
 
 
 class LogoutViewEx(LogoutView):
@@ -266,6 +267,15 @@ class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
         limit = self.request.query_params.get('limit', None)
         content = pull_and_analyze_notanalyzed_testruns_by_all_regfilters(limit)
         return Response(content)
+
+
+class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
+    # authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)   
+    
+    def get(self, request):
+        celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters.delay()
+        return Response("OK")
 
 
 
