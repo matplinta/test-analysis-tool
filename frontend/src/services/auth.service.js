@@ -13,8 +13,12 @@ const login = (username, password) => {
 }
 
 const logout = () => {
-    localStorage.removeItem("user")
-    document.cookie = "sessionid= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
+    return axios.post("api-auth/logout/")
+        .then(response => {
+            if (response.data.key) {
+                localStorage.removeItem("user")
+            }
+        })
 }
 
 const getCurrentUser = () => {

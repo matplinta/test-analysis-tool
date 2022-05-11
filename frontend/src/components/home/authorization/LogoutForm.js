@@ -15,9 +15,18 @@ let LogoutComponent = ({ handleSuccess }) => {
 
     let handleLogoutClick = async (event) => {
         event.preventDefault();
-        AuthService.logout();
-        handleSuccess();
-        navigate({ pathname: "" });
+        try {
+            await AuthService.logout().then(
+                (response) => {
+                    handleSuccess();
+                    navigate({ pathname: "" });
+                },
+                (error) => {
+                    console.log(error)
+                })
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (
