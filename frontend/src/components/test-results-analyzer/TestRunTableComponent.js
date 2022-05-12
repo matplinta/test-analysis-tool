@@ -143,8 +143,12 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         return <span className={resultCssName}>{rowData.result}</span>;
     }
 
-    let dateBodyTemplate = (rowData) => {
+    let startDateBodyTemplate = (rowData) => {
         return <p>{rowData.start_time.replace('T', ' ').replace('Z', '')}</p>
+    }
+
+    let endDateBodyTemplate = (rowData) => {
+        return <p>{rowData.end_time.replace('T', ' ').replace('Z', '')}</p>
     }
 
     const onColumnToggle = (event) => {
@@ -165,8 +169,10 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const columnComponents = selectedColumns.map(col => {
-        if (col.field === 'start_time' || col.field == 'end_time') {
-            return <Column key={col.field} body={dateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
+        if (col.field === 'start_time') {
+            return <Column key={col.field} body={startDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
+        } else if(col.field === 'end_time') {
+            return <Column key={col.field} body={endDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px' }} />;
         }
