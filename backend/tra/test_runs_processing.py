@@ -9,6 +9,7 @@ from django.conf import settings
 from itertools import chain
 import re
 from django.contrib.auth.models import User
+from celery import shared_task
 
 from .models import (
     FeatureBuild,
@@ -50,11 +51,25 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
     return None, None
 
 
-def analyze_testrun_in_rp(test_run):
-    pass
+@shared_task(name="celery_analyze_testruns")
+def celery_analyze_testruns(runs, comment, common_build, result, env_issue_type, token):
+    return RepPortal(token=token).analyze_testruns(runs, comment, common_build, result, env_issue_type)
 
 
-def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType], first_lines_to_match: int = 3):
+def analyze_testrun_in_rp(test_run, token):
+    analyzing_user = test_run.analyzed_by.username
+    celery_analyze_testruns.delay(
+        # runs=[test_run.rp_id], 
+        runs=[test_run.rp_id, test_run.rp_id],  # WA
+        comment=f"Analyzed by user {analyzing_user}: {test_run.comment}", 
+        common_build=test_run.builds, 
+        result=test_run.result.name, 
+        env_issue_type=test_run.env_issue_type.name,
+        token=token
+    )
+
+
+def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType], first_lines_to_match: int = 3, token: str = None):
     fail_message_type, line_no = match_fail_message_type(fail_message=test_run.fail_message, fail_message_types=fail_message_types)
     if fail_message_type and line_no <= first_lines_to_match:
         env_issue, created = TestRunResult.objects.get_or_create(name="environment issue")
@@ -65,7 +80,7 @@ def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMess
         autouser, created = User.objects.get_or_create(username="autoanalyzer")
         test_run.analyzed_by = autouser
 
-        analyze_testrun_in_rp(test_run)
+        analyze_testrun_in_rp(test_run, token)
 
     return test_run
 
@@ -152,7 +167,7 @@ def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, 
         try:
             tr = create_testrun_obj_based_on_rp_data(test_run, pass_old_testruns=False)
             if try_to_analyze and regfilter:
-                tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types)
+                tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types, token=token)
             tr.save()
             tr_list.append(tr.rp_id)
         except TestRunWithSuchRPIDAlreadyExists as e:

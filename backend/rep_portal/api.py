@@ -9,6 +9,7 @@ from numpy import isin
 from django.conf import settings
 from rep_api import RepApi
 from urllib.parse import quote
+from typing import List
 import datetime
 import time
 import json
@@ -118,34 +119,34 @@ class RepPortal():
         url = self._build_get_url_for_testruns(limit, filters, fields, ordering)
         api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
         api.session.login(token=self.token)
-
         retry = 3
-        while retry > 0:
-            resp = api.get(url, params=None)
-            if resp.status_code == 200:
-                break
-            elif resp.status_code == 429:
-                wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
-                time.sleep(wait_sec_until_new_minute_starts)
-                retry -= 1
-                continue
-            else:
-                raise RepPortalError(f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}")
-        
-        api.logout()
+        try:
+            while retry > 0:
+                resp = api.get(url, params=None)
+                if resp.status_code == 200:
+                    break
+                elif resp.status_code == 429:
+                    wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                    time.sleep(wait_sec_until_new_minute_starts)
+                    retry -= 1
+                    continue
+                else:
+                    raise RepPortalError(f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}")
+        finally:
+            api.logout()
         results = resp.json().get('results', None)
         if results is None:
             raise RepPortalError(f"Last response: {resp}, {resp.text}. No results for url: {url}")
         return results
 
 
-    def _generate_analyze_json(self, runs, result, comment, env_issue_type=None, common_build="", suggested_prontos=[], pronto="", 
-                               default_blocked=True, send_to_qc=False, suspend=None, suspension_end = None):
+    def _generate_analyze_dict(self, runs: List[int], result: str, comment: str, env_issue_type=None, common_build="", suggested_prontos: List[str]=[], pronto="", 
+                               default_blocked=True, send_to_qc=False, suspend=None, suspension_end=None):
         if result == "environment issue" and not env_issue_type:
-            raise TypeError(f"Result if {result}, but env_issue_type is not defined!")
+            raise TypeError(f"Result is {result}, but env_issue_type is not defined!")
         data = {
             "common_build": common_build,
-            "suggested_prontos": [],
+            "suggested_prontos": suggested_prontos,
             "pronto": pronto,
             "default_blocked": default_blocked,
             "runs": runs,
@@ -157,31 +158,29 @@ class RepPortal():
             data["env_issue_type"] = env_issue_type
         if suspend:
             data["suspend"] = suspend
-        if suspension_end:
+        if suspend and suspension_end:
             data["suspension_end"] = suspension_end
         return data
 
 
-    def analyze_testruns(self, runs, comment, result="environment issue", env_issue_type=None):
-        data = self._generate_analyze_json(runs=runs, comment=comment, result=result, env_issue_type=env_issue_type)
+    def analyze_testruns(self, runs, comment, common_build, result="environment issue", env_issue_type=None):
+        data = self._generate_analyze_dict(runs=runs, comment=comment, result=result, env_issue_type=env_issue_type, common_build=common_build)
         url = "https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/runs-analyze/"
-        # with RepApi(username=self.user, password=self.passwd, config='rep-prod-one') as api:
         api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
         api.session.login(token=self.token)
         retry = 3
-        while retry > 0:
-            resp = api.post(url, params=None, data=data)
-            if resp.status_code == 200:
-                break
-            elif resp.status_code == 429:
-                wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
-                time.sleep(wait_sec_until_new_minute_starts)
-                retry -= 1
-                continue
-            else:
-                print(resp)
-                print(resp.text)
-                print(resp.status_code)
-                break
-        api.logout()
-        return resp
+        try:
+            while retry > 0:
+                resp = api.post(url, params=None, data=data)
+                if resp.status_code == 200:
+                    break
+                elif resp.status_code == 429:
+                    wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                    time.sleep(wait_sec_until_new_minute_starts)
+                    retry -= 1
+                    continue
+                else:
+                    raise RepPortalError(f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}, data: {data}")
+        finally:
+            api.logout()
+        return {"resp.text": resp.text, "resp.status_code": resp.status_code}
