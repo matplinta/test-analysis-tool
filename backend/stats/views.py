@@ -10,7 +10,7 @@ from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSeria
 
 from stats.models import * 
 from tra.models import FailMessageType
-from rep_portal.analyzer import Analyzer
+from stats.analyzer import Analyzer
 
 
 class ListFiltersWithFilterSetView(generics.ListAPIView):
@@ -61,7 +61,7 @@ class GetChartForFailAnalysis(APIView):
     def get(self, request, filterset_id):
         filter_set = FilterSet.objects.get(pk=filterset_id)
         filters = Filter.objects.filter(filter_set=filter_set)
-        fail_message_types = FailMessageType.objects.filter(user=self.request.user)
+        fail_message_types = FailMessageType.objects.filter(author=self.request.user)
         analyzer = Analyzer(fail_message_types, filters)
         data = analyzer.plot_runs_by_exception_types()
         return Response(data)

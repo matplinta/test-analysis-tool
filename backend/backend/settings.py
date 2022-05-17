@@ -76,7 +76,7 @@ SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
 RP_USER = 'sc'
-RP_PASSWORD = 'Pico1234^'
+RP_PASSWORD = 'Pico1234&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

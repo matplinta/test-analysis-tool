@@ -15,8 +15,6 @@ import matplotlib.patches as mpatches
 from pandas import json_normalize
 import re
 from rep_portal.api import RepPortal
-# from tra.models import FailMessageType
-
 
 # exception_dict = {
 #     r'NoRegexpMatch:.*after 10 secs to match regexp \(.*\) in output': "EGATE print did not match",
@@ -107,7 +105,8 @@ class Analyzer():
         fig = ax.get_figure()
         plt.subplots_adjust(left=0.7, )
         fig.savefig(f'media/{figure_name}.png')  
-        return df_temp.to_json()
+        data = json.loads(df_temp.to_json())
+        return data
     
     
 
