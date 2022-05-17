@@ -25,7 +25,7 @@ class FeatureBuildAdmin(admin.ModelAdmin):
 class FailMessageTypeAdmin(admin.ModelAdmin):
     list_display = ['regex', 'id', 'name', 'author', 'env_issue_type']
     list_filter = ['name', 'author', 'env_issue_type']
-    search_fields = ['name', 'regex', 'author', 'env_issue_type']
+    search_fields = ['name', 'regex', 'author', 'env_issue_type__name']
 
 
 class FailMessageTypeInline(admin.TabularInline):
@@ -81,7 +81,7 @@ class TestSetAdmin(admin.ModelAdmin):
 class TestInstanceAdmin(admin.ModelAdmin):
     list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
     list_filter = ['execution_suspended', 'test_set']
-    search_fields = ['test_set', 'test_case_name']
+    search_fields = ['test_set__name', 'test_case_name']
 
 
 class TestRunAdmin(admin.ModelAdmin):
@@ -108,7 +108,7 @@ class TestRunAdmin(admin.ModelAdmin):
         'end_time'
     ]
     list_filter = ['result', 'fb', 'testline_type', 'analyzed_by', 'test_suite', 'test_instance']
-    search_fields = ['fail_message', 'result', 'env_issue_type', 'fb']
+    search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id']
 
 
 class RepPortalUserTokenAdmin(admin.ModelAdmin):
@@ -120,7 +120,7 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
 class RegressionFilterAdmin(admin.ModelAdmin):
     list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
     list_filter = ['test_set', 'testline_type']
-    search_fields = ['name', 'test_set']
+    search_fields = ['name', 'test_set__name']
 
 
 admin.site.register(FeatureBuild, FeatureBuildAdmin)

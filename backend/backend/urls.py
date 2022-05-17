@@ -25,7 +25,7 @@ from stats import views as stats_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
-    path('api-auth/logout/', LogoutView.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
+    path('api-auth/logout/', views.LogoutViewEx.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/', include('tra.urls'), name="api"),
     path('stats/', include('stats.urls'), name="stats"),
 

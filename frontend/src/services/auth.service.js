@@ -1,4 +1,5 @@
 import axios from "axios";
+import authHeader from "./auth-header";
 
 const login = (username, password) => {
     return axios.post("api-auth/login/", { username, password })
@@ -13,7 +14,7 @@ const login = (username, password) => {
 }
 
 const logout = () => {
-    return axios.post("api-auth/logout/")
+    return axios.post("api-auth/logout/", {}, { headers: authHeader() })
         .then(response => {
             if (response.data.key) {
                 localStorage.removeItem("user")
