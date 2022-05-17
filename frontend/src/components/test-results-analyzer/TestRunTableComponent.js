@@ -74,12 +74,10 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const onPageInputKeyDown = (event, options) => {
         if (event.key === 'Enter') {
             const page = parseInt(currentPage);
-            console.log(page)
             if (page < 0 || page > options.totalPages) {
                 setPageInputTooltip(`Value must be between 1 and ${options.totalPages}.`);
             }
             else {
-                console.log("event enter")
                 const first = currentPage ? options.rows * (page - 1) : 0;
                 setFirst(first);
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
@@ -93,7 +91,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const templateCurrentPageReport = {
         layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport',
         'CurrentPageReport': (options) => {
-            console.log(options)
             return (
                 <>
                     <span className="p-mx-3" style={{ color: 'var(--text-color)', userSelect: 'none' }}>
@@ -165,7 +162,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const columnComponents = selectedColumns.map(col => {
-        if (col.field === 'start_time' || col.field == 'end_time') {
+        if (col.field === 'start_time' || col.field === 'end_time') {
             return <Column key={col.field} body={dateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px' }} />;

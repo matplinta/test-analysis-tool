@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Tree } from 'primereact/tree';
+import { Tooltip } from 'primereact/tooltip';
 
 import TestRunTableComponent from './TestRunTableComponent';
 
@@ -16,6 +17,18 @@ let RegressionTestRuns = () => {
     const [regressionFiltersNodes, setRegressionFiltersNodes] = useState([]);
     const [expandedFilterKeys, setExpandedFilterKeys] = useState({});
     const [selectedFilterKeys, setSelectedFilterKeys] = useState(null);
+
+    const [testSetFiltersNodes, setTestSetFiltersNodes] = useState([]);
+    const [expandedTestSetKeys, setExpandedTestSetKeys] = useState({});
+    const [selectedTestSetKeys, setSelectedTestSetKeys] = useState(null);
+
+    const [testLineTypeFiltersNodes, setTestLineTypeFiltersNodes] = useState([]);
+    const [expandedTestLineTypeKeys, setExpandedTestLineTypeKeys] = useState({});
+    const [selectedTestLineTypeKeys, setSelectedTestLineTypeKeys] = useState(null);
+
+    const [branchFiltersNodes, setBranchFiltersNodes] = useState([]);
+    const [expandedBranchKeys, setExpandedBranchKeys] = useState({});
+    const [selectedBranchTypeKeys, setSelectedBranchKeys] = useState(null);
 
     const [statusFilterNodes, setStatusFiltersNode] = useState([]);
     const [expandedStatusKeys, setExpandedStatusKeys] = useState({});
@@ -39,6 +52,7 @@ let RegressionTestRuns = () => {
 
     const navigate = useNavigate();
 
+    const [tooLongLabelTooltip, setTooLongLabelTooltip] = useState('');
 
     const expandAll = (nodesList, setExpanded) => {
         let _expandedKeys = {};
@@ -73,30 +87,108 @@ let RegressionTestRuns = () => {
         setSelectedNodesKeys(selectedFilters)
     }
 
-    let fetchTestFilters = (data) => {
-        if (regressionFiltersNodes.length === 0) {
+    // let fetchTestFilters = (data) => {
+    //     if (regressionFiltersNodes.length === 0) {
+    //         let filters = {
+    //             key: 'reg_filters',
+    //             label: 'Regression filters',
+    //             data: 'Regression Filters',
+    //             children: []
+    //         }
+
+    //         const filterChildren = data.map((item, index) => {
+    //             return { key: item.pk, label: item.fields.name, data: item.model, children: [] }
+    //         })
+    //         filters.children = filterChildren;
+
+    //         let nodesTmp = [...regressionFiltersNodes];
+
+    //         nodesTmp.push(filters);
+    //         expandAll(nodesTmp, setExpandedFilterKeys);
+
+    //         if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+    //             selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedFilterKeys);
+    //         }
+
+    //         setRegressionFiltersNodes(nodesTmp)
+    //     }
+    // }
+
+    const fetchTestSets = (data) => {
+        if (testSetFiltersNodes.length === 0) {
             let filters = {
-                key: 'reg_filters',
-                label: 'Regression filters',
-                data: 'Regression Filters',
+                key: 'test_set_name',
+                label: 'Test Set Name',
+                data: 'Test Set Name',
                 children: []
             }
 
             const filterChildren = data.map((item, index) => {
-                return { key: item.pk, label: item.fields.name, data: item.model, children: [] }
+                return { key: item.pk, label: item.pk, data: item.pk, children: [] }
             })
             filters.children = filterChildren;
 
-            let nodesTmp = [...regressionFiltersNodes];
-
+            let nodesTmp = [...testSetFiltersNodes];
             nodesTmp.push(filters);
-            expandAll(nodesTmp, setExpandedFilterKeys);
+            expandAll(nodesTmp, setExpandedTestSetKeys)
 
             if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
-                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedFilterKeys);
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedTestSetKeys);
             }
 
-            setRegressionFiltersNodes(nodesTmp)
+            setTestSetFiltersNodes(nodesTmp);
+        }
+    }
+
+    const fetchTestLineType = (data) => {
+        if (testSetFiltersNodes.length === 0) {
+            let filters = {
+                key: 'testline_type',
+                label: 'Test Line Type',
+                data: 'Test Line Type',
+                children: []
+            }
+
+            const filterChildren = data.map((item, index) => {
+                return { key: item.pk, label: item.pk, data: item.pk, children: [] }
+            })
+            filters.children = filterChildren;
+
+            let nodesTmp = [...testLineTypeFiltersNodes];
+            nodesTmp.push(filters);
+            expandAll(nodesTmp, setExpandedTestLineTypeKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedTestLineTypeKeys);
+            }
+
+            setTestLineTypeFiltersNodes(nodesTmp);
+        }
+    }
+
+    const fetchBranch = (data) => {
+        if (testSetFiltersNodes.length === 0) {
+            let filters = {
+                key: 'branch',
+                label: 'Branch',
+                data: 'Branch',
+                children: []
+            }
+
+            const filterChildren = data.map((item, index) => {
+                return { key: item.pk, label: item.pk, data: item.pk, children: [] }
+            })
+            filters.children = filterChildren;
+
+            let nodesTmp = [...branchFiltersNodes];
+            nodesTmp.push(filters);
+            expandAll(nodesTmp, setExpandedBranchKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedBranchKeys);
+            }
+
+            setBranchFiltersNodes(nodesTmp);
         }
     }
 
@@ -181,10 +273,14 @@ let RegressionTestRuns = () => {
         getTestRunsFilters().then(
             (response) => {
                 const data = response.data;
-                fetchTestFilters(data['regfilters']);
+                // fetchTestFilters(data['regfilters']);
+                fetchTestSets(data['test_set_name']);
+                fetchTestLineType(data['testline_type']);
+                fetchBranch(data['branch']);
                 fetchStatuses(data['result']);
                 fetchAnalyzers(data['analyzed_by']);
                 fetchFBs(data['fb']);
+                showTooltifIfLabelTooLong();
             },
             (error) => {
                 console.log(error);
@@ -216,7 +312,10 @@ let RegressionTestRuns = () => {
 
     const defineApiUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
-        filterUrl += defineApiUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        // filterUrl += defineApiUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
+        filterUrl += defineApiUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
         filterUrl += defineApiUrlFromSelectedFilter(selectedStatusKeys, "result");
         filterUrl += defineApiUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
         filterUrl += defineApiUrlFromSelectedFilter(selectedFbKeys, "fb");
@@ -229,7 +328,10 @@ let RegressionTestRuns = () => {
 
     const defineWebUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
-        filterUrl += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        // filterUrl += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
+        filterUrl += defineWebUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
         filterUrl += defineWebUrlFromSelectedFilter(selectedStatusKeys, "result");
         filterUrl += defineWebUrlFromSelectedFilter(selectedAnalyzerKeys, "analyzed_by");
         filterUrl += defineWebUrlFromSelectedFilter(selectedFbKeys, "fb");
@@ -253,9 +355,51 @@ let RegressionTestRuns = () => {
         setSortOrder(null);
     }
 
-    const testFiltersCheckboxList = (
+    const showTooltifIfLabelTooLong = () => {
+        var elements = document.getElementsByClassName('p-treenode-content p-treenode-selectable');
+        console.log(elements);
+        for(let element of elements) {
+            console.log(element ,element.offsetWidth, element.scrollWidth, element.clientWidth )
+            if( element.offsetWidth < element.scrollWidth){
+                // your element have overflow
+                console.log("tooLong")
+                setTooLongLabelTooltip("tooLong")
+                element.style.background = "yellow";
+                }
+                else{
+                //your element don't have overflow
+                }
+        }
+        // if( (element.offsetHeight < element.scrollHeight) || (element.offsetWidth < element.scrollWidth)){
+        // // your element have overflow
+        // element.style.background = "yellow";
+        // }
+        // else{
+        // //your element don't have overflow
+        // }
+    }
+
+    // const testFiltersCheckboxList = (
+    //     <div>
+    //         <Tree value={regressionFiltersNodes} expandedKeys={expandedFilterKeys} selectionMode="checkbox" selectionKeys={selectedFilterKeys} onSelectionChange={e => setSelectedFilterKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+    //     </div>
+    // )
+
+    const testSetCheckboxList = (
         <div>
-            <Tree value={regressionFiltersNodes} expandedKeys={expandedFilterKeys} selectionMode="checkbox" selectionKeys={selectedFilterKeys} onSelectionChange={e => setSelectedFilterKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+        </div>
+    )
+
+    const testLineTypeCheckboxList = (
+        <div>
+            <Tree value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+        </div>
+    )
+
+    const branchCheckboxList = (
+        <div>
+            <Tree value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
         </div>
     )
 
@@ -278,7 +422,6 @@ let RegressionTestRuns = () => {
     )
 
     const convertUrl = (paramsEntry) => {
-        console.log(paramsEntry)
         let serverUrl = "";
         for (let key in paramsEntry) {
             if (paramsEntry[key].indexOf(',')) {
@@ -290,7 +433,6 @@ let RegressionTestRuns = () => {
                 serverUrl += key + "=" + paramsEntry[key] + "&"
             }
             if (key === "ordering") {
-                console.log(paramsEntry[key].indexOf('-'))
                 paramsEntry[key].indexOf('-') === 0 ? setSortOrder(-1) : setSortOrder(1);
                 setSortField(paramsEntry[key].replace('-', ''));
             }
@@ -318,6 +460,7 @@ let RegressionTestRuns = () => {
 
     useEffect(() => {
         fetchTestRunsFilters();
+        // showTooltifIfLabelTooLong();
         if (Object.keys(searchParamsEntry).length !== 0) {
             let url = convertUrl(searchParamsEntry)
             setApiFilterUrl(url);
@@ -330,7 +473,10 @@ let RegressionTestRuns = () => {
 
         <div className="wrapper">
             <aside>
-                {testFiltersCheckboxList}
+                {/* {testFiltersCheckboxList} */}
+                {testSetCheckboxList}
+                {testLineTypeCheckboxList}
+                {branchCheckboxList}
                 {statusCheckboxList}
                 {analyzerCheckboxList}
                 {fbCheckboxList}

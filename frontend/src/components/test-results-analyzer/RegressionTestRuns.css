@@ -83,6 +83,20 @@ aside {
     margin-right: 0;
 }
 
-.p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+/* .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+    width: fit-content;
+    white-space: nowrap;
+    padding-right: 15px;
+    margin-right: 15px;
+    min-width: 250px;
     margin: 2px;
+} */
+
+.p-tree .p-tree-container .p-treenode {
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.p-treenode-label {
+    white-space: nowrap;
 }
