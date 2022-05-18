@@ -86,3 +86,8 @@ services:
 
 volumes:
   postgres_db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './postgres_db'

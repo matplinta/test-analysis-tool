@@ -15,6 +15,8 @@ import matplotlib.patches as mpatches
 from pandas import json_normalize
 import re
 from rep_portal.api import RepPortal
+from tra.models import FailMessageType
+from .models import Filter
 
 # exception_dict = {
 #     r'NoRegexpMatch:.*after 10 secs to match regexp \(.*\) in output': "EGATE print did not match",
