@@ -12,10 +12,10 @@ ENV BACKEND_API_URL=http://web:8000/
 
 WORKDIR /frontend
 
-COPY ./frontend/package.json /frontend/
-COPY ./frontend/package-lock.json /frontend/
+COPY ./package.json /frontend/
+COPY ./package-lock.json /frontend/
 RUN npm install
 
-COPY ./frontend /frontend/
+COPY . /frontend/
 
  
