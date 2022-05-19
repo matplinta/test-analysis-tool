@@ -119,7 +119,7 @@ class RepPortal():
         url = self._build_get_url_for_testruns(limit, filters, fields, ordering)
         api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
         api.session.login(token=self.token)
-        retry = 3
+        retry = 5
         try:
             while retry > 0:
                 resp = api.get(url, params=None)
@@ -164,6 +164,8 @@ class RepPortal():
 
 
     def analyze_testruns(self, runs, comment, common_build, result="environment issue", env_issue_type=None):
+        if settings.DEBUG:
+            return "DEBUG is set to True, will skip sending data to RP"
         data = self._generate_analyze_dict(runs=runs, comment=comment, result=result, env_issue_type=env_issue_type, common_build=common_build)
         url = "https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/runs-analyze/"
         api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
