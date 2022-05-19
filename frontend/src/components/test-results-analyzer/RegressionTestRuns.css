@@ -97,6 +97,19 @@ aside {
     margin-right: 5px;
 }
 
-.p-treenode-label {
+.p-tree .p-tree-container .p-treenode {
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.might-overflow {
+    text-overflow: ellipsis;
+    overflow: hidden;
     white-space: nowrap;
+}
+
+.might-overflow:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-all;
 }

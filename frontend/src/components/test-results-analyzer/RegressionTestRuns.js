@@ -52,8 +52,6 @@ let RegressionTestRuns = () => {
 
     const navigate = useNavigate();
 
-    const [tooLongLabelTooltip, setTooLongLabelTooltip] = useState('');
-
     const expandAll = (nodesList, setExpanded) => {
         let _expandedKeys = {};
         for (let node of nodesList) {
@@ -280,7 +278,6 @@ let RegressionTestRuns = () => {
                 fetchStatuses(data['result']);
                 fetchAnalyzers(data['analyzed_by']);
                 fetchFBs(data['fb']);
-                showTooltifIfLabelTooLong();
             },
             (error) => {
                 console.log(error);
@@ -355,29 +352,25 @@ let RegressionTestRuns = () => {
         setSortOrder(null);
     }
 
-    const showTooltifIfLabelTooLong = () => {
-        var elements = document.getElementsByClassName('p-treenode-content p-treenode-selectable');
-        console.log(elements);
-        for(let element of elements) {
-            console.log(element ,element.offsetWidth, element.scrollWidth, element.clientWidth )
-            if( element.offsetWidth < element.scrollWidth){
-                // your element have overflow
-                console.log("tooLong")
-                setTooLongLabelTooltip("tooLong")
-                element.style.background = "yellow";
-                }
-                else{
-                //your element don't have overflow
-                }
-        }
-        // if( (element.offsetHeight < element.scrollHeight) || (element.offsetWidth < element.scrollWidth)){
-        // // your element have overflow
-        // element.style.background = "yellow";
-        // }
-        // else{
-        // //your element don't have overflow
-        // }
-    }
+    // const showTooltifIfLabelTooLong = () => {
+    //     var elements = document.getElementsByClassName('p-treenode-label');
+    //     // console.log(elements);
+    //     for (let element of elements) {
+    //         // console.log(element ,element.offsetWidth, element.scrollWidth, element.clientWidth )
+    //         if (element.offsetWidth < element.scrollWidth) {
+    //             // your element have overflow
+    //             element.style.background = "yellow";
+    //             element.addEventListener('onmouseover', (e) => {
+    //                 console.log(e)
+    //                 console.log("najechalem")
+    //             })
+    //             // element.appendTo()
+    //         }
+    //         else {
+    //             //your element don't have overflow
+    //         }
+    //     }
+    // }
 
     // const testFiltersCheckboxList = (
     //     <div>
@@ -385,33 +378,44 @@ let RegressionTestRuns = () => {
     //     </div>
     // )
 
+    const nodeTemplate = (node, options) => {
+        return (
+            <>
+                <span className="p-treenode-label might-overflow">
+                    {node.label}
+                </span>
+
+            </>
+        )
+    }
+
     const testSetCheckboxList = (
         <div>
-            <Tree value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
         </div>
     )
 
     const testLineTypeCheckboxList = (
         <div>
-            <Tree value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
         </div>
     )
 
     const branchCheckboxList = (
         <div>
-            <Tree value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
         </div>
     )
 
     const statusCheckboxList = (
         <div>
-            <Tree value={statusFilterNodes} expandedKeys={expandedStatusKeys} selectionMode="checkbox" selectionKeys={selectedStatusKeys} onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} nodeTemplate={nodeTemplate} value={statusFilterNodes} expandedKeys={expandedStatusKeys} selectionMode="checkbox" selectionKeys={selectedStatusKeys} onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)} />
         </div>
     )
 
     const analyzerCheckboxList = (
         <div>
-            <Tree value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys} selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys} onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys} selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys} onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)} />
         </div>
     )
 
@@ -460,7 +464,6 @@ let RegressionTestRuns = () => {
 
     useEffect(() => {
         fetchTestRunsFilters();
-        // showTooltifIfLabelTooLong();
         if (Object.keys(searchParamsEntry).length !== 0) {
             let url = convertUrl(searchParamsEntry)
             setApiFilterUrl(url);
