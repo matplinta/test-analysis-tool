@@ -488,8 +488,6 @@ let RegressionTestRuns = () => {
             </aside>
             <main>
                 <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
-
-
             </main>
         </div >
     )

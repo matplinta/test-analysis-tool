@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'react-bootstrap';
 import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
+import { Dropdown } from 'primereact/dropdown';
 
 import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -47,16 +48,16 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const [selectedColumns, setSelectedColumns] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [lazyParams, setLazyParams] = useState({
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-        filters: {}
-    });
+    // const [lazyParams, setLazyParams] = useState({
+    //     first: 0,
+    //     rows: 10,
+    //     page: 1,
+    //     sortField: null,
+    //     sortOrder: null,
+    //     filters: {}
+    // });
 
-    const rowsPerPage = 5;
+    const [rowsPerPage, setRowsPerPage] = useState(30);
 
     const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
 
@@ -66,7 +67,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     let onPageChange = (event) => {
         setFirst(event.first)
-        setLazyParams(event);
+        // setLazyParams(event);
         setCurrentPage(event.page);
         fetchTestRunsByFilter(filterUrl, event.page + 1);
     }
@@ -81,15 +82,20 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 const first = currentPage ? options.rows * (page - 1) : 0;
                 setFirst(first);
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
-                setLazyParams(event);
+                // setLazyParams(event);
                 setCurrentPage(page);
                 fetchTestRunsByFilter(filterUrl, page);
             }
         }
     }
 
+    const onPagesPerRowChange = (e) => {
+        console.log(e);
+        fetchTestRunsByFilter(filterUrl, 1, e.value);
+    }
+
     const templateCurrentPageReport = {
-        layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport',
+        layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown',
         'CurrentPageReport': (options) => {
             return (
                 <>
@@ -97,28 +103,37 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                         Go to <InputText size="2" className="p-ml-1" value={currentPage} tooltip={pageInputTooltip}
                             onKeyDown={(e) => onPageInputKeyDown(e, options)} onChange={onPageInputChange} />
                     </span>
-                    <span style={{ color: 'var(--text-color)', userSelect: 'none', textAlign: 'center' }}>
+                    <span style={{ color: 'var(--text-color)', userSelect: 'none' }}>
                         of {options.totalPages} pages ({options.first} - {options.last} of {options.totalRecords} rows)
                     </span>
+                </>
+            )
+        },
+        'RowsPerPageDropdown': (options) => {
+            return (
+                <>
+                    <Dropdown value={rowsPerPage} options={options.options} onChange={(e) => onPagesPerRowChange(e)} placeholder="Select a City" />
                 </>
             )
         }
     };
 
-    let fetchTestRunsByFilter = (filter, page) => {
+    let fetchTestRunsByFilter = (filter, page, pageSize) => {
         setLoading(true);
-        getTestRunsUsingFilter(filter, page).then(
+        getTestRunsUsingFilter(filter, page, pageSize).then(
             (response) => {
                 if (response.data.results.length > 0) {
                     setTestRuns(response.data.results);
                     setTestRunsCount(response.data.count);
                     setPagesCount(Math.round(response.data.count / rowsPerPage));
                     setCurrentPage(page);
+                    setRowsPerPage(pageSize);
                     setLoading(false);
                 } else {
                     setTestRuns([]);
                     setTestRunsCount(0);
                     setPagesCount(1);
+                    setRowsPerPage(pageSize);
                     setLoading(false);
                 }
 
@@ -187,9 +202,10 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     return (
         <DataTable value={testRuns} lazy paginator size="small" stripedRows
-            pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
+            pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
             dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
+            rowsPerPageOptions={[10, 30, 50, 100]}
             resizableColumns columnResizeMode="expand"
             emptyMessage="No test runs found! Please change your selected filters."
             sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} >
