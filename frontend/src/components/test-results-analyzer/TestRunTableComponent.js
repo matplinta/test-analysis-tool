@@ -74,12 +74,10 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const onPageInputKeyDown = (event, options) => {
         if (event.key === 'Enter') {
             const page = parseInt(currentPage);
-            console.log(page)
             if (page < 0 || page > options.totalPages) {
                 setPageInputTooltip(`Value must be between 1 and ${options.totalPages}.`);
             }
             else {
-                console.log("event enter")
                 const first = currentPage ? options.rows * (page - 1) : 0;
                 setFirst(first);
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
@@ -93,7 +91,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const templateCurrentPageReport = {
         layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport',
         'CurrentPageReport': (options) => {
-            console.log(options)
             return (
                 <>
                     <span className="p-mx-3" style={{ color: 'var(--text-color)', userSelect: 'none' }}>
@@ -144,11 +141,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     let startDateBodyTemplate = (rowData) => {
-        return <p>{rowData.start_time.replace('T', ' ').replace('Z', '')}</p>
+        return <span>{rowData.start_time.replace('T', ' ').replace('Z', '')}</span>
     }
 
     let endDateBodyTemplate = (rowData) => {
-        return <p>{rowData.end_time.replace('T', ' ').replace('Z', '')}</p>
+        return <span>{rowData.end_time.replace('T', ' ').replace('Z', '')}</span>
     }
 
     const onColumnToggle = (event) => {
@@ -171,12 +168,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const columnComponents = selectedColumns.map(col => {
         if (col.field === 'start_time') {
             return <Column key={col.field} body={startDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
-        } else if(col.field === 'end_time') {
+        } else if (col.field === 'end_time') {
             return <Column key={col.field} body={endDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
         } else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px' }} />;
         }
-
     });
 
     useEffect(
@@ -190,7 +186,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     )
 
     return (
-        <DataTable value={testRuns} lazy paginator className="p-datatable-test-runs" size="small" stripedRows
+        <DataTable value={testRuns} lazy paginator size="small" stripedRows
             pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
             dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
