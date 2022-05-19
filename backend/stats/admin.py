@@ -17,9 +17,9 @@ class FilterDefinitionAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 class FilterSetAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id']
-    list_filter = ['name']
-    search_fields = ['name']
+    list_display = ['name', 'id', 'author']
+    list_filter = ['name', 'author']
+    search_fields = ['name', 'author']
 
     
 admin.site.register(FilterField, FilterDefinitionAdmin)

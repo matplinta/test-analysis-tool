@@ -49,7 +49,7 @@ from .models import (
 )
 
 from .filters import TestRunFilter
-
+from .pagination import StandardResultsSetPagination
 from rep_portal.api import RepPortal
 import json
 from datetime import datetime
@@ -220,6 +220,7 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
     filterset_class = TestRunFilter
+    pagination_class = StandardResultsSetPagination
     ordering_fields = (
         'id', 
         'rp_id', 

@@ -18,32 +18,6 @@ from rep_portal.api import RepPortal
 from tra.models import FailMessageType
 from .models import Filter
 
-# exception_dict = {
-#     r'NoRegexpMatch:.*after 10 secs to match regexp \(.*\) in output': "EGATE print did not match",
-#     r'MibSibAcquisitionFailed': "MIB-SIB Acquisition Failed",
-#     r'RadioHeadTimeoutException': "RadioHeadTimeoutException",
-#     r'ParsingFailed:.*syslog': "Cannot find print in syslog",
-#     r'AdminApiProcedureFailureException': "Admin API exception",
-#     r'Number of messages \d+ is not.*': "Cannot find print in syslog",
-#     r'It was not possible to find string.*Established PDU session': "PDU session setup failure",
-#     r'It was not possible to find string.*Received REGISTRATION COMPLETE': "UE register failure",
-#     r'UnboundLocalError: local variable.*admin_connection.*referenced before assignment': "Admin API exception",
-#     r'Value for period \d+ is \d+ but expected is': "PM Counter error",
-#     r'CounterNotFound': "PM Counter error",
-#     r'MessageObserverTimeout': "PCAP validation failed",
-#     r'NoRegexpMatch: Fail regexp found \(.*handover.*performed.*\)': "Handover performed while it should not have been",
-#     r'No keyword with name': "Test script error",
-#     r'NoValidConnectionsError:.*192.168.255.1': "Connection to gNB was lost",
-#     r'AdminApi.*Exception': "Admin API exception",
-#     r'DTX ratio.*is to.*high': "DTX ratio is to high",
-#     r'.*is present in SCF. This is unexpected': "Object in SCF is present, while it should not be",
-#     r'.*is present in SCF, while it should not be': "Object in SCF is present, while it should not be",
-#     r'.*is not present in SCF': "Object is missing from SCF",
-#     r'.*not found in gNB tcpdump file': "PCAP validation failed",
-#     r'Counter.*does not satisfy the expression': "PM Counter error",
-#     r'NoMessageInFlow:.*': "PCAP validation failed",
-# }
-
 
 class Analyzer():
     def __init__(self, fail_message_types, filter_sets) -> None:
