@@ -69,7 +69,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         setFirst(event.first)
         // setLazyParams(event);
         setCurrentPage(event.page);
-        fetchTestRunsByFilter(filterUrl, event.page + 1);
+        fetchTestRunsByFilter(filterUrl, event.page + 1, rowsPerPage);
     }
 
     const onPageInputKeyDown = (event, options) => {
@@ -84,14 +84,15 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
                 // setLazyParams(event);
                 setCurrentPage(page);
-                fetchTestRunsByFilter(filterUrl, page);
+                fetchTestRunsByFilter(filterUrl, page, rowsPerPage);
             }
         }
     }
 
     const onPagesPerRowChange = (e) => {
-        console.log(e);
-        fetchTestRunsByFilter(filterUrl, 1, e.value);
+        setRowsPerPage(e.value);
+        fetchTestRunsByFilter(filterUrl, 1, e.value, rowsPerPage);
+        setCurrentPage(1);
     }
 
     const templateCurrentPageReport = {
@@ -112,9 +113,10 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         'RowsPerPageDropdown': (options) => {
             return (
                 <>
-                    <Dropdown value={rowsPerPage} options={options.options} onChange={(e) => onPagesPerRowChange(e)} placeholder="Select a City" />
+                    <span className="p-mx-1" style={{ color: 'var(--text-color)', userSelect: 'none', paddingLeft: '15px' }}> Items per page: </span>
+                    <Dropdown value={rowsPerPage} options={options.options} onChange={(e) => onPagesPerRowChange(e)} appendTo={document.body} style={{ justifyContent: 'right' }} />
                 </>
-            )
+            );
         }
     };
 
@@ -127,13 +129,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                     setTestRunsCount(response.data.count);
                     setPagesCount(Math.round(response.data.count / rowsPerPage));
                     setCurrentPage(page);
-                    setRowsPerPage(pageSize);
                     setLoading(false);
                 } else {
                     setTestRuns([]);
                     setTestRunsCount(0);
                     setPagesCount(1);
-                    setRowsPerPage(pageSize);
                     setLoading(false);
                 }
 
@@ -193,9 +193,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     useEffect(
         () => {
             if (filterUrl === "" && filterUrl !== null) {
-                fetchTestRunsByFilter("", currentPage);
+                fetchTestRunsByFilter("", currentPage, rowsPerPage);
             } else if (filterUrl !== "" && filterUrl !== null) {
-                fetchTestRunsByFilter(filterUrl, 1);
+                fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
             }
         }, [filterUrl, sortField, sortOrder]
     )

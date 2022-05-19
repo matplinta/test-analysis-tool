@@ -50,6 +50,8 @@ let RegressionTestRuns = () => {
     const [sortField, setSortField] = useState(null);
     const [sortOrder, setSortOrder] = useState(null);
 
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
 
     const expandAll = (nodesList, setExpanded) => {
@@ -268,6 +270,7 @@ let RegressionTestRuns = () => {
     }
 
     let fetchTestRunsFilters = () => {
+        setLoading(true);
         getTestRunsFilters().then(
             (response) => {
                 const data = response.data;
@@ -278,10 +281,12 @@ let RegressionTestRuns = () => {
                 fetchStatuses(data['result']);
                 fetchAnalyzers(data['analyzed_by']);
                 fetchFBs(data['fb']);
+                setLoading(false);
             },
             (error) => {
                 console.log(error);
                 Notify.sendNotification(Errors.GET_TEST_RUNS, AlertTypes.error);
+                setLoading(false);
             }
         )
     }
@@ -391,37 +396,37 @@ let RegressionTestRuns = () => {
 
     const testSetCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
         </div>
     )
 
     const testLineTypeCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
         </div>
     )
 
     const branchCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
         </div>
     )
 
     const statusCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} nodeTemplate={nodeTemplate} value={statusFilterNodes} expandedKeys={expandedStatusKeys} selectionMode="checkbox" selectionKeys={selectedStatusKeys} onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={statusFilterNodes} expandedKeys={expandedStatusKeys} selectionMode="checkbox" selectionKeys={selectedStatusKeys} onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)} loading={loading} />
         </div>
     )
 
     const analyzerCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys} selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys} onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)} />
+            <Tree nodeTemplate={nodeTemplate} value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys} selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys} onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)} loading={loading} />
         </div>
     )
 
     const fbCheckboxList = (
         <div>
-            <Tree value={fbFilterNodes} expandedKeys={expandedFbKeys} selectionMode="checkbox" selectionKeys={selectedFbKeys} onSelectionChange={e => setSelectedFbKeys(e.value)} onToggle={e => setExpandedFbKeys(e.value)} />
+            <Tree value={fbFilterNodes} expandedKeys={expandedFbKeys} selectionMode="checkbox" selectionKeys={selectedFbKeys} onSelectionChange={e => setSelectedFbKeys(e.value)} onToggle={e => setExpandedFbKeys(e.value)} loading={loading} />
         </div>
     )
 
