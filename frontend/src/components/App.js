@@ -19,6 +19,7 @@ import LoginComponent from './home/authorization/LoginComponent';
 import LogoutComponent from './home/authorization/LogoutComponent';
 import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
 import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
+import CommonMenuComponent from './home/CommonMenuComponent';
 
 import './App.css';
 
@@ -44,17 +45,9 @@ const App = () => {
         <header className="App-header">
           <img src={NOKIA_LOGO_WHITE_50px} className="App-logo" alt="-logo" />
         </header>
+
         <nav>
-          <div className="buttons-container">
-            <div className="back-button-div">
-              <GoBackHomeComponent />
-            </div>
-            <div className="buttons-div">
-              {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
-              {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
-              <GoToAdminComponent />
-            </div>
-          </div>
+          <CommonMenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />
         </nav>
         <section>
           <Routes>
@@ -67,7 +60,7 @@ const App = () => {
             </Route>
             <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-              <Route path="user-filters" index element={<UserFiltersComponent />} />
+              <Route path="regression-filters" index element={<UserFiltersComponent />} />
             </Route>
           </Routes>
           <ToastContainer autoClose={2500} />

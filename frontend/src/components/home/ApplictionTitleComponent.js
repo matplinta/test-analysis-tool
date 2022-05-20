@@ -1,6 +1,6 @@
 import './ApplictionTitleComponent.css';
 
-let ApplictionTitleComponent = ({appName}) => {
+let ApplictionTitleComponent = ({ appName }) => {
     return (
         <header className="application-header">
             <p>{appName}</p>
