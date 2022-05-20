@@ -150,6 +150,16 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         )
     }
 
+    let rpLinkBodyTemplate = (rowData) => {
+        const rpUrl = `https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,
+                       hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,
+                       builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=`;
+        const rpLink = rpUrl + rowData.rp_id;
+        return (
+            <Button variant="link" href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </Button >
+        )
+    }
+
     let resultBodyTemplate = (rowData) => {
         let resultCssName = "result-badge result-" + rowData.result.replace(' ', '-');
         return <span className={resultCssName}>{rowData.result}</span>;
@@ -204,13 +214,13 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         <DataTable value={testRuns} lazy paginator size="small" stripedRows
             pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
-            dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
+            dataKey="id" rowHover responsiveLayout="scroll" loading={loading} scrolable scrollDirection="both"
             rowsPerPageOptions={[10, 30, 50, 100]}
             resizableColumns columnResizeMode="expand"
             emptyMessage="No test runs found! Please change your selected filters."
-            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} >
+            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
 
-            <Column field="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
+            <Column body={rpLinkBodyTemplate} header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
             <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px' }} />
             <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px' }} />
             <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px' }} />

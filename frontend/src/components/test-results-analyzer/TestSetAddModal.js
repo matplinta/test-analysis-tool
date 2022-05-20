@@ -58,10 +58,10 @@ let TestSetAddModal = ({ showTestSetForm, handleTestSetFormClose }) => {
                 <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} placeholder="Test Set Name" />
             </div>
             <div className="form-item">
-                <Button variant="primary" type="submit" onClick={handleTestSetAdd}>
+                <Button className="p-button-primary" type="submit" onClick={handleTestSetAdd}>
                     Add Test Set
                 </Button>
-                <Button variant="primary" type="submit" onClick={clearForm}>
+                <Button className="p-button-primary" type="submit" onClick={clearForm}>
                     Clear Form
                 </Button>
             </div>

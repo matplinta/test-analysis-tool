@@ -52,6 +52,8 @@ let RegressionTestRuns = () => {
 
     const [loading, setLoading] = useState(false);
 
+    const [showFilters, setShowFilters] = useState(true);
+
     const navigate = useNavigate();
 
     const expandAll = (nodesList, setExpanded) => {
@@ -479,22 +481,32 @@ let RegressionTestRuns = () => {
 
     return (
 
-        <div className="wrapper">
-            <aside>
-                {/* {testFiltersCheckboxList} */}
-                {testSetCheckboxList}
-                {testLineTypeCheckboxList}
-                {branchCheckboxList}
-                {statusCheckboxList}
-                {analyzerCheckboxList}
-                {fbCheckboxList}
-                <Button onClick={searchTestRuns} style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
+        <div className="p-grid" style={{ width: '100%', padding: '5px' }}>
+            {showFilters ?
+                <div className="p-col-fixed" style={{ width: '16%' }}>
+                    <Button label="Hide" onClick={() => setShowFilters(false)} icon="pi pi-angle-double-left" className="p-button-text p-button-sm p-button-plain" />
+                    {testSetCheckboxList}
+                    {testLineTypeCheckboxList}
+                    {branchCheckboxList}
+                    {statusCheckboxList}
+                    {analyzerCheckboxList}
+                    <Button onClick={searchTestRuns} className="p-button-primary" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
+                </div>
+                :
+                <div className="p-col-fixed" style={{ width: '55px' }}>
+                    <Button onClick={() => setShowFilters(true)} icon="pi pi-angle-double-right" className="p-button-text p-button-sm p-button-plain" />
+                </div>}
 
-            </aside>
-            <main>
-                <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
-            </main>
-        </div >
+            {showFilters ?
+                <div className="p-col" style={{ width: '84%' }}>
+                    <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
+                </div>
+                :
+                <div className="p-col" style={{ width: `calc(100 % - 55px)` }}>
+                    <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
+                </div>
+            }
+        </div>
     )
 }
 

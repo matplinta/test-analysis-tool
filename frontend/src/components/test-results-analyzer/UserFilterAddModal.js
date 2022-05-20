@@ -142,10 +142,10 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
                         optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Set" />
                 </div>
                 <div className="form-item">
-                    <Button variant="primary" className="p-button-color" type="submit" onClick={handleFilterAdd}>
+                    <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterAdd}>
                         Add Filter
                     </Button>
-                    <Button variant="primary" className="p-button-color" type="submit" onClick={clearForm}>
+                    <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
                         Clear Form
                     </Button>
                 </div>
