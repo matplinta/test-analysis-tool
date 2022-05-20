@@ -174,11 +174,9 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
     permission_classes = (IsAuthenticated,)
-    serializer_class = TestRunSerializer
 
-    def get(self, request):
+    def get_distinct_values_based_on_subscribed_regfilters(self):
         fields_dict = {}
-
         def get_distinct_values_and_serialize(field, model, serializer=None, order_by_param=None, key_override=None):
             order_by_param = order_by_param if order_by_param else field
             distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
@@ -187,11 +185,8 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
             key = field if not key_override else key_override
             fields_dict[key] = json.loads(data)
 
-            # serializer = serializer(objects, many=True)
-            # fields_dict[field] = serializer.data
-        
         queryset = TestRun.objects.all()
-        regfilters = RegressionFilter.objects.filter(subscribers=request.user)
+        regfilters = RegressionFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
                                                test_instance__test_set=reg_filter.test_set), regfilters, Q())
@@ -199,7 +194,7 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
 
         fields_dict["regfilters"] = json.loads(serialize("json", regfilters))
         fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
-        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer) #, "test_instance__id")
+        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer)
         get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
         get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
@@ -210,9 +205,10 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         distinct_values = queryset.order_by("test_instance__test_set__id").distinct("test_instance__test_set").values_list("test_instance__test_set", flat=True)
         objects = TestSet.objects.filter(pk__in=distinct_values).distinct("name").values_list("name", flat=True)
         fields_dict['test_set_name'] = [{'pk': elem} for elem in list(objects)]
-        # get_distinct_values_and_serialize('test_instance__test_set', TestSet, key_override="test_set__name",
-        #                                   order_by_param="test_instance__test_set__id")
-        
+        return fields_dict
+
+    def get(self, request):
+        fields_dict = self.get_distinct_values_based_on_subscribed_regfilters()
         return Response(fields_dict)
 
 

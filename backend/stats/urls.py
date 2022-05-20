@@ -15,5 +15,6 @@ urlpatterns = [
     path('filter_fields', views.FilterFieldView.as_view(), name="filterfields"),
     path('userfiltersets', views.UserFilterSetView.as_view(), name="userfiltersets"),
     path('disp_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="stats"),
-    path('fail_barchart/<int:filterset_id>', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
+    path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
+    path('fail_barchart_subs_regfilters', views.GetFailChartForUsersAllSubscribedRegFilters.as_view(), name="failbarchart_subs_regfilters"),
 ]
