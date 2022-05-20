@@ -47,7 +47,7 @@ let UserFiltersComponent = () => {
 
     let removeButton = (rowData) => {
         return (
-            <Button icon="pi pi-times" className="p-button-sm" onClick={() => confirmRemove(rowData.id)} />
+            <Button icon="pi pi-times" className="p-button-primary p-button-sm" onClick={() => confirmRemove(rowData.id)} />
         );
     }
 
@@ -73,7 +73,7 @@ let UserFiltersComponent = () => {
     return (
         <>
             <br />
-            <Button size="sm" style={{ "marginLeft": '20px' }} className="p-button-color" onClick={handleFormShow}>Add Glogal Filter</Button>
+            <Button size="sm" style={{ "marginLeft": '20px' }} className="p-button-primary p-button-color" onClick={handleFormShow}>Add Glogal Filter</Button>
 
             <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row">
                 <Column field="name" header="Name" sortable></Column>

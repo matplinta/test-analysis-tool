@@ -38,9 +38,6 @@ let LogoutComponent = ({ handleSuccess }) => {
                 <Button variant="primary" type="submit">
                     Logout
                 </Button>
-                <Button variant="primary" type="submit">
-                    Cancel
-                </Button>
             </Form>
         </>
     )

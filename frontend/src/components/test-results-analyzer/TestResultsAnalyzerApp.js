@@ -4,7 +4,6 @@ import MenuComponent from './MenuComponent';
 let TestResultsAnalyzerApp = () => {
     return (
         <>
-            <ApplictionTitleComponent appName="Test Results Analyser" />
             <MenuComponent />
             <br />
         </>

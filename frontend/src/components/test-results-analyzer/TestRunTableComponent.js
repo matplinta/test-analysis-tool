@@ -5,6 +5,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'react-bootstrap';
 import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
+import { Dropdown } from 'primereact/dropdown';
 
 import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -47,16 +48,16 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const [selectedColumns, setSelectedColumns] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [lazyParams, setLazyParams] = useState({
-        first: 0,
-        rows: 10,
-        page: 1,
-        sortField: null,
-        sortOrder: null,
-        filters: {}
-    });
+    // const [lazyParams, setLazyParams] = useState({
+    //     first: 0,
+    //     rows: 10,
+    //     page: 1,
+    //     sortField: null,
+    //     sortOrder: null,
+    //     filters: {}
+    // });
 
-    const rowsPerPage = 5;
+    const [rowsPerPage, setRowsPerPage] = useState(30);
 
     const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
 
@@ -66,9 +67,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     let onPageChange = (event) => {
         setFirst(event.first)
-        setLazyParams(event);
+        // setLazyParams(event);
         setCurrentPage(event.page);
-        fetchTestRunsByFilter(filterUrl, event.page + 1);
+        fetchTestRunsByFilter(filterUrl, event.page + 1, rowsPerPage);
     }
 
     const onPageInputKeyDown = (event, options) => {
@@ -81,15 +82,21 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 const first = currentPage ? options.rows * (page - 1) : 0;
                 setFirst(first);
                 setPageInputTooltip('Press \'Enter\' key to go to this page.');
-                setLazyParams(event);
+                // setLazyParams(event);
                 setCurrentPage(page);
-                fetchTestRunsByFilter(filterUrl, page);
+                fetchTestRunsByFilter(filterUrl, page, rowsPerPage);
             }
         }
     }
 
+    const onPagesPerRowChange = (e) => {
+        setRowsPerPage(e.value);
+        fetchTestRunsByFilter(filterUrl, 1, e.value, rowsPerPage);
+        setCurrentPage(1);
+    }
+
     const templateCurrentPageReport = {
-        layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport',
+        layout: 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown',
         'CurrentPageReport': (options) => {
             return (
                 <>
@@ -97,17 +104,25 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                         Go to <InputText size="2" className="p-ml-1" value={currentPage} tooltip={pageInputTooltip}
                             onKeyDown={(e) => onPageInputKeyDown(e, options)} onChange={onPageInputChange} />
                     </span>
-                    <span style={{ color: 'var(--text-color)', userSelect: 'none', textAlign: 'center' }}>
+                    <span style={{ color: 'var(--text-color)', userSelect: 'none' }}>
                         of {options.totalPages} pages ({options.first} - {options.last} of {options.totalRecords} rows)
                     </span>
                 </>
             )
+        },
+        'RowsPerPageDropdown': (options) => {
+            return (
+                <>
+                    <span className="p-mx-1" style={{ color: 'var(--text-color)', userSelect: 'none', paddingLeft: '15px' }}> Items per page: </span>
+                    <Dropdown value={rowsPerPage} options={options.options} onChange={(e) => onPagesPerRowChange(e)} appendTo={document.body} style={{ justifyContent: 'right' }} />
+                </>
+            );
         }
     };
 
-    let fetchTestRunsByFilter = (filter, page) => {
+    let fetchTestRunsByFilter = (filter, page, pageSize) => {
         setLoading(true);
-        getTestRunsUsingFilter(filter, page).then(
+        getTestRunsUsingFilter(filter, page, pageSize).then(
             (response) => {
                 if (response.data.results.length > 0) {
                     setTestRuns(response.data.results);
@@ -132,6 +147,16 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     let logLinkBodyTemplate = (rowData) => {
         return (
             <Button variant="link" href={rowData.log_file_url} style={{ fontSize: '11px' }}>Logs</Button>
+        )
+    }
+
+    let rpLinkBodyTemplate = (rowData) => {
+        const rpUrl = `https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,
+                       hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,
+                       builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=`;
+        const rpLink = rpUrl + rowData.rp_id;
+        return (
+            <Button variant="link" href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </Button >
         )
     }
 
@@ -178,23 +203,24 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     useEffect(
         () => {
             if (filterUrl === "" && filterUrl !== null) {
-                fetchTestRunsByFilter("", currentPage);
+                fetchTestRunsByFilter("", currentPage, rowsPerPage);
             } else if (filterUrl !== "" && filterUrl !== null) {
-                fetchTestRunsByFilter(filterUrl, 1);
+                fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
             }
         }, [filterUrl, sortField, sortOrder]
     )
 
     return (
         <DataTable value={testRuns} lazy paginator size="small" stripedRows
-            pageCount={pagesCount} rows={10} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
+            pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
-            dataKey="id" rowHover responsiveLayout="scroll" loading={loading}
+            dataKey="id" rowHover responsiveLayout="scroll" loading={loading} scrolable scrollDirection="both"
+            rowsPerPageOptions={[10, 30, 50, 100]}
             resizableColumns columnResizeMode="expand"
             emptyMessage="No test runs found! Please change your selected filters."
-            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} >
+            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
 
-            <Column field="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
+            <Column body={rpLinkBodyTemplate} header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
             <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px' }} />
             <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px' }} />
             <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px' }} />

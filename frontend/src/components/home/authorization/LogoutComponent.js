@@ -7,7 +7,7 @@ import LogoutForm from './LogoutForm';
 
 import './LoginComponent.css';
 
-let LogoutComponent = ({setIsUserLoggedIn}) => {
+let LogoutComponent = ({ setIsUserLoggedIn }) => {
 
     const [show, setShow] = useState(false);
 
@@ -26,28 +26,28 @@ let LogoutComponent = ({setIsUserLoggedIn}) => {
             () => {
                 handleConfirmationClose();
                 setIsUserLoggedIn(false);
-            }, 
+            },
             1500
         );
-        
+
     }
 
-    return(
+    return (
         <div>
-            <Button variant="primary" size="sm" onClick={handleShow}>Logout</Button>
+            <Button size="sm" style={{ "marginLeft": '20px', height: '35px' }} className="p-button-primary p-button-color" onClick={handleShow}>Logout</Button>
 
             <Modal show={show} onHide={handleClose} size="sm" centered >
                 <Modal.Header closeButton>
-                <Modal.Title>Logout</Modal.Title>
+                    <Modal.Title>Logout</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <LogoutForm handleSuccess={handleSuccess}/>
+                    <LogoutForm handleSuccess={handleSuccess} />
                 </Modal.Body>
             </Modal>
 
             <ConfirmationComponent confirmationType='logout' show={showConfirmation} handleClose={handleConfirmationClose} />
         </div>
-        
+
     )
 }
 

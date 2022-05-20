@@ -3,44 +3,34 @@ import { Link, Outlet } from 'react-router-dom';
 import { Navbar, Nav } from 'react-bootstrap';
 import { TabMenu } from 'primereact/tabmenu';
 import { Button } from 'primereact/button';
+import { Menubar } from 'primereact/menubar';
+
+import logo_TRA from './../../assets/logo_TRA.png';
 
 import './MenuComponent.css';
 
 
 let MenuComponent = () => {
 
-    // const [activeIndex, setActiveIndex] = useState(1);
+    const items = [
+        {
+            label: <Link to="regression-test-runs" className="menu-item">Regression Test Runs</Link>,
+            icon: 'pi pi-database'
+        },
+        {
+            label: <Link to="regression-filters" className="menu-item" >Regression Filter</Link>,
+            icon: 'pi pi-filter'
+        }
+    ]
 
-    // let history = createBrowserHistory();
-
-    // const items = [
-    //     { label: 'Analized Test Runs', icon: 'pi pi-fw pi-home', command: () => { this.navigateToPage('/analyzed-test-runs') } },
-    //     { label: 'Waiting Test Runs', icon: 'pi pi-fw pi-calendar', command: () => { this.navigateToPage('/waiting-test-runs') } },
-    //     { label: 'Define Filter', icon: 'pi pi-fw pi-pencil', command: () => { this.navigateToPage('/user-filters') } }
-    // ];
-
-    // navigateToPage = (path) => {
-    //     this.props.history.push(path);
-    // }
+    const start = <img alt="..." src={logo_TRA} style={{ height: '20px', marginRight: '10px' }}></img>;
 
     return (
         <>
-            <Navbar className="navbar-style" variant="dark">
-                <Nav className="me-auto">
-                    <Link to="regression-test-runs" className='nav-style link-style' >Regression Test Runs</Link>
-                    <Link to="user-filters" exact="true" className='nav-style link-style' >Define Filter</Link>
-                </Nav>
-            </Navbar>
+
+            <Menubar model={items} start={start} className="menu" />
             <Outlet />
 
-            {/* <div>
-                <div className="card">
-                    <TabMenu model={items} onTabChange={(e) => setActiveIndex(e.index)} >
-
-                    </TabMenu>
-
-                </div>
-            </div> */}
         </>
     )
 }

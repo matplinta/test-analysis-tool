@@ -113,3 +113,13 @@ aside {
     white-space: normal;
     word-break: break-all;
 }
+
+.p-button.p-button-text.p-button-plain {
+    width: 100%;
+    margin-bottom: 1px;
+    text-align: left;
+    color: #495057;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: none !important;
+}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Button from 'react-bootstrap/Button';
+import { Button } from 'primereact/button';
 import Modal from 'react-bootstrap/Modal';
 
 import LoginForm from './LoginForm';
@@ -9,7 +9,7 @@ import LoginErrorComponent from './LoginErrorComponent';
 import './LoginComponent.css';
 
 
-let LoginComponent = ({setIsUserLoggedIn}) => {
+let LoginComponent = ({ setIsUserLoggedIn }) => {
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -31,7 +31,7 @@ let LoginComponent = ({setIsUserLoggedIn}) => {
             () => {
                 handleConfirmationClose();
                 setIsUserLoggedIn(true);
-            }, 
+            },
             1500
         );
     }
@@ -39,18 +39,19 @@ let LoginComponent = ({setIsUserLoggedIn}) => {
     let handleFail = () => {
         handleErrorShow();
         setTimeout(
-            () => handleErrorClose(), 
+            () => handleErrorClose(),
             1500
         );
     }
 
-    return(
+    return (
         <div>
-            <Button variant="primary" size="sm" onClick={handleShow}>Login</Button>
+            <Button size="sm" style={{ "marginLeft": '20px', height: '35px' }} className="p-button-primary p-button-color" onClick={handleShow}>Login</Button>
+
 
             <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered dialogClassName="modal-90w" >
                 <Modal.Header closeButton>
-                <Modal.Title>Log in using LDAP credentials!</Modal.Title>
+                    <Modal.Title>Log in using LDAP credentials!</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <LoginForm handleSuccess={handleSuccess} handleFail={handleFail} handleClose={handleClose} />
@@ -60,7 +61,7 @@ let LoginComponent = ({setIsUserLoggedIn}) => {
             <ConfirmationComponent confirmationType='login' show={showConfirmation} handleClose={handleConfirmationClose} />
             <LoginErrorComponent show={showError} handleClose={handleErrorClose} />
         </div>
-        
+
     )
 }
 
