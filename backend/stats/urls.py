@@ -18,7 +18,7 @@ urlpatterns = [
     path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
     # fail_barchart
     #   PARAMS:
-    #       - filterset_id [REQUIRED]   Id of filterset
+    #       - filterset    [REQUIRED]   Id of filterset
     #       - date_middle  [OPTIONAL]   Separation date (e.g. 2022-12-03)
     #       - date_start   [OPTIONAL]   Start date (e.g. 2022-12-03) to filter against; must be used with date_end
     #       - date_end     [OPTIONAL]   End date (e.g. 2022-12-03) to filter against;  must be used with date_start
