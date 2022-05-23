@@ -151,9 +151,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     let rpLinkBodyTemplate = (rowData) => {
-        const rpUrl = `https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,
-                       hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,
-                       builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=`;
+        const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
         const rpLink = rpUrl + rowData.rp_id;
         return (
             <Button variant="link" href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </Button >
@@ -192,11 +190,13 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const columnComponents = selectedColumns.map(col => {
         if (col.field === 'start_time') {
-            return <Column key={col.field} body={startDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
+            return <Column key={col.field} body={startDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
         } else if (col.field === 'end_time') {
-            return <Column key={col.field} body={endDateBodyTemplate} header={col.header} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
+            return <Column key={col.field} body={endDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
+        } else if (col.field === 'fail_message') {
+            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '450px' }} />;
         } else {
-            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px' }} />;
+            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '150px' }} />;
         }
     });
 
@@ -216,20 +216,21 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
             dataKey="id" rowHover responsiveLayout="scroll" loading={loading} scrolable scrollDirection="both"
             rowsPerPageOptions={[10, 30, 50, 100]}
+            reorderableColumns={true}
             resizableColumns columnResizeMode="expand"
             emptyMessage="No test runs found! Please change your selected filters."
             sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
 
-            <Column body={rpLinkBodyTemplate} header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px' }} />
-            <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px' }} />
-            <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px' }} />
-            <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px' }} />
-            <Column field="builds" header="Build" sortable style={{ fontSize: '11px' }} />
-            <Column body={resultBodyTemplate} header="Result" sortField="result" sortable style={{ fontSize: '11px' }} />
-            <Column body={logLinkBodyTemplate} header="Logs" style={{ fontSize: '11px' }} />
-            <Column field="fb" header="FB" sortable style={{ fontSize: '11px' }} />
+            <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '100px' }} />
+            <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
+            <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
+            <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
+            <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '140px' }} />
+            <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
+            <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
+            <Column field="fb" header="FB" sortable style={{ fontSize: '11px', minWidth: "60px" }} />
             <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
-            <Column field="comment" header="Comment" sortable style={{ fontSize: '11px' }} />
+            <Column field="comment" header="Comment" sortable style={{ fontSize: '11px', minWidth: '150px' }} />
             {columnComponents}
         </DataTable>
     )

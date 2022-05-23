@@ -35,6 +35,16 @@
     padding-bottom: 1rem;
 }
 
-/* .p-datatable[pr_id_4] .p-datatable-tfoot>tr>td:nth-child(1) { */
-/* max-width: 600px ! important; */
-/* } */
+.p-datatable-resizable .p-datatable-thead>tr>th,
+.p-datatable-resizable .p-datatable-tfoot>tr>td {
+    overflow: hidden;
+    white-space: nowrap
+}
+
+.p-datatable-resizable .p-datatable-tbody>tr>td {
+    overflow: hidden;
+    white-space: unset;
+    overflow-wrap: anywhere;
+    min-width: fit-content;
+    max-width: max-content;
+}

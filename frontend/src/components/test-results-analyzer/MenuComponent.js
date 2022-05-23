@@ -23,7 +23,7 @@ let MenuComponent = () => {
         }
     ]
 
-    const start = <img alt="..." src={logo_TRA} style={{ height: '20px', marginRight: '10px' }}></img>;
+    const start = <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px' }}></img>;
 
     return (
         <>

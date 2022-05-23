@@ -490,6 +490,7 @@ let RegressionTestRuns = () => {
                     {branchCheckboxList}
                     {statusCheckboxList}
                     {analyzerCheckboxList}
+                    {fbCheckboxList}
                     <Button onClick={searchTestRuns} className="p-button-primary" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
                 </div>
                 :
