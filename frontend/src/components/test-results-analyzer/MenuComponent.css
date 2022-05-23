@@ -1,29 +1,17 @@
-.navbar-style {
+.p-menubar {
   background-color: #004c9a;
-  padding-left: 20px;
-  height: 45px;
 }
 
-.nav-style {
-  margin-left: 15px;
-  margin-right: 15px;
-}
-
-.menu-item {
-  text-decoration: none;
+.p-menubar .p-menubar-root-list>.p-menuitem>.p-menuitem-link .p-menuitem-text {
   color: white;
   font-weight: bold;
-  margin-top: 5px;
-}
-
-.menu-item:hover {
-  color: #495057;
-}
-
-.menu {
-  background-color: #004c9a;
 }
 
 .p-menubar .p-menubar-root-list>.p-menuitem>.p-menuitem-link .p-menuitem-icon {
   color: white;
 }
+
+/* .p-menubar .p-menubar-root-list>.p-menuitem>.p-menuitem-link:not(.p-disabled):hover {
+  background-color: #2876c4;
+  color: white;
+} */

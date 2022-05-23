@@ -61,6 +61,8 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
 
+    // const tableHeight = calc(100vh - 204px);
+
     const onPageInputChange = (event) => {
         setCurrentPage(event.target.value);
     }
@@ -214,10 +216,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         <DataTable value={testRuns} lazy paginator size="small" stripedRows
             pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
             paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
-            dataKey="id" rowHover responsiveLayout="scroll" loading={loading} scrolable scrollDirection="both"
+            dataKey="id" rowHover loading={loading}
             rowsPerPageOptions={[10, 30, 50, 100]}
             reorderableColumns={true}
             resizableColumns columnResizeMode="expand"
+            scrollHeight="calc(100vh - 290px)"
             emptyMessage="No test runs found! Please change your selected filters."
             sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
 
@@ -225,7 +228,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
             <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
             <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
             <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
-            <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '140px' }} />
+            <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
             <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
             <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
             <Column field="fb" header="FB" sortable style={{ fontSize: '11px', minWidth: "60px" }} />

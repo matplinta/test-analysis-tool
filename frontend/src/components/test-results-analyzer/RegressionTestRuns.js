@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card } from 'primereact/card';
 import { Tree } from 'primereact/tree';
 import { Tooltip } from 'primereact/tooltip';
+import { ScrollPanel } from 'primereact/scrollpanel';
 
 import TestRunTableComponent from './TestRunTableComponent';
 
@@ -485,6 +486,7 @@ let RegressionTestRuns = () => {
             {showFilters ?
                 <div className="p-col-fixed" style={{ width: '16%' }}>
                     <Button label="Hide" onClick={() => setShowFilters(false)} icon="pi pi-angle-double-left" className="p-button-text p-button-sm p-button-plain" />
+                    {/* <ScrollPanel style={{ width: '100%', height: 'calc(100vh - 310px)' }}> */}
                     {testSetCheckboxList}
                     {testLineTypeCheckboxList}
                     {branchCheckboxList}
@@ -492,22 +494,24 @@ let RegressionTestRuns = () => {
                     {analyzerCheckboxList}
                     {fbCheckboxList}
                     <Button onClick={searchTestRuns} className="p-button-primary" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
+                    {/* </ScrollPanel> */}
                 </div>
                 :
                 <div className="p-col-fixed" style={{ width: '55px' }}>
                     <Button onClick={() => setShowFilters(true)} icon="pi pi-angle-double-right" className="p-button-text p-button-sm p-button-plain" />
                 </div>}
 
-            {showFilters ?
-                <div className="p-col" style={{ width: '84%' }}>
-                    <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
-                </div>
-                :
-                <div className="p-col" style={{ width: `calc(100 % - 55px)` }}>
-                    <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
-                </div>
+            {
+                showFilters ?
+                    <div className="p-col" style={{ width: '84%' }}>
+                        <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
+                    </div>
+                    :
+                    <div className="p-col" style={{ width: `calc(100 % - 55px)` }}>
+                        <TestRunTableComponent filterUrl={apiFilterUrl} onSortColumn={onSortColumn} sortField={sortField} sortOrder={sortOrder}></TestRunTableComponent>
+                    </div>
             }
-        </div>
+        </div >
     )
 }
 
