@@ -61,7 +61,7 @@ from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilt
 
 
 class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication,)
+    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication)
     permission_classes = (IsAuthenticated,)  
 
 
