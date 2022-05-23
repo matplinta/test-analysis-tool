@@ -15,6 +15,8 @@ import tra.models as tra_models
 from tra.views import TestRunsBasedOnQueryDictinctValues
 from stats.analyzer import Analyzer
 from datetime import date, datetime
+from itertools import chain
+
 
 
 class ListFiltersWithFilterSetView(generics.ListAPIView):
@@ -78,14 +80,24 @@ class GetDataForFailChartBase(APIView):
                 dates[date_key] = datetime.strptime(date_str, "%Y-%m-%d").date()
         return dates
 
-    def parse_filters_and_failmessagetypes(self, filterset_id):
+    def parse_filters_and_fmtgs(self, filterset_id):
         filter_set = FilterSet.objects.get(pk=filterset_id)
         filters_by_filterset = Filter.objects.filter(filter_set=filter_set)
-        fail_message_types = tra_models.FailMessageType.objects.filter(author=self.request.user)
-
-        fail_message_dict = {fm_type.regex: fm_type.name for fm_type in fail_message_types}
         filters = {filter.field.name: filter.value for filter in filters_by_filterset}
-        return fail_message_dict, filters
+        fmtgs = filters.pop("fail_message_type_groups", [])
+        if fmtgs:
+            fmtgs = [int(value) for value in fmtgs.split(",")]
+        return filters, fmtgs
+
+    def parse_failmessagetypes(self, ids_list):
+        querysets = []
+        for _id in ids_list:
+            fail_message_type_group = tra_models.FailMessageTypeGroup.objects.get(id=_id)
+            querysets.append(fail_message_type_group.fail_message_types.all())
+
+        fail_message_types = list(chain(*querysets))
+        fail_message_dict = {fm_type.regex: fm_type.name for fm_type in fail_message_types}
+        return fail_message_dict
 
     def get_filters_and_failmessagetypes_from_post_data(self):
         data = self.request.data
@@ -109,7 +121,8 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
         filterset_id = self._handle_filterset_id_in_request(self.request)
         if not filterset_id:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        fail_message_dict, filters = self.parse_filters_and_failmessagetypes(filterset_id)
+        filters, fmtgs = self.parse_filters_and_fmtgs(filterset_id)
+        fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
         data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
         return Response(data)
 
@@ -120,11 +133,14 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
 
 
 class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestRunsBasedOnQueryDictinctValues):
+    def _handle_limit_in_request(self, request):
+        return request.query_params.get("limit", None)
 
-    def prepare_failmessagetypes_for_users_all_subs_regfilters(self):
-        fail_message_types = tra_models.FailMessageType.objects.filter(author=self.request.user)
-        fail_message_dict = {fm_type.regex: fm_type.name for fm_type in fail_message_types}
-        return fail_message_dict
+    def prepare_failmessagetypes_for_users_all_subs_regfilters(self, request):
+        fmtgs = request.query_params.get("fail_message_type_groups", [])
+        if fmtgs:
+            fmtgs = [int(value) for value in fmtgs.split(",")]
+        return self.parse_failmessagetypes(ids_list=fmtgs), fmtgs
 
     def prepare_filters_for_users_all_subs_regfilters(self):
         def _parse_branches(branches):
@@ -151,7 +167,7 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
         }
 
     def handle_creation_or_update_of_users_allsubs_filterset(self, filters):
-        user_allsubs_filterset_name = f"AUTOGEN: {self.request.user.username}: from subscribed RegressionFilters"
+        user_allsubs_filterset_name = f"AUTOGEN-SUBS-REGFILTERS: {self.request.user.username}"
         user_allsubs_filterset, created = FilterSet.objects.get_or_create(name=user_allsubs_filterset_name, author=self.request.user)
         for key, value in filters.items():
             key = FilterField.objects.get(name=key)
@@ -159,9 +175,15 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
 
 
     def get(self, request):
-        fail_message_dict = self.prepare_failmessagetypes_for_users_all_subs_regfilters()
+        fail_message_dict, _fmtgs = self.prepare_failmessagetypes_for_users_all_subs_regfilters(request)
+        limit = self._handle_limit_in_request(request)
         filters = self.prepare_filters_for_users_all_subs_regfilters()
+        if _fmtgs:
+            filters["fail_message_type_groups"] = ",".join([str(s) for s in _fmtgs])
+        if limit:
+            filters["limit"] = limit
         self.handle_creation_or_update_of_users_allsubs_filterset(filters)
+        filters.pop('fail_message_type_groups', None)
         data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
         return Response(data)
 

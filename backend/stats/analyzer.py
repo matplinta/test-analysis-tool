@@ -64,6 +64,11 @@ class Analyzer():
         # print(msg)
         return lines[0]
 
+    def _get_additional_info(self, df):
+        earliest = min(df["end"])
+        latest = max(df["end"])
+        return f"Data range: {earliest} - {latest}"
+
     def _get_normalized_exception_data(self, df):
         df_temp = df.copy()
         df_temp['exception_type'] = df_temp.apply(lambda value: self._establishing_exception_type(value.fail_message), axis=1)
@@ -91,41 +96,46 @@ class Analyzer():
 
 
     def merge_df_from_date_ranges(self, df_1, df_2):
-        return df_1.join(df_2).fillna(value=0).astype(int)
+        return pd.merge(df_1, df_2, how="outer", left_index=True, right_index=True).fillna(value=0).astype(int)
 
 
-    def _prepare_data_for_frontend(self, df_merged) -> Dict:
+    def _prepare_data_for_frontend(self, df_merged, info=None) -> Dict:
         data = {"labels": df_merged.index.values.tolist()}
         for col in df_merged.columns:
             data[col] = df_merged[col].values.tolist()
+        if info:
+            data['info'] = info
         return data
 
 
     def _handle_matplotlib_params(self, df, size, figure_name="figure"):
-        ax = df.plot.barh(figsize=(18,10))
-        ax.text(10, 3, f"Number of total failed runs {size}")
-        ax.legend(bbox_to_anchor=(1, 0.3), fontsize='14');
-        for p in ax.patches:
-            w = p.get_width()
-            ax.annotate(f'{w:.2f}', (w * 0.5, p.get_y() + 0.1))
-        plt.show()
-        plt.rcParams["figure.figsize"] = [7.00, 3.50]
-        plt.rcParams["figure.autolayout"] = True
-        fig = ax.get_figure()
-        plt.subplots_adjust(left=0.7, )
-        fig.savefig(f'media/{figure_name}.png') 
-
+        try:
+            ax = df.plot.barh(figsize=(18,10))
+            ax.text(10, 3, f"Number of total failed runs {size}")
+            ax.legend(bbox_to_anchor=(1, 0.3), fontsize='14');
+            for p in ax.patches:
+                w = p.get_width()
+                ax.annotate(f'{w:.2f}', (w * 0.5, p.get_y() + 0.1))
+            plt.show()
+            plt.rcParams["figure.figsize"] = [7.00, 3.50]
+            plt.rcParams["figure.autolayout"] = True
+            fig = ax.get_figure()
+            plt.subplots_adjust(left=0.7, )
+            fig.savefig(f'media/{figure_name}.png')
+        except IndexError as e:
+            print(str(e))
 
     def plot_runs_by_exception_types(self, df=None, plot=False, figure_name="figure"):
         if df is None:
             df = self.df
         size = len(df.index)
         df_temp = self._get_normalized_exception_data(df)
+        info = self._get_additional_info(df_temp)
         df_temp = self._get_data_indexed_by_exception_type(df_temp)
         df_temp.sort_values(by=list(df_temp.columns), inplace=True)
         if plot:
             self._handle_matplotlib_params(df_temp, size, figure_name)
-        return self._prepare_data_for_frontend(df_temp)
+        return self._prepare_data_for_frontend(df_temp, info=info)
 
 
     def plot_runs_by_exception_types_by_date_ranges(
@@ -141,6 +151,7 @@ class Analyzer():
             df = self.df
         size = len(df.index)
         df_temp = self._get_normalized_exception_data(df)
+        info = self._get_additional_info(df_temp)
         if date_middle and date_start and date_end:
             df_before = self._get_data_indexed_by_exception_type(df_temp, date_start=date_start, date_end=date_middle)
             df_after = self._get_data_indexed_by_exception_type(df_temp,  date_start=date_middle, date_end=date_end)
@@ -155,7 +166,7 @@ class Analyzer():
         df_merged.sort_values(by=list(df_merged.columns), inplace=True)
         if plot:
             self._handle_matplotlib_params(df_merged, size, figure_name)
-        return self._prepare_data_for_frontend(df_merged)
+        return self._prepare_data_for_frontend(df_merged, info=info)
     
 
 
