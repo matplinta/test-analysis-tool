@@ -101,6 +101,12 @@ class TestlineTypeView(viewsets.ModelViewSet):
     pagination_class = None
 
 
+class EnvIssueTypeView(viewsets.ModelViewSet):
+    serializer_class = EnvIssueTypeSerializer
+    queryset = EnvIssueType.objects.all()
+    pagination_class = None
+
+
 class TestsSetView(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)   
     serializer_class = TestSetSerializer
@@ -151,13 +157,13 @@ class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
 
-    @action(detail=True, methods=['put'], url_path="analyze")
-    def analyze(self, request, pk=None):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(analyzed=True, analyzed_by=self.request.user)
-        return Response(serializer.data)
+    # @action(detail=True, methods=['put'], url_path="analyze")
+    # def analyze(self, request, pk=None):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save(analyzed=True, analyzed_by=self.request.user)
+    #     return Response(serializer.data)
 
 
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
@@ -252,6 +258,33 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
                                                test_instance__test_set=reg_filter.test_set), regfilters, Q())
         )
         return queryset
+
+
+class TestRunsAnalyzeToRP(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        data = self.request.data
+        rp_ids = data["rp_ids"] 
+        comment = data["comment"]
+        result = data["result"]
+        env_issue_type = data["env_issue_type"]
+        
+        result_obj = TestRunResult.objects.get(name=result)
+        rp_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
+
+        celery_analyze_testruns.delay(
+            runs=rp_ids,
+            comment=comment, 
+            common_build="", 
+            result=result_obj.name, 
+            env_issue_type=env_issue_type,
+            # token=token
+        )
+
+        rp_to_analyze.update(analyzed=True, analyzed_by=request.user, comment=comment, result=result_obj)
+
+        return Response({})
 
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
