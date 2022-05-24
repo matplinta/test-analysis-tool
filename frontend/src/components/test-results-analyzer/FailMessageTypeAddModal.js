@@ -15,10 +15,9 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
     const [name, setName] = useState('');
     const [regex, setRegex] = useState('');
     const [description, setDescription] = useState('');
+    const [envIssueType, setEnvIssueType] = useState('');
 
-    const handleFailMessageTypeAdd = () => {
-
-    }
+    const [envIssueTypesList, setEnvIssueTypesList] = useState([]);
 
     const clearForm = () => {
         setName('');
@@ -30,7 +29,8 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
         let failMessgeRegexTypeToAdd = {
             'name': name,
             'regex': regex,
-            'description': description
+            'description': description,
+            'env_issue_type': envIssueType
         }
         postFailMessageType(failMessgeRegexTypeToAdd).then(
             (success) => {
@@ -55,6 +55,11 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
                     <label htmlFor="regex" className="block">Fail Message Regex</label>
                     <br />
                     <InputTextarea id="regex" value={regex} rows={2} onChange={(e) => setRegex(e.target.value)} autoResize className="block" style={{ width: "100%" }} />
+                </div>
+                <div className="form-item">
+                    <label htmlFor="envIssueType" className="block">Env Issue Type</label>
+                    <Dropdown value={envIssueType} options={envIssueTypesList} onChange={(e) => { setEnvIssueType(e.target.value) }} style={{ width: "100%" }}
+                        optionLabel="label" filter showClear filterBy="label" id="envIssueType" />
                 </div>
                 <div className="form-item">
                     <label htmlFor="regex" className="block">Description</label>

@@ -55,10 +55,11 @@ const FailRegexTypesComponent = () => {
                 scrollHeight="calc(100vh - 230px)"
                 resizableColumns columnResizeMode="fit">
                 {/* <Column field="id" header="Id" sortable></Column> */}
-                < Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '25%' }} ></Column >
+                < Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '20%' }} ></Column >
                 <Column field="regex" header="Regex" sortable filter filterPlaceholder="Search by regex" style={{ width: '35%' }} ></Column>
+                <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Search by env issue tye" style={{ width: '15%' }} ></Column>
                 <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '15%' }}  ></Column>
-                <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description" style={{ width: '25%' }} ></Column>
+                <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description" style={{ width: '15%' }} ></Column>
             </DataTable >
 
             <FailMessageTypeAddModal showForm={showForm} handleFormClose={handleFormClose} handleFormShow={handleFormShow} />
