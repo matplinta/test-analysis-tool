@@ -52,15 +52,14 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
 
 
 @shared_task(name="celery_analyze_testruns")
-def celery_analyze_testruns(runs, comment, common_build, result, env_issue_type, token):
+def celery_analyze_testruns(runs, comment, common_build, result, env_issue_type, token=None):
     return RepPortal(token=token).analyze_testruns(runs, comment, common_build, result, env_issue_type)
 
 
 def analyze_testrun_in_rp(test_run, token):
     analyzing_user = test_run.analyzed_by.username
     celery_analyze_testruns.delay(
-        # runs=[test_run.rp_id], 
-        runs=[test_run.rp_id, test_run.rp_id],  # WA
+        runs=[test_run.rp_id], 
         comment=f"Analyzed by user {analyzing_user}: {test_run.comment}", 
         common_build=test_run.builds, 
         result=test_run.result.name, 

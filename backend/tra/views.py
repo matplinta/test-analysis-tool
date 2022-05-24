@@ -1,5 +1,6 @@
 from dataclasses import fields
 from functools import reduce
+from sre_constants import SUCCESS
 from django.shortcuts import render
 from rest_framework import permissions, authentication
 from rest_framework.views import APIView
@@ -272,6 +273,11 @@ class TestRunsAnalyzeToRP(APIView):
         
         result_obj = TestRunResult.objects.get(name=result)
         rp_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
+        user = self.request.user
+        if hasattr(user, 'rp_token') and user.rp_token.token:
+            token = user.rp_token.token
+        else:
+            token = None
 
         celery_analyze_testruns.delay(
             runs=rp_ids,
@@ -279,12 +285,12 @@ class TestRunsAnalyzeToRP(APIView):
             common_build="", 
             result=result_obj.name, 
             env_issue_type=env_issue_type,
-            # token=token
+            token=token
         )
 
         rp_to_analyze.update(analyzed=True, analyzed_by=request.user, comment=comment, result=result_obj)
 
-        return Response({})
+        return Response(status=200)
 
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
