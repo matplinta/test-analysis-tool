@@ -33,7 +33,7 @@ let MenuComponent = () => {
     return (
         <>
 
-            <Menubar model={items} start={start} className="menu" style={{ height: '50px' }} />
+            <Menubar model={items} start={start} className="menu" style={{ height: '55px' }} />
             <Outlet />
 
         </>

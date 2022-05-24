@@ -126,20 +126,20 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
             <Dialog header="Create user filter" visible={showForm} className="dialog-style" onHide={handleFormClose}>
                 <div className="form-item">
                     <label>Filter Name</label>
-                    <InputText value={filterName} onChange={handleFilterNameChange} style={{ width: "100%" }} placeholder="Filter Name" />
+                    <InputText value={filterName} onChange={handleFilterNameChange} style={{ width: "100%" }} />
                 </div>
                 <div className="form-item">
                     <label>Test Line Type</label>
                     <br />
                     <Dropdown value={testLineType} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Line Type" />
+                        optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <label>Test Set</label>
                     <Tooltip target=".custom-target-icon" />
                     <FaPlus className="custom-target-icon add-icon" onClick={showAddTestSetForm} data-pr-tooltip="Click to add Test Set" />
                     <Dropdown value={testSetId} options={testSetsOptions} onChange={handleTestSetChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Set" />
+                        optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterAdd}>
