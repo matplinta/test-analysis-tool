@@ -26,7 +26,7 @@ class FailMessageTypeSerializer(serializers.ModelSerializer):
     author = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
         model = FailMessageType
-        fields = ('id', 'name', 'regex', 'author', 'description')
+        fields = ('id', 'name', 'regex', 'author', 'description', 'env_issue_type')
         extra_kwargs = {
             'name': {'validators': []},
             'regex': {'validators': []},

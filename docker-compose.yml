@@ -4,7 +4,7 @@ services:
   db:
     image: postgres
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - ./postgres_db:/var/lib/postgresql/data
     env_file:
       - ./.postgres.env
 
@@ -92,10 +92,10 @@ services:
       - db
       - web
 
-volumes:
-  postgres_db:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './postgres_db'
+# volumes:
+#   postgres_db:
+#     driver: local
+#     driver_opts:
+#       type: 'none'
+#       o: 'bind'
+#       device: './postgres_db'

@@ -25,7 +25,7 @@ class FilterSet(models.Model):
 class Filter(models.Model):
     field = models.ForeignKey(FilterField, on_delete=models.CASCADE, blank=False, help_text="Filter field")
     filter_set = models.ForeignKey(FilterSet, on_delete=models.CASCADE, blank=False, help_text="Name of associated filter set")
-    value = models.CharField(max_length=200, blank=True, null=False, help_text="Value")
+    value = models.TextField(max_length=4000, blank=True, null=False, help_text="Value")
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["field", "filter_set"], name='filter_constraint')]
