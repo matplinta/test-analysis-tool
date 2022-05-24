@@ -20,7 +20,7 @@ let CommonMenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     )
 
     return (
-        <Menubar start={start} end={end} className="menu" style={{ backgroundColor: 'white' }} />
+        <Menubar start={start} end={end} className="menu" style={{ backgroundColor: 'white', height: '40px' }} />
     )
 }
 

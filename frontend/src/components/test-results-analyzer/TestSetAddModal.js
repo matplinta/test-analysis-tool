@@ -51,11 +51,11 @@ let TestSetAddModal = ({ showTestSetForm, handleTestSetFormClose }) => {
         <Dialog header="Create test set" visible={showTestSetForm} className="dialog-style" onHide={handleTestSetFormClose}>
             <div className="form-item">
                 <label>Test Set Name (from Reporting Portal)</label>
-                <InputText value={testSetName} onChange={handleTestSetNameChange} style={{ width: "100%" }} placeholder="Test Set Name" />
+                <InputText value={testSetName} onChange={handleTestSetNameChange} style={{ width: "100%" }} />
             </div>
             <div className="form-item">
                 <label>Test Lab Path (from Reporting Portal)</label>
-                <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} placeholder="Test Set Name" />
+                <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} />
             </div>
             <div className="form-item">
                 <Button className="p-button-primary" type="submit" onClick={handleTestSetAdd}>

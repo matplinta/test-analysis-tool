@@ -7,19 +7,16 @@ import Notify from './../services/Notify';
 import AuthService from './../services/auth.service.js';
 
 import NOKIA_LOGO_WHITE_50px from './../assets/NOKIA_LOGO_WHITE_50px.png';
-import GoToAdminComponent from './home/GoToAdminComponent';
-import GoBackHomeComponent from './home/GoBackHomeComponent';
 import GridApplications from './home/GridApplications';
 import TestLineManagerApp from './test-line-manager/TestLineManagerApp';
 import TestLineReservationSchedulerApp from './test-line-reservation-scheduler/TestLineReservationSchedulerApp';
 import TestResultsAnalyzerApp from './test-results-analyzer/TestResultsAnalyzerApp';
 import TestLineListComponent from './test-line-manager/TestLineListComponent';
 import MyTestLineComponentList from './test-line-manager/MyTestLineComponentList';
-import LoginComponent from './home/authorization/LoginComponent';
-import LogoutComponent from './home/authorization/LogoutComponent';
 import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
 import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 import CommonMenuComponent from './home/CommonMenuComponent';
+import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 
 import './App.css';
 
@@ -61,6 +58,7 @@ const App = () => {
             <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
               <Route path="regression-filters" index element={<UserFiltersComponent />} />
+              <Route path="fail-regex" index element={<FailRegexTypesComponent />} />
             </Route>
           </Routes>
           <ToastContainer autoClose={2500} />

@@ -6,10 +6,12 @@ import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { Badge } from 'primereact/badge'
 import { FaPlus } from 'react-icons/fa';
+import { MultiSelect } from 'primereact/multiselect';
 
 import TestSetAddModal from './TestSetAddModal';
 
-import { getTestFilters, getTestSets, getTestLineTypes, postTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestSets, getTestLineTypes, postTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import './UserFilterAddModal.css';
@@ -19,10 +21,12 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
     const [testSets, setTestSets] = useState([]);
     const [testSetsOptions, setTestSetsOptions] = useState([]);
     const [testLinesTypes, setTestLinesTypes] = useState([]);
+    const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
 
     const [filterName, setFilterName] = useState("");
     const [testLineType, setTestLineType] = useState(null);
     const [testSetId, setTestSetId] = useState(null);
+    const [failMessageTypeGroup, setFailMessageTypeGroup] = useState(null);
 
     const [showTestSetForm, setShowTestSetForm] = useState(false);
     const handleTestSetFormClose = () => setShowTestSetForm(false);
@@ -62,6 +66,21 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
             })
     }
 
+    let fetchFailMessageTypeGroups = () => {
+        getFailMessageTypeGroups().then(
+            (response) => {
+                if (response.data.length > 0) {
+                    const failMessageTypeGroupsValue = response.data.map(item => {
+                        return { label: item.name + ", Author: " + item.author, value: item.id }
+                    })
+                    setFailMessageTypeGroups(failMessageTypeGroupsValue);
+                }
+            },
+            (error) => {
+                console.log(error)
+            })
+    }
+
     let handleFilterNameChange = (e) => {
         setFilterName(e.target.value);
     }
@@ -74,10 +93,15 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
         setTestSetId(e.target.value);
     }
 
+    let handleFailMessageTypeGroupsChange = (e) => {
+        setFailMessageTypeGroup(e.target.value);
+    }
+
     let clearForm = () => {
         setFilterName("");
-        setTestLineType("");
+        setTestLineType(null);
         setTestSetId(null);
+        setFailMessageTypeGroup(null)
     }
 
     let handleFilterAdd = () => {
@@ -119,6 +143,7 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
     useEffect(() => {
         fetchTestSets();
         fetchTestLines();
+        fetchFailMessageTypeGroups();
     }, [])
 
     return (
@@ -126,20 +151,26 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
             <Dialog header="Create user filter" visible={showForm} className="dialog-style" onHide={handleFormClose}>
                 <div className="form-item">
                     <label>Filter Name</label>
-                    <InputText value={filterName} onChange={handleFilterNameChange} style={{ width: "100%" }} placeholder="Filter Name" />
+                    <InputText value={filterName} onChange={handleFilterNameChange} style={{ width: "100%" }} />
                 </div>
                 <div className="form-item">
                     <label>Test Line Type</label>
                     <br />
                     <Dropdown value={testLineType} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Line Type" />
+                        optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <label>Test Set</label>
                     <Tooltip target=".custom-target-icon" />
                     <FaPlus className="custom-target-icon add-icon" onClick={showAddTestSetForm} data-pr-tooltip="Click to add Test Set" />
                     <Dropdown value={testSetId} options={testSetsOptions} onChange={handleTestSetChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" placeholder="Select Test Set" />
+                        optionLabel="label" filter showClear filterBy="label" />
+                </div>
+                <div className="form-item">
+                    <label>Fail Message Type Groups</label>
+                    <br />
+                    <MultiSelect value={failMessageTypeGroup} options={failMessageTypeGroups} onChange={handleFailMessageTypeGroupsChange} style={{ width: "100%" }}
+                        optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterAdd}>
