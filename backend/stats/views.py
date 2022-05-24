@@ -1,6 +1,4 @@
 from django.shortcuts import render
-from redis import ResponseError
-
 from rep_portal.api import RepPortal
 from rest_framework import generics
 from rest_framework import status
