@@ -22,8 +22,10 @@ router.register(r'test_sets', views.TestsSetView, 'testsets')
 # API to handle TestlineType model
 router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 
+# API to handle EnvIssueType model
+router.register(r'env_issue_types', views.EnvIssueTypeView, 'testline_types')
+
 # API to handle TestRun model
-# special actions: /pk/analyze via PUT   to edit instance and automatically set analyzed and analyzed_by fields 
 router.register(r'test_runs', views.TestRunView, 'testruns')
 
 urlpatterns = [
@@ -31,6 +33,7 @@ urlpatterns = [
     #     - reg_filters, fb, test_instance, result, env_issue_type, analyzed_by, analyzed, testline_type,
     # All fields should be referenced by their primary keys
     path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='byquery'),
+    path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
     # path('test_runs/by_reg_filter/', views.TestRunsBasedOnAllSubscribedRegressionFiltersView.as_view(), name='by_reg_filter'),
     path('test_runs/by_reg_filter/<int:rfid>/', views.TestRunsBasedOnRegressionFiltersView.as_view(), name='by_reg_filter_pk'),
