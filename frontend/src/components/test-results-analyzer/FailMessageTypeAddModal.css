@@ -1,0 +1,15 @@
+.p-buttonset .p-button {
+    border-radius: 0;
+    padding: 0.8rem 0.5rem;
+    font-size: 11px;
+}
+
+.p-selectbutton .p-button.p-highlight:hover {
+    background-color: #004c9a;
+    border-color: #004c9a;
+}
+
+.p-selectbutton .p-button.p-highlight {
+    background-color: #004c9a;
+    border-color: #004c9a;
+}

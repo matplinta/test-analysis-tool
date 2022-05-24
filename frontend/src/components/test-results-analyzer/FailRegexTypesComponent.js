@@ -23,8 +23,15 @@ const FailRegexTypesComponent = () => {
     const [loading, setLoading] = useState(true);
 
     const [showForm, setShowForm] = useState(false);
+
     const handleFormClose = () => setShowForm(false);
+
     const handleFormShow = () => setShowForm(true);
+
+    const handleTestSetFormCloseAndRefresh = () => {
+        handleFormClose();
+        fetchTestFilters();
+    }
 
     let fetchTestFilters = () => {
         getFailMessageTypes().then(
@@ -62,7 +69,7 @@ const FailRegexTypesComponent = () => {
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description" style={{ width: '15%' }} ></Column>
             </DataTable >
 
-            <FailMessageTypeAddModal showForm={showForm} handleFormClose={handleFormClose} handleFormShow={handleFormShow} />
+            <FailMessageTypeAddModal showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
         </>
     )
 }

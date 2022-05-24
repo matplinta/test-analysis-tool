@@ -25,7 +25,8 @@ let UserFiltersComponent = () => {
         'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_set.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_set.branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'description': { value: null, matchMode: FilterMatchMode.CONTAINS }
+        'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
 
     const [loading, setLoading] = useState(true);
@@ -58,12 +59,6 @@ let UserFiltersComponent = () => {
             })
     }
 
-    let removeButton = (rowData) => {
-        return (
-            <Button icon="pi pi-times" className="p-button-primary p-button-sm" style={{ height: '30px', width: '30px' }} onClick={() => confirmRemove(rowData.id)} />
-        );
-    }
-
     const confirmRemove = (id) => {
         confirmDialog({
             message: 'Are you sure you want to remove test filter?',
@@ -77,6 +72,20 @@ let UserFiltersComponent = () => {
         handleFormClose();
         fetchTestFilters();
         Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+    }
+
+    let removeButton = (rowData) => {
+        return (
+            <Button icon="pi pi-times" className="p-button-primary p-button-sm" style={{ height: '30px', width: '30px' }} onClick={() => confirmRemove(rowData.id)} />
+        );
+    }
+
+    const ownersListBody = (rowData) => {
+        let owners = "";
+        for (let owner of rowData.owners) {
+            owners += owner.username + ', ';
+        }
+        return <span>{owners.slice(0, -2)}</span>
     }
 
     useEffect(() => {
@@ -93,10 +102,11 @@ let UserFiltersComponent = () => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
                 resizableColumns columnResizeMode="fit">
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '20%' }}></Column>
-                <Column field="test_set.name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '35%' }}></Column>
+                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '15%' }}></Column>
+                <Column field="test_set.name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '30%' }}></Column>
                 <Column field="test_set.branch" header="Branch" sortable filter filterPlaceholder="Search by branch" style={{ width: '15%' }}></Column>
-                <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" style={{ width: '25%' }}></Column>
+                <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" style={{ width: '20%' }}></Column>
+                <Column body={ownersListBody} header="Owners" filter filterPlaceholder="Search by owner" style={{ width: '15%' }} />
                 <Column body={removeButton} header="Remove" style={{ width: '5%' }} />
 
             </DataTable>

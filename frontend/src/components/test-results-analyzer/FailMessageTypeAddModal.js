@@ -1,28 +1,43 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { SelectButton } from 'primereact/selectbutton';
+import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
 
-import { postFailMessageType } from './../../services/test-results-analyzer/fail-message-type.service';
+import { postFailMessageType, getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 
+import './FailMessageTypeAddModal.css';
 
 const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) => {
 
     const [name, setName] = useState('');
     const [regex, setRegex] = useState('');
     const [description, setDescription] = useState('');
-    const [envIssueType, setEnvIssueType] = useState('');
+    const [envIssueType, setEnvIssueType] = useState(null);
 
     const [envIssueTypesList, setEnvIssueTypesList] = useState([]);
+
+    const fetchEnvIssueTypes = () => {
+        getEnvIssueTypes().then(
+            (response) => {
+                let data = response.data.filter(item => item.name !== "");
+                setEnvIssueTypesList(data);
+            },
+            (error) => {
+                console.log("Error");
+            })
+    }
 
     const clearForm = () => {
         setName('');
         setRegex('');
         setDescription('');
+        setEnvIssueType(null);
     }
 
     const handleFailMessageRegexTypeAdd = () => {
@@ -43,6 +58,10 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
             })
     }
 
+    useEffect(() => {
+        fetchEnvIssueTypes();
+    }, [])
+
     return (
         <div>
             <Dialog header="Create fail message regex type" visible={showForm} className="dialog-style" onHide={handleFormClose}>
@@ -58,8 +77,7 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
                 </div>
                 <div className="form-item">
                     <label htmlFor="envIssueType" className="block">Env Issue Type</label>
-                    <Dropdown value={envIssueType} options={envIssueTypesList} onChange={(e) => { setEnvIssueType(e.target.value) }} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" id="envIssueType" />
+                    <SelectButton optionLabel="name" optionValue="name" className="issue-type-select-button" value={envIssueType} options={envIssueTypesList} onChange={(e) => setEnvIssueType(e.value)}></SelectButton>
                 </div>
                 <div className="form-item">
                     <label htmlFor="regex" className="block">Description</label>
