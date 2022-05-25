@@ -15,6 +15,7 @@ router.register(r'fail_message_types', views.FailMessageTypeView, 'failmessagety
 # API to handle FailMessageTypeGroup model
 # special actions: /my         to display FailMessageTypeGroup objects that the user is the author of
 router.register(r'fail_message_type_groups', views.FailMessageTypeGroupView, 'failmessagetypegroups')
+# router.register(r'fail_message_type_groups_ro', views.FailMessageTypeGroupROView, 'failmessagetypegroupsro')
 
 # API to handle TestSet model
 router.register(r'test_sets', views.TestsSetView, 'testsets')
@@ -24,6 +25,9 @@ router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 
 # API to handle EnvIssueType model
 router.register(r'env_issue_types', views.EnvIssueTypeView, 'testline_types')
+
+# API to handle TestRunResult model
+router.register(r'test_run_results', views.TestRunResultView, 'testrunresults')
 
 # API to handle TestRun model
 router.register(r'test_runs', views.TestRunView, 'testruns')
