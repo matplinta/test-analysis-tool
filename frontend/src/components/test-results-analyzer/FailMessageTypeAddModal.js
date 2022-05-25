@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
 
 import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
-import { Tag } from 'primereact/tag';
-import { Tooltip } from 'primereact/tooltip';
 
 import { postFailMessageType, getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 

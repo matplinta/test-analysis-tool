@@ -27,7 +27,7 @@ let UserFiltersComponent = () => {
         'test_set.branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        // 'owners': { value: null, matchMode: FilterMatchMode.CONTAINS }
+        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
 
     const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ let UserFiltersComponent = () => {
                 <Column field="test_set.name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '30%' }}></Column>
                 <Column field="test_set.branch" header="Branch" sortable filter filterPlaceholder="Search by branch" style={{ width: '15%' }}></Column>
                 <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" style={{ width: '20%' }}></Column>
-                <Column body={ownersListBody} header="Owners" style={{ width: '15%' }} />
+                <Column body={ownersListBody} header="Owners" filterField="owners" filter filterPlaceholder="Search by owner" style={{ width: '15%' }} />
                 <Column body={removeButton} header="Remove" style={{ width: '5%' }} />
 
             </DataTable>
