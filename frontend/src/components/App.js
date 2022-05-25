@@ -19,6 +19,7 @@ import CommonMenuComponent from './home/CommonMenuComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 
 import './App.css';
+import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
 
 
 const App = () => {
@@ -59,6 +60,7 @@ const App = () => {
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
               <Route path="regression-filters" index element={<UserFiltersComponent />} />
               <Route path="fail-regex" index element={<FailRegexTypesComponent />} />
+              <Route path="fail-regex-groups" index element={<FailMessageTypeGroupComponent />} />
             </Route>
           </Routes>
           <ToastContainer autoClose={2500} />

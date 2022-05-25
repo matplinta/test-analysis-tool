@@ -7,8 +7,10 @@ import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
 
+import TestRunsAnalyzeModal from './TestRunsAnalyzeModal';
+
 import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../../services/Notify.js';
 
 import './TestRunTableComponent.css';
 
@@ -16,6 +18,7 @@ import './TestRunTableComponent.css';
 let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) => {
 
     const [testRuns, setTestRuns] = useState([]);
+    const [selectedTestRuns, setSelectedTestRuns] = useState(null);
     const [first, setFirst] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -61,7 +64,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
 
-    // const tableHeight = calc(100vh - 204px);
+    const [showForm, setShowForm] = useState(false);
+
+    const handleFormClose = () => setShowForm(false);
+
+    const handleFormShow = () => setShowForm(true);
 
     const onPageInputChange = (event) => {
         setCurrentPage(event.target.value);
@@ -179,11 +186,37 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         setSelectedColumns(orderedSelectedColumns);
     }
 
+    const handleGenerateRPUrl = () => {
+        let rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
+        if (selectedTestRuns.length > 0) {
+            for (let run of selectedTestRuns) {
+                rpUrl += run.rp_id + ',';
+            }
+            navigator.clipboard.writeText(rpUrl.slice(0, -1))
+            Notify.sendNotification(Infos.RP_URL_COPIED, AlertTypes.info);
+            setSelectedTestRuns([]);
+        } else {
+            Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
+        }
+    }
+
+    const handleAnalizeTestRuns = () => {
+        if (selectedTestRuns.length > 0) {
+            handleFormShow();
+            setSelectedTestRuns([]);
+        } else {
+            Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
+        }
+    }
+
     const header = (
-        <div style={{ textAlign: 'left' }}>
-            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%' }}
+        <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
+            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyze Test Runs As Env Issue</Button>
         </div>
+
     );
 
     const defineSortFieldNameByField = (field) => {
@@ -202,40 +235,57 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         }
     });
 
+    let refreshTestRunsFetching = () => {
+        if (filterUrl === "" && filterUrl !== null) {
+            fetchTestRunsByFilter("", currentPage, rowsPerPage);
+        } else if (filterUrl !== "" && filterUrl !== null) {
+            fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
+        }
+    }
+
+    const handleFormCloseAndRefresh = () => {
+        handleFormClose();
+        refreshTestRunsFetching();
+    }
+
+
     useEffect(
         () => {
-            if (filterUrl === "" && filterUrl !== null) {
-                fetchTestRunsByFilter("", currentPage, rowsPerPage);
-            } else if (filterUrl !== "" && filterUrl !== null) {
-                fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
-            }
+            refreshTestRunsFetching();
         }, [filterUrl, sortField, sortOrder]
     )
 
     return (
-        <DataTable value={testRuns} lazy paginator size="small" stripedRows
-            pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
-            paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
-            dataKey="id" rowHover loading={loading}
-            rowsPerPageOptions={[10, 30, 50, 100]}
-            reorderableColumns={true}
-            resizableColumns columnResizeMode="expand"
-            scrollHeight="calc(100vh - 290px)"
-            emptyMessage="No test runs found! Please change your selected filters."
-            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
+        <>
+            <DataTable value={testRuns} lazy paginator size="small" stripedRows
+                pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
+                paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
+                dataKey="id" rowHover loading={loading}
+                rowsPerPageOptions={[10, 30, 50, 100]}
+                reorderableColumns={true}
+                resizableColumns columnResizeMode="expand"
+                scrollHeight="calc(100vh - 290px)"
+                emptyMessage="No test runs found! Please change your selected filters."
+                sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}
+                selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}
+                className="test-runs-table">
 
-            <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '100px' }} />
-            <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
-            <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
-            <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
-            <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
-            <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
-            <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
-            <Column field="fb" header="FB" sortable style={{ fontSize: '11px', minWidth: "60px" }} />
-            <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
-            <Column field="comment" header="Comment" sortable style={{ fontSize: '11px', minWidth: '150px' }} />
-            {columnComponents}
-        </DataTable>
+                <Column selectionMode="multiple" headerStyle={{ textAlign: 'center' }}></Column>
+                <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '100px' }} />
+                <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
+                <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
+                <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
+                <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
+                <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
+                <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
+                <Column field="fb" header="FB" sortable style={{ fontSize: '11px', minWidth: "60px" }} />
+                <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
+                <Column field="comment" header="Comment" sortable style={{ fontSize: '11px', minWidth: '150px' }} />
+                {columnComponents}
+            </DataTable>
+
+            <TestRunsAnalyzeModal selectedRuns={selectedTestRuns} showForm={showForm} handleFormShow={handleFormShow} handleFormClose={handleFormCloseAndRefresh} />
+        </>
     )
 }
 

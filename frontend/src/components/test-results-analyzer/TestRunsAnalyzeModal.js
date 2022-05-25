@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 
 import { InputText } from 'primereact/inputtext';
+import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
+import { Tag } from 'primereact/tag';
+import { Tooltip } from 'primereact/tooltip';
 
-import { postFailMessageType, getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
+import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
+import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
 
-import './FailMessageTypeAddModal.css';
+const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFormClose }) => {
 
-const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) => {
-
-    const [name, setName] = useState('');
-    const [regex, setRegex] = useState('');
-    const [description, setDescription] = useState('');
+    const [result, setResult] = useState(null);
     const [envIssueType, setEnvIssueType] = useState(null);
+    const [comment, setComment] = useState("");
 
+    const [resultsList, setResultsList] = useState([]);
     const [envIssueTypesList, setEnvIssueTypesList] = useState([]);
 
     const fetchEnvIssueTypes = () => {
@@ -31,20 +33,19 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
     }
 
     const clearForm = () => {
-        setName('');
-        setRegex('');
-        setDescription('');
+        setResult(null);
         setEnvIssueType(null);
+        setComment("");
     }
 
-    const handleFailMessageRegexTypeAdd = () => {
-        let failMessgeRegexTypeToAdd = {
-            'name': name,
-            'regex': regex,
-            'description': description,
+    const handleAnalyzeTestRun = () => {
+        let testRunToUpdate = {
+            'rp_ids': selectedRuns.map(run => run.rp_id),
+            'comment': comment,
+            'result': "environment issue",
             'env_issue_type': envIssueType
         }
-        postFailMessageType(failMessgeRegexTypeToAdd).then(
+        postTestRun(testRunToUpdate).then(
             (success) => {
                 console.log("Success!")
                 clearForm();
@@ -61,30 +62,25 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
 
     return (
         <div>
-            <Dialog header="Create fail message regex type" visible={showForm} className="dialog-style" onHide={handleFormClose}>
+            <Dialog header="Analyze selected test runs" visible={showForm} className="dialog-style" onHide={handleFormClose}>
                 <div className="form-item">
-                    <label htmlFor="name" className="block">Fail Message Name</label>
-                    <InputText id="name" value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}
-                        className="block" />
-                </div>
-                <div className="form-item">
-                    <label htmlFor="regex" className="block">Fail Message Regex</label>
+                    <label htmlFor="result" className="block">Result</label>
                     <br />
-                    <InputTextarea id="regex" value={regex} rows={2} onChange={(e) => setRegex(e.target.value)} autoResize className="block" style={{ width: "100%" }} />
+                    <Tag value="Environment issue" style={{ fontSize: 'medium' }}></Tag>
                 </div>
                 <div className="form-item">
                     <label htmlFor="envIssueType" className="block">Env Issue Type</label>
                     <SelectButton optionLabel="name" optionValue="name" className="issue-type-select-button" value={envIssueType} options={envIssueTypesList} onChange={(e) => setEnvIssueType(e.value)}></SelectButton>
                 </div>
                 <div className="form-item">
-                    <label htmlFor="regex" className="block">Description</label>
+                    <label htmlFor="comment" className="block">Comment</label>
                     <br />
-                    <InputTextarea value={description} rows={2} onChange={(e) => setDescription(e.target.value)} autoResize style={{ width: "100%" }} />
+                    <InputTextarea id="comment" value={comment} rows={2} onChange={(e) => setComment(e.target.value)} autoResize className="block" style={{ width: "100%" }} />
                 </div>
 
                 <div className="form-item">
-                    <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeAdd}>
-                        Add Filter
+                    <Button className="p-button-primary p-button-color" type="submit" onClick={handleAnalyzeTestRun}>
+                        Analyze Test Runs
                     </Button>
                     <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
                         Clear Form
@@ -96,4 +92,4 @@ const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) 
     )
 }
 
-export default FailMessageTypeAddModal;
+export default TestRunsAnalyzeModal;

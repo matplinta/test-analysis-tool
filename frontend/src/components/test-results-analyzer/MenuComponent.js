@@ -23,6 +23,10 @@ let MenuComponent = () => {
             command: () => { navigate('regression-filters') }
         },
         {
+            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Message Groups</span>,
+            command: () => { navigate('fail-regex-groups') }
+        },
+        {
             label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Message Regex</span>,
             command: () => { navigate('fail-regex') }
         }

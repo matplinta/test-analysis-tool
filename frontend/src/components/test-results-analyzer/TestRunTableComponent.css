@@ -48,3 +48,13 @@
     min-width: fit-content;
     max-width: max-content;
 }
+
+.test-runs-table .p-checkbox {
+    width: 25px;
+    height: 25px;
+}
+
+.test-runs-table .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #004c9a;
+    background-color: #004c9a;
+}
