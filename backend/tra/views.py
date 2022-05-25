@@ -96,9 +96,16 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
+
 class TestlineTypeView(viewsets.ModelViewSet):
     serializer_class = TestlineTypeSerializer
     queryset = TestlineType.objects.all()
+    pagination_class = None
+
+
+class TestRunResultView(viewsets.ModelViewSet):
+    serializer_class = TestRunResultSerializer
+    queryset = TestRunResult.objects.all()
     pagination_class = None
 
 
@@ -165,6 +172,18 @@ class TestRunView(viewsets.ModelViewSet):
     #     serializer.is_valid(raise_exception=True)
     #     serializer.save(analyzed=True, analyzed_by=self.request.user)
     #     return Response(serializer.data)
+
+
+class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)   
+    serializer_class = TestRunSerializer
+
+    def get_queryset(self):
+        queryset = TestRun.objects.all()
+        rfid = self.kwargs['rfid']
+        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        return queryset.filter(testline_type=regression_filter.testline_type, 
+                               test_instance__test_set=regression_filter.test_set)
 
 
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
@@ -321,51 +340,3 @@ class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
     def get(self, request):
         celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters.delay()
         return Response("OK")
-
-
-
-
-# class CheckView(APIView):
-#     # authentication_classes = (authentication.TokenAuthentication,)
-#     # permission_classes = (IsAuthenticated,)   
-    
-#     def get(self, request):
-#         content = {'message': '{}'.format(str(api_settings.DEFAULT_AUTHENTICATION_CLASSES))}
-#         return Response(content)
-
-
-# class HelloView(APIView):
-#     # authentication_classes = (authentication.TokenAuthentication,)
-#     # permission_classes = (IsAuthenticated,)   
-    
-#     def get(self, request):
-#         # lol = kwargs.get("lol")
-#         pull_tcs.delay()
-#         return Response(200)
-
-
-# class TestAuthView(APIView):
-#     authentication_classes = (authentication.TokenAuthentication,)
-#     permission_classes = (permissions.IsAuthenticated,)
-
-#     def get(self, request, format=None):
-#         return Response("Hello {0} {1}!".format(request.user, str(api_settings.DEFAULT_AUTHENTICATION_CLASSES)))
-
-#     def post(self, request, format=None):
-#         return Response("Hello {0}! Posted!".format(request.user))
-
-
-# class TestSessView(APIView):
-#     authentication_classes = (authentication.SessionAuthentication,)
-#     permission_classes = (permissions.IsAuthenticated,)
-
-#     def get(self, request, format=None):
-#         return Response("Hello {0}!".format(request.user))
-
-#     def post(self, request, format=None):
-#         return Response("Hello {0}! Posted!".format(request.user))
-
-
- 
-
-

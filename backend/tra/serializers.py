@@ -43,18 +43,18 @@ class FailMessageTypeGroupROSerializer(serializers.ModelSerializer):
 
 class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
     author = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
-
+    fail_message_types = FailMessageTypeSerializer(many=True)
     class Meta:
         model = FailMessageTypeGroup
         fields = ('id', 'name', 'fail_message_types', 'author')
 
-    # def create(self, validated_data):
-    #     fail_message_types_data = validated_data.pop('fail_message_types')
-    #     fail_message_type_group_instance = FailMessageTypeGroup.objects.create(**validated_data)
-    #     for elem in fail_message_types_data:
-    #         fail_message_type_instance = FailMessageType.objects.get(**elem)
-    #         fail_message_type_group_instance.fail_message_types.add(fail_message_type_instance)
-    #     return fail_message_type_group_instance
+    def create(self, validated_data):
+        fail_message_types_data = validated_data.pop('fail_message_types')
+        fail_message_type_group_instance = FailMessageTypeGroup.objects.create(**validated_data)
+        for elem in fail_message_types_data:
+            fail_message_type_instance = FailMessageType.objects.get(**elem)
+            fail_message_type_group_instance.fail_message_types.add(fail_message_type_instance)
+        return fail_message_type_group_instance
 
 
 class FeatureBuildSerializer(serializers.ModelSerializer):
@@ -79,6 +79,7 @@ class EnvIssueTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = EnvIssueType
         fields = ('name',)
+
 
 
 class TestSetSerializer(serializers.ModelSerializer):
