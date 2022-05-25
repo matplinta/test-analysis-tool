@@ -8,7 +8,7 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
 
 import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../../services/Notify.js';
 
 import './TestRunTableComponent.css';
 
@@ -16,6 +16,7 @@ import './TestRunTableComponent.css';
 let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) => {
 
     const [testRuns, setTestRuns] = useState([]);
+    const [selectedTestRuns, setSelectedTestRuns] = useState(null);
     const [first, setFirst] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -179,11 +180,31 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         setSelectedColumns(orderedSelectedColumns);
     }
 
+    const handleGenerateRPUrl = () => {
+        let rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
+        if (selectedTestRuns.length > 0) {
+            for (let run of selectedTestRuns) {
+                rpUrl += run.rp_id + ',';
+            }
+            navigator.clipboard.writeText(rpUrl.slice(0, -1))
+            Notify.sendNotification(Infos.RP_URL_COPIED, AlertTypes.info);
+        } else {
+            Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
+        }
+    }
+
+    const handleAnalizeTestRuns = () => {
+
+    }
+
     const header = (
         <div style={{ textAlign: 'left' }}>
-            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%' }}
+            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
+            <Button style={{ marginRight: '2px', marginLeft: '2px', marginTop: '-30px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', marginTop: '-30px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyse Test Runs</Button>
         </div>
+
     );
 
     const defineSortFieldNameByField = (field) => {
@@ -222,8 +243,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
             resizableColumns columnResizeMode="expand"
             scrollHeight="calc(100vh - 290px)"
             emptyMessage="No test runs found! Please change your selected filters."
-            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}>
+            sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}
+            selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}
+            className="test-runs-table">
 
+            <Column selectionMode="multiple" headerStyle={{ textAlign: 'center' }}></Column>
             <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '100px' }} />
             <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
             <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />

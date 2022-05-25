@@ -66,9 +66,9 @@ export const Errors = {
 }
 
 export const Warnings = {
-
+    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!'
 }
 
 export const Infos = {
-
+    'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!'
 }

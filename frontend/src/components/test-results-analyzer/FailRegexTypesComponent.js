@@ -17,6 +17,7 @@ const FailRegexTypesComponent = () => {
         'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'regex': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'author': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'env_issue_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
 
@@ -61,7 +62,6 @@ const FailRegexTypesComponent = () => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 230px)"
                 resizableColumns columnResizeMode="fit">
-                {/* <Column field="id" header="Id" sortable></Column> */}
                 < Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '20%' }} ></Column >
                 <Column field="regex" header="Regex" sortable filter filterPlaceholder="Search by regex" style={{ width: '35%' }} ></Column>
                 <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Search by env issue tye" style={{ width: '15%' }} ></Column>

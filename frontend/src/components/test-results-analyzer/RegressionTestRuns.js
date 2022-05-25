@@ -399,37 +399,53 @@ let RegressionTestRuns = () => {
 
     const testSetCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox" selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
+            <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox"
+                selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)}
+                onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} className="regression-filters-tree" />
         </div>
     )
 
     const testLineTypeCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys} selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys} onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
+            <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys}
+                selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys}
+                onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)}
+                loading={loading} className="regression-filters-tree" />
         </div>
     )
 
     const branchCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys} selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys} onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} />
+            <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys}
+                selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys}
+                onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)}
+                loading={loading} className="regression-filters-tree" />
         </div>
     )
 
     const statusCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={statusFilterNodes} expandedKeys={expandedStatusKeys} selectionMode="checkbox" selectionKeys={selectedStatusKeys} onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)} loading={loading} />
+            <Tree nodeTemplate={nodeTemplate} value={statusFilterNodes} expandedKeys={expandedStatusKeys}
+                selectionMode="checkbox" selectionKeys={selectedStatusKeys}
+                onSelectionChange={e => setSelectedStatusKeys(e.value)} onToggle={e => setExpandedStatusKeys(e.value)}
+                loading={loading} className="regression-filters-tree" />
         </div>
     )
 
     const analyzerCheckboxList = (
         <div>
-            <Tree nodeTemplate={nodeTemplate} value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys} selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys} onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)} loading={loading} />
+            <Tree nodeTemplate={nodeTemplate} value={analyzerFilterNodes} expandedKeys={expandedAnalyzerKeys}
+                selectionMode="checkbox" selectionKeys={selectedAnalyzerKeys}
+                onSelectionChange={e => setSelectedAnalyzerKeys(e.value)} onToggle={e => setExpandedAnalyzerKeys(e.value)}
+                loading={loading} className="regression-filters-tree" />
         </div>
     )
 
     const fbCheckboxList = (
         <div>
-            <Tree value={fbFilterNodes} expandedKeys={expandedFbKeys} selectionMode="checkbox" selectionKeys={selectedFbKeys} onSelectionChange={e => setSelectedFbKeys(e.value)} onToggle={e => setExpandedFbKeys(e.value)} loading={loading} />
+            <Tree value={fbFilterNodes} expandedKeys={expandedFbKeys} selectionMode="checkbox" selectionKeys={selectedFbKeys}
+                onSelectionChange={e => setSelectedFbKeys(e.value)} onToggle={e => setExpandedFbKeys(e.value)}
+                loading={loading} className="regression-filters-tree" />
         </div>
     )
 
