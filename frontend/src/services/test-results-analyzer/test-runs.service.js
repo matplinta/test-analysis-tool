@@ -12,3 +12,7 @@ export const getTestRunsUsingFilter = async (filter, page, pageSize) => {
 export const getTestRunsFilters = async () => {
     return (await axios.get('api/test_runs/dist_fields_values/', { headers: authHeader() }));
 }
+
+export const postTestRun = async (analyzedObiect) => {
+    return (await axios.post('/api/test_runs/analyze_to_rp/', analyzedObiect, { headers: authHeader() }));
+}

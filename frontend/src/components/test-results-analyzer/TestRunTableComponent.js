@@ -194,21 +194,27 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
             }
             navigator.clipboard.writeText(rpUrl.slice(0, -1))
             Notify.sendNotification(Infos.RP_URL_COPIED, AlertTypes.info);
+            setSelectedTestRuns([]);
         } else {
             Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
         }
     }
 
     const handleAnalizeTestRuns = () => {
-        handleFormShow();
+        if (selectedTestRuns.length > 0) {
+            handleFormShow();
+            setSelectedTestRuns([]);
+        } else {
+            Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
+        }
     }
 
     const header = (
-        <div style={{ textAlign: 'left' }}>
+        <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
             <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
-            <Button style={{ marginRight: '2px', marginLeft: '2px', marginTop: '-15px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
-            <Button style={{ marginRight: '2px', marginLeft: '2px', marginTop: '-15px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyse Test Runs</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyze Test Runs As Env Issue</Button>
         </div>
 
     );
@@ -229,13 +235,23 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         }
     });
 
+    let refreshTestRunsFetching = () => {
+        if (filterUrl === "" && filterUrl !== null) {
+            fetchTestRunsByFilter("", currentPage, rowsPerPage);
+        } else if (filterUrl !== "" && filterUrl !== null) {
+            fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
+        }
+    }
+
+    const handleFormCloseAndRefresh = () => {
+        handleFormClose();
+        refreshTestRunsFetching();
+    }
+
+
     useEffect(
         () => {
-            if (filterUrl === "" && filterUrl !== null) {
-                fetchTestRunsByFilter("", currentPage, rowsPerPage);
-            } else if (filterUrl !== "" && filterUrl !== null) {
-                fetchTestRunsByFilter(filterUrl, 1, rowsPerPage);
-            }
+            refreshTestRunsFetching();
         }, [filterUrl, sortField, sortOrder]
     )
 
@@ -268,7 +284,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 {columnComponents}
             </DataTable>
 
-            <TestRunsAnalyzeModal selectedRuns={selectedTestRuns} showForm={showForm} handleFormShow={handleFormShow} handleFormClose={handleFormClose} />
+            <TestRunsAnalyzeModal selectedRuns={selectedTestRuns} showForm={showForm} handleFormShow={handleFormShow} handleFormClose={handleFormCloseAndRefresh} />
         </>
     )
 }

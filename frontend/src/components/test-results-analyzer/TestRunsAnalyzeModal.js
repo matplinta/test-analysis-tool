@@ -10,6 +10,7 @@ import { Tag } from 'primereact/tag';
 import { Tooltip } from 'primereact/tooltip';
 
 import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
+import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
 
 const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFormClose }) => {
 
@@ -38,7 +39,21 @@ const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFo
     }
 
     const handleAnalyzeTestRun = () => {
-
+        let testRunToUpdate = {
+            'rp_ids': selectedRuns.map(run => run.rp_id),
+            'comment': comment,
+            'result': "environment issue",
+            'env_issue_type': envIssueType
+        }
+        postTestRun(testRunToUpdate).then(
+            (success) => {
+                console.log("Success!")
+                clearForm();
+                handleFormClose();
+            },
+            (error) => {
+                console.log("Error!")
+            })
     }
 
     useEffect(() => {
@@ -50,7 +65,8 @@ const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFo
             <Dialog header="Analyze selected test runs" visible={showForm} className="dialog-style" onHide={handleFormClose}>
                 <div className="form-item">
                     <label htmlFor="result" className="block">Result</label>
-                    <SelectButton optionLabel="name" optionValue="name" className="issue-type-select-button" value={result} options={resultsList} onChange={(e) => setResult(e.value)}></SelectButton>
+                    <br />
+                    <Tag value="Environment issue" style={{ fontSize: 'medium' }}></Tag>
                 </div>
                 <div className="form-item">
                     <label htmlFor="envIssueType" className="block">Env Issue Type</label>
