@@ -6,8 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSerializer, FilterSerializerListOnly
 
+from .permissions import IsAuthorOfRelatedObject
+from backend.permissions import IsAuthorOfObject
 from stats.models import * 
 import tra.models as tra_models
 from tra.views import TestRunsBasedOnQueryDictinctValues
@@ -33,30 +36,45 @@ class FilterSetView(viewsets.ModelViewSet):
     serializer_class = FilterSetSerializer
     queryset = FilterSet.objects.all()
 
+    @action(detail=False, url_path="my")
+    def user_is_owner(self, request):
+        filtersets = FilterSet.objects.all().filter(author=self.request.user)
+        page = self.paginate_queryset(filtersets)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtersets, many=True)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
-
-class UserFilterSetView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = FilterSetSerializer
-
-    def get_queryset(self):
-        return FilterSet.objects.all().filter(author=self.request.user)
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsAuthorOfObject()]
+        return permissions
 
 
 class FilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
     serializer_class = FilterSerializer
     queryset = Filter.objects.all()
     pagination_class = None
+
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsAuthorOfRelatedObject()]
+        return permissions
 
 
 class FilterFieldView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = FilterFieldSerializer
     queryset = FilterField.objects.all()
-
+    pagination_class = None
 
 
 class GetDataForFailChartBase(APIView):

@@ -13,7 +13,6 @@ router.register(r'filter', views.FilterView)
 urlpatterns = [
     path('', include(router.urls)),
     path('filter_fields', views.FilterFieldView.as_view(), name="filterfields"),
-    path('userfiltersets', views.UserFilterSetView.as_view(), name="userfiltersets"),
     path('disp_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="stats"),
     path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
     # fail_barchart
