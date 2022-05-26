@@ -101,6 +101,21 @@ INSTALLED_APPS = [
     'stats',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += (
+        # Dev extensions
+        'django_extensions',
+    )
+
+NOTEBOOK_ARGUMENTS = [
+    "--ip",
+    "0.0.0.0",
+    "--port",
+    "8888",
+    "--allow-root",
+    "--no-browser",
+]
+
 CSRF_TRUSTED_ORIGINS = [
     "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
     "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",

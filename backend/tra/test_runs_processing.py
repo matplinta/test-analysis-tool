@@ -52,7 +52,7 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
 
 
 @shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
-def celery_analyze_testruns(runs, comment, common_build, result, env_issue_type, token=None):
+def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, token=None):
     return RepPortal(token=token).analyze_testruns(runs, comment, common_build, result, env_issue_type)
 
 
