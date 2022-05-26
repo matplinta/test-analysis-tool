@@ -10,7 +10,7 @@ import { postFailMessageType, getEnvIssueTypes } from './../../services/test-res
 
 import './FailMessageTypeAddModal.css';
 
-const FailMessageTypeAddModal = ({ showForm, handleFormShow, handleFormClose }) => {
+const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
 
     const [name, setName] = useState('');
     const [regex, setRegex] = useState('');

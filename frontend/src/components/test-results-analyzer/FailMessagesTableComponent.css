@@ -1,0 +1,22 @@
+.fail-message-table {
+    margin-top: 5px;
+    font-size: 12px;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 99%;
+}
+
+.fail-message-table .p-inputtext {
+    height: 30px;
+    font-size: 13px;
+}
+
+.fail-message-table .p-checkbox {
+    width: 25px;
+    height: 25px;
+}
+
+.fail-message-table .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #004c9a;
+    background-color: #004c9a;
+}
