@@ -104,10 +104,11 @@ let FailMessageTypeGroupComponent = () => {
 
             <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleFormShow}>Add Regex Group</Button>
 
-            <TreeTable value={failMessageTypeGroups} size="small" lazy loading={loading}
-                scrollable scrollHeight="calc(100vh - 250px)" stripedRows showGridlines className="tree-table-style"
+            <TreeTable value={failMessageTypeGroups} scrollable size="small" loading={loading}
+                scrollHeight="calc(100vh - 300px)" showGridlines className="tree-table-style"
                 resizableColumns columnResizeMode="fit" rowClassName={rowClassName}
                 expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}>
+
                 <Column field="group_name" header="Group Name" expander sortable filter filterPlaceholder="Filter by name"></Column>
                 <Column field="group_author" header="Group Author" sortable filter filterPlaceholder="Filter by author"></Column>
                 <Column field="type_name" header="Regex Name" sortable filter filterPlaceholder="Filter by name"></Column>
