@@ -1,0 +1,42 @@
+.tree-table-style.p-treetable {
+    margin-top: 5px;
+    font-size: 12px;
+    margin-left: 5px;
+    margin-right: 5px;
+    width: 99%;
+}
+
+.p-treetable .p-treetable-tbody>tr>td {
+    padding: 0.2rem 0.2rem;
+}
+
+.p-treetable .p-inputtext {
+    height: 30px;
+    font-size: 13px;
+    padding-left: 5px;
+}
+
+.p-treetable .p-treetable-thead>tr>th {
+    padding: 0.4rem;
+}
+
+.p-treetable .p-treetable-tbody>tr.p-highlight {
+    background-color: #f6f6f6;
+    color: #495057;
+}
+
+.toggle-button-expand.p-togglebutton.p-button:not(.p-disabled):not(.p-highlight):hover {
+    color: white;
+}
+
+.toggle-button-expand.p-togglebutton.p-button:not(.p-disabled):not(.p-highlight) {
+    color: white;
+}
+
+.toggle-button-expand.p-togglebutton.p-button:not(.p-disabled):not(.p-highlight):hover .p-button-icon-left {
+    color: white;
+}
+
+.toggle-button-expand.p-togglebutton.p-button:not(.p-disabled):not(.p-highlight) .p-button-icon-left {
+    color: white;
+}
