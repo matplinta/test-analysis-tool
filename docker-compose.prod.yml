@@ -23,7 +23,7 @@ services:
   web:
     build: 
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.prod
     command: /app/wsgi-entrypoint.sh
     volumes:
       - static_volume:/app/django_static
@@ -57,7 +57,7 @@ services:
   celery_worker:
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.prod
     command: celery -A backend worker -l info
     env_file:
       - ./.postgres.env
@@ -75,7 +75,7 @@ services:
     container_name: celery_beat
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.prod
     command: celery -A backend beat -l info
     env_file:
       - ./.postgres.env
@@ -89,7 +89,7 @@ services:
     container_name: celery_flower
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.prod
     env_file:
       - ./.postgres.env
     command: /start-flower

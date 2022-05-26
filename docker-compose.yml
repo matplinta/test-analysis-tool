@@ -11,12 +11,13 @@ services:
   web:
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.dev
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
     ports:
       - "8000:8000"
+      - "8888:8888"
     env_file:
       - ./.postgres.env
     environment:
@@ -31,7 +32,7 @@ services:
   celery_worker:
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.dev
     command: celery -A backend worker -l info
     env_file:
       - ./.postgres.env
@@ -50,7 +51,7 @@ services:
     container_name: celery_beat
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.dev
     command: celery -A backend beat -l info
     env_file:
       - ./.postgres.env
@@ -65,7 +66,7 @@ services:
     container_name: celery_flower
     build:
       context: ./backend
-      dockerfile: ../docker/backend/Dockerfile
+      dockerfile: ../docker/backend/Dockerfile.dev
     command: /start-flower
     env_file:
       - ./.postgres.env

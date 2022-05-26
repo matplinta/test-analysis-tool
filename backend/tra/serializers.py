@@ -172,6 +172,20 @@ class TestRunSerializer(serializers.ModelSerializer):
         return instance
 
 
+class RegressionFilterCustomSerializer(serializers.ModelSerializer):
+    test_set = TestSetSerializer()
+    testline_type = serializers.CharField(source='testline_type.name')
+    fail_message_type_groups = FailMessageTypeGroupSerializer(many=True)
+
+
+    class Meta:
+        model = RegressionFilter
+        fields = ('id', 'name', 'limit', 'test_set', 'testline_type', 'fail_message_type_groups',)
+        extra_kwargs = {
+            'fail_message_type_groups': {'validators': []},
+        }
+
+
 class RegressionFilterSerializer(serializers.ModelSerializer):
     test_set = TestSetSerializer()
     testline_type = serializers.CharField(source='testline_type.name')
