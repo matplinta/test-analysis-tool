@@ -16,3 +16,7 @@ export const getEnvIssueTypes = async () => {
 export const getFailMessageTypeGroups = async () => {
     return (await axios.get('api/fail_message_type_groups/', { headers: authHeader() }));
 }
+
+export const postFailMessageTypeGroup = async (failMessageTypeGroup) => {
+    return (await axios.post('api/fail_message_type_groups/', failMessageTypeGroup, { headers: authHeader() }));
+}

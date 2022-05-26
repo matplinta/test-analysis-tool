@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
-import { VscRegex } from 'react-icons/vsc';
+import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
 
@@ -23,7 +23,7 @@ let MenuComponent = () => {
             command: () => { navigate('regression-filters') }
         },
         {
-            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Message Groups</span>,
+            label: <span><VscGroupByRefType size='20' style={{ marginBottom: '3px' }} /> Fail Message Groups</span>,
             command: () => { navigate('fail-regex-groups') }
         },
         {

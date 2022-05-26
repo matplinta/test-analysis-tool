@@ -8,6 +8,7 @@ import { ToggleButton } from 'primereact/togglebutton';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 
 import "./FailMessageTypeGroupComponent.css";
+import FailMessageGroupAddModal from './FailMessageGroupAddModal';
 
 let FailMessageTypeGroupComponent = () => {
 
@@ -18,7 +19,12 @@ let FailMessageTypeGroupComponent = () => {
 
     const [loading, setLoading] = useState(true);
 
-    let fetchTestFilters = () => {
+    const [showForm, setShowForm] = useState(false);
+    const handleFormClose = () => setShowForm(false);
+    const handleFormShow = () => setShowForm(true);
+
+
+    let fetchFailMessageGroups = () => {
         getFailMessageTypeGroups().then(
             (response) => {
                 let parsedData = response.data.map(group => {
@@ -76,8 +82,9 @@ let FailMessageTypeGroupComponent = () => {
         setExpandedKeys([]);
     }
 
-    const handleRegexGroupAdd = () => {
-
+    const handleFormCloseAndRefresh = () => {
+        handleFormClose();
+        fetchFailMessageGroups();
     }
 
     const rowClassName = (node) => {
@@ -85,7 +92,7 @@ let FailMessageTypeGroupComponent = () => {
     }
 
     useEffect(() => {
-        fetchTestFilters();
+        fetchFailMessageGroups();
     }, [])
 
     return (
@@ -95,9 +102,9 @@ let FailMessageTypeGroupComponent = () => {
                 className="p-button-primary p-button-color p-button-sm toggle-button-expand"
                 style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} />
 
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleRegexGroupAdd}>Add Regex Group</Button>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleFormShow}>Add Regex Group</Button>
 
-            <TreeTable value={failMessageTypeGroups} size="small" lazyloading={loading}
+            <TreeTable value={failMessageTypeGroups} size="small" lazy loading={loading}
                 scrollable scrollHeight="calc(100vh - 250px)" stripedRows showGridlines className="tree-table-style"
                 resizableColumns columnResizeMode="fit" rowClassName={rowClassName}
                 expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}>
@@ -109,6 +116,8 @@ let FailMessageTypeGroupComponent = () => {
                 <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Filter by env issue type"></Column>
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Filter by description"></Column>
             </TreeTable>
+
+            <FailMessageGroupAddModal showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
         </>
     )
 }
