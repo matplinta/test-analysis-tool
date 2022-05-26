@@ -1,5 +1,5 @@
 from xmlrpc.client import boolean
-from rep_portal.api import RepPortal
+from rep_portal.api import RepPortal, RepPortalError
 import json
 from datetime import datetime
 import pytz
@@ -51,7 +51,7 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
     return None, None
 
 
-@shared_task(name="celery_analyze_testruns")
+@shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
 def celery_analyze_testruns(runs, comment, common_build, result, env_issue_type, token=None):
     return RepPortal(token=token).analyze_testruns(runs, comment, common_build, result, env_issue_type)
 

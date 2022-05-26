@@ -1,6 +1,7 @@
 from dataclasses import fields
 from functools import reduce
 from sre_constants import SUCCESS
+from urllib import response
 from django.shortcuts import render
 from rest_framework import permissions, authentication
 from rest_framework.views import APIView
@@ -24,6 +25,7 @@ from .serializers import (
     TestRunSerializer, 
     TestlineTypeSerializer, 
     RegressionFilterSerializer, 
+    RegressionFilterCustomSerializer, 
     TestSetSerializer, 
     FailMessageTypeSerializer,
     FailMessageTypeGroupSerializer,
@@ -116,13 +118,11 @@ class EnvIssueTypeView(viewsets.ModelViewSet):
 
 
 class TestsSetView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
     serializer_class = TestSetSerializer
     queryset = TestSet.objects.all()
 
 
 class RegressionFilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
     serializer_class = RegressionFilterSerializer
     queryset = RegressionFilter.objects.all()
 
@@ -160,8 +160,6 @@ class RegressionFilterView(viewsets.ModelViewSet):
 
 
 class TestRunView(viewsets.ModelViewSet):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)  
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
 
@@ -175,7 +173,6 @@ class TestRunView(viewsets.ModelViewSet):
 
 
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
 
     def get_queryset(self):
@@ -187,7 +184,6 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
 
 
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
 
     def get_queryset(self):
@@ -198,9 +194,20 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
                                test_instance__test_set=regression_filter.test_set)
 
 
-class TestRunsBasedOnQueryDictinctValues(APIView):
-    permission_classes = (IsAuthenticated,)
+class RegressionFilterCustomView(APIView):
 
+    def get(self, request):
+        response = []
+        queryset = RegressionFilter.objects.all()
+        for item in queryset:
+            serialized = RegressionFilterCustomSerializer(item).data
+            serialized['owners'] = ", ".join([owner.username for owner in item.owners.all()])
+            serialized['subscribers'] = ", ".join([subs.username for subs in item.subscribers.all()])
+            response.append(serialized)
+        return Response(response)
+
+
+class TestRunsBasedOnQueryDictinctValues(APIView):
     def get_distinct_values_based_on_subscribed_regfilters(self):
         fields_dict = {}
         def get_distinct_values_and_serialize(field, model, serializer=None, order_by_param=None, key_override=None):
@@ -239,7 +246,6 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
 
 
 class TestRunsBasedOnQuery(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
     serializer_class = TestRunSerializer
     filterset_class = TestRunFilter
     pagination_class = StandardResultsSetPagination
@@ -281,8 +287,6 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
 
 
 class TestRunsAnalyzeToRP(APIView):
-    permission_classes = (IsAuthenticated,)
-    
     def post(self, request):
         data = self.request.data
         rp_ids = data["rp_ids"] 
@@ -313,9 +317,6 @@ class TestRunsAnalyzeToRP(APIView):
 
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
-    
     def get(self, request, rfid):
         regression_filter = RegressionFilter.objects.get(pk=rfid)
         limit = self.request.query_params.get('limit', None)
@@ -324,9 +325,6 @@ class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
 
 
 class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
-    
     def get(self, request):
         limit = self.request.query_params.get('limit', None)
         content = pull_and_analyze_notanalyzed_testruns_by_all_regfilters(limit)
@@ -334,9 +332,10 @@ class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
 
 
 class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)   
-    
     def get(self, request):
         celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters.delay()
         return Response("OK")
+
+
+class SummaryStatisticsView(APIView):
+    pass
