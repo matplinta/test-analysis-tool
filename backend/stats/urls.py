@@ -6,14 +6,16 @@ from dj_rest_auth.views import LoginView, LogoutView
 from stats import views
 
 router = routers.DefaultRouter()
-router.register(r'filterset', views.FilterSetView)
-router.register(r'filter', views.FilterView)
+router.register(r'filtersets', views.FilterSetView)
+router.register(r'filters', views.FilterView)
 
 
 urlpatterns = [
     path('', include(router.urls)),
     path('filter_fields', views.FilterFieldView.as_view(), name="filterfields"),
-    path('disp_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="stats"),
+    path('filtersets_detailed/', views.FilterSetDetailView.as_view(), name="filterset_detailed"),
+    path('filtersets_detailed/<int:filterset_id>', views.FilterSetDetailView.as_view(), name="filterset_detailed_pk"),
+    path('filters/by_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="filters_by_filterset"),
     path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
     # fail_barchart
     #   PARAMS:

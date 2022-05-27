@@ -26,12 +26,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
     path('api-auth/logout/', views.LogoutViewEx.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
-    path('api/', include('tra.urls'), name="api"),
-    path('api/stats/', include('stats.urls'), name="stats"),
+    path('api/tra/', include('tra.urls'), name="api_tra"),
+    path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
+    # path('api/trs/', include('trs.urls'), name="api_trs"),
+    # path('api/tlm/', include('tlm.urls'), name="api_tlm"),
 
-
-    # path('hello/', views.HelloView.as_view(), name='hello'),
-    # path('check/', views.CheckView.as_view(), name='check'),
-    # path('test/', views.TestAuthView.as_view(), name='test'),
-    # path('session/', views.TestSessView.as_view(), name='session'),
 ]

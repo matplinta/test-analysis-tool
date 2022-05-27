@@ -1,47 +1,48 @@
 from django.conf import settings
 from django.db import models
+from django.contrib.auth.models import User
+
 
 
 class LabLocation(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=100, blank=False, unique=True)
+
     def __str__(self):
         return self.name
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=30, blank=False, unique=True)
-
 
 class Laboratory(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50, blank=False)
+    lab_location = models.ForeignKey(LabLocation, on_delete=models.CASCADE, blank=False)
+    
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["name", "lab_location"], name='name_labloc_uniq')]
+
     def __str__(self):
         return self.name
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=30, blank=False)
-    lab_location = models.ForeignKey(LabLocation, on_delete=models.CASCADE, blank=False)
-
-    class Meta:
-        unique_together = ('name', 'lab_location')
 
 
 class Rack(models.Model):
-    def __str__(self):
-        return self.name
-
-    name = models.CharField(max_length=30, blank=False, unique=True)
+    name = models.CharField(max_length=50, blank=False, unique=True)
     laboratory = models.ForeignKey(Laboratory, on_delete=models.CASCADE, blank=False)
 
     class Meta:
-        unique_together = ('name', 'laboratory')
+        constraints = [models.UniqueConstraint(fields=["name", "laboratory"], name='name_lab_uniq')]
 
-
-class TestLine(models.Model):
     def __str__(self):
         return self.name
 
+class Testline(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=30, blank=False, unique=True)
-    maintainer = CurrentUserField()
+    maintainer = models.ForeignKey(User, on_delete=models.CASCADE)
     rack = models.ForeignKey(Rack, on_delete=models.CASCADE, blank=False, null=True)
 
+    def __str__(self):
+        return self.name
 
-class HardWare(models.Model):
+class Hardware(models.Model):
     def __str__(self):
         return self.name
     id = models.BigAutoField(primary_key=True)
@@ -80,8 +81,8 @@ class Unit(models.Model):
         return self.name
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=30, blank=False, unique=True)
-    test_line = models.ForeignKey(TestLine, on_delete=models.SET_NULL, blank=True, null=True)
-    hard_ware_type = models.ForeignKey(HardWare, on_delete=models.SET_NULL, blank=False, null=True)
+    test_line = models.ForeignKey(Testline, on_delete=models.SET_NULL, blank=True, null=True)
+    hard_ware_type = models.ForeignKey(Hardware, on_delete=models.SET_NULL, blank=False, null=True)
     serial_number = models.CharField(max_length=30, blank=False, unique=True)
     version = models.CharField(max_length=10, blank=True, null=True, unique=True)
     one_lab_reservation = models.OneToOneField(OneLabReservation, on_delete=models.SET_NULL, blank=True, unique=True, null=True)
