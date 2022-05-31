@@ -1,136 +1,124 @@
 from django.contrib import admin
 from .models import *
+from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelAdmin
 
 
+@admin.register(LabLocation)
 class LabLocationAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(Laboratory)
 class LaboratoryAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'lab_location']
     list_filter = ['name', 'lab_location']
     search_fields = ['name', 'lab_location']
 
 
+@admin.register(Rack)
 class RackAdmin(admin.ModelAdmin):
     list_display = ['name', 'laboratory']
     list_filter = ['name', 'laboratory']
     search_fields = ['name', 'laboratory']
 
 
-class TestLineAdmin(admin.ModelAdmin):
-    list_display = ['name', 'maintainer', 'rack']
+@admin.register(Testline)
+class TestlineAdmin(admin.ModelAdmin):
+    list_display = ['name', 'maintainer', 'rack', 'virtual_machine', 'vnc']
     list_filter = ['name', 'maintainer', 'rack']
     search_fields = ['name', 'maintainer', 'rack']
 
 
-class HardWareAdmin(admin.ModelAdmin):
+@admin.register(HardwareType)
+class HardwareTypeAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
     list_filter = ['id', 'name']
     search_fields = ['id', 'name']
 
 
+@admin.register(OneLabReservation)
 class OneLabReservationAdmin(admin.ModelAdmin):
     list_display = ['id', 'one_lab_status']
     list_filter = ['id', 'one_lab_status']
     search_fields = ['id', 'one_lab_status']
 
 
+@admin.register(PowerDistributionUnit)
 class PowerDistributionUnitAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'ip']
-    list_filter = ['id', 'name', 'ip']
-    search_fields = ['id', 'name', 'ip']
+    list_display = ['id', 'name', 'address', 'rack']
+    list_filter = ['id', 'name', 'address']
+    search_fields = ['id', 'name', 'address']
 
 
+@admin.register(PowerDistributionUnitPort)
 class PowerDistributionUnitPortAdmin(admin.ModelAdmin):
-    list_display = ['power_distribution_unit', 'port', 'status']
-    list_filter = ['power_distribution_unit', 'port', 'status']
-    search_fields = ['power_distribution_unit', 'port', 'status']
+    list_display = ['pdu', 'name', 'status']
+    list_filter = ['pdu', 'name', 'status']
+    search_fields = ['pdu', 'name', 'status']
 
 
+@admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'test_line', 'hard_ware_type', 'serial_number', 'one_lab_reservation', 'power_distribution_unit_port']
-    list_filter = ['id', 'name', 'test_line', 'hard_ware_type', 'serial_number', 'one_lab_reservation', 'power_distribution_unit_port']
-    search_fields = ['id', 'name', 'test_line', 'hard_ware_type', 'serial_number', 'one_lab_reservation', 'power_distribution_unit_port']
+    list_display = ['id', 'name', 'testline', 'hardware_type', 'serial_number', 'one_lab_reservation', 'pdu_port', 'version']
+    list_filter = ['id', 'name', 'testline', 'hardware_type', 'serial_number', 'one_lab_reservation', 'pdu_port']
+    search_fields = ['id', 'name', 'testline', 'hardware_type', 'serial_number', 'one_lab_reservation', 'pdu_port']
 
 
+@admin.register(Switch)
 class SwitchAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'rack']
+    list_display = ['id', 'name', 'rack', 'address']
     list_filter = ['id', 'name', 'rack']
     search_fields = ['id', 'name', 'rack']
 
 
+# class PortAdmin(Poly)
+
+
+@admin.register(UnitPort)
 class UnitPortAdmin(admin.ModelAdmin):
-    list_display = ['id', 'unit', 'port_name']
-    list_filter = ['id', 'unit', 'port_name']
-    search_fields = ['id', 'unit', 'port_name']
+    list_display = ['id', 'unit', 'name', 'connected_to']
+    list_filter = ['id', 'unit', 'name']
+    search_fields = ['id', 'unit', 'name']
 
 
+@admin.register(SwitchPort)
 class SwitchPortAdmin(admin.ModelAdmin):
-    list_display = ['id', 'switch', 'port_name', 'status', 'trunk_mode']
-    list_filter = ['id', 'switch', 'port_name', 'status', 'trunk_mode']
-    search_fields = ['id', 'switch', 'port_name', 'status', 'trunk_mode']
+    list_display = ['id', 'switch', 'name', 'status', 'trunk_mode', 'connected_to']
+    list_filter = ['id', 'switch', 'name', 'status', 'trunk_mode']
+    search_fields = ['id', 'switch', 'name', 'status', 'trunk_mode']
 
 
-class UnitsPortSwitchPortAdmin(admin.ModelAdmin):
-    list_display = ['id', 'unit_port', 'switch_port']
-    list_filter = ['id', 'unit_port', 'switch_port']
-    search_fields = ['id', 'unit_port', 'switch_port']
+# class UnitsPortSwitchPortAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'unit_port', 'switch_port']
+#     list_filter = ['id', 'unit_port', 'switch_port']
+#     search_fields = ['id', 'unit_port', 'switch_port']
 
 
-class UnitPortUnitPortAdmin(admin.ModelAdmin):
-    list_display = ['id', 'port1', 'port2']
-    list_filter = ['id', 'port1', 'port2']
-    search_fields = ['id', 'port1', 'port2']
+# class UnitPortUnitPortAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'port1', 'port2']
+#     list_filter = ['id', 'port1', 'port2']
+#     search_fields = ['id', 'port1', 'port2']
 
 
+@admin.register(Vlan)
 class VlanAdmin(admin.ModelAdmin):
-    list_display = ['switch_port', 'vlan_name']
-    list_filter = ['switch_port', 'vlan_name']
-    search_fields = ['switch_port', 'vlan_name']
+    list_display = ['switch_port', 'name']
+    list_filter = ['switch_port', 'name']
+    search_fields = ['switch_port', 'name']
 
 
+@admin.register(Topology)
 class TopologyAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
-class TestlineTopologyAdmin(admin.ModelAdmin):
-    list_display = ['testline', 'topology']
-    list_filter = ['testline', 'topology']
-    search_fields = ['testline', 'topology']
-
-
-class ServerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'vnc']
-    list_filter = ['name', 'vnc']
-    search_fields = ['name', 'vnc']
-
-
+@admin.register(VirtualMachine)
 class VirtualMachineAdmin(admin.ModelAdmin):
-    list_display = ['name', 'address', 'server', 'cpu', 'RAM']
-    list_filter = ['server', 'cpu', 'RAM']
-    search_fields = ['name', 'address', 'server', 'cpu', 'RAM']
+    list_display = ['name', 'address', 'cpu', 'ram']
+    list_filter = ['cpu', 'ram']
+    search_fields = ['name', 'address', 'cpu', 'ram']
 
-
-admin.site.register(Server, ServerAdmin)
-admin.site.register(VirtualMachine, VirtualMachineAdmin)
-admin.site.register(Laboratory, LaboratoryAdmin)
-admin.site.register(Rack, RackAdmin)
-admin.site.register(TestLine, TestLineAdmin)
-admin.site.register(HardWare, HardWareAdmin)
-admin.site.register(OneLabReservation, OneLabReservationAdmin)
-admin.site.register(PowerDistributionUnit, PowerDistributionUnitAdmin)
-admin.site.register(PowerDistributionUnitPort, PowerDistributionUnitPortAdmin)
-admin.site.register(Switch, SwitchAdmin)
-admin.site.register(Unit, UnitAdmin)
-admin.site.register(UnitPort, UnitPortAdmin)
-admin.site.register(SwitchPort, SwitchPortAdmin)
-admin.site.register(UnitsPortSwitchPort, UnitsPortSwitchPortAdmin)
-admin.site.register(UnitPortUnitPort, UnitPortUnitPortAdmin)
-admin.site.register(Vlan, VlanAdmin)
-admin.site.register(Topology, TopologyAdmin)
-admin.site.register(TestlineTopology, TestlineTopologyAdmin)

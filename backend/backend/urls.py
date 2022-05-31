@@ -19,7 +19,6 @@ from django.urls import path, include
 from rest_framework import routers
 from dj_rest_auth.views import LoginView, LogoutView
 from tra import views
-from stats import views as stats_views
 
 
 urlpatterns = [
@@ -29,6 +28,6 @@ urlpatterns = [
     path('api/tra/', include('tra.urls'), name="api_tra"),
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
     # path('api/trs/', include('trs.urls'), name="api_trs"),
-    # path('api/tlm/', include('tlm.urls'), name="api_tlm"),
+    path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
 
 ]

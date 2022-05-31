@@ -1,9 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from .views import TestlineView, UnitPortsView
+from rest_framework import routers
 
-from .views import base_template, TestlineView
+router = routers.DefaultRouter()
+router.register(r'testline', TestlineView)
 
 urlpatterns = [
-    path('', base_template, name="testline_menager"),
-    path('testline/<int:testline_id>', TestlineView.as_view(), name="testline-view"),
+    path('', include(router.urls)),
+    path('ports', UnitPortsView.as_view(), name="unitportsview"),
 
 ]
