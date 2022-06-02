@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 from polymorphic.models import PolymorphicModel
 
 
+class ModelIntegrityError(Exception):
+    pass
+
+
 class LabLocation(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=100, blank=False, unique=True)
@@ -140,10 +144,33 @@ class Port(PolymorphicModel):
 
 class UnitPort(Port):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, blank=False, unique=False, related_name="ports")
-    connected_to = models.OneToOneField(Port, on_delete=models.CASCADE, blank=True, null=True, unique=True, related_name="unit_port")
+    connected_to = models.OneToOneField(Port, on_delete=models.CASCADE, blank=True, null=True, related_name="unit_port")
 
     def __str__(self):
         return f"Unit: {self.unit.name} - Port: {self.name}"
+
+    def connect_to(self, instance):
+        self.connected_to = instance
+        instance.connected_to = self
+
+        self.save(update_fields=['connected_to'])
+        instance.save(update_fields=['connected_to'])
+        return [self.connected_to, instance.connected_to]
+
+    def disconnect(self):
+        self.connected_to.connected_to = None
+        self.connected_to.save(update_fields=['connected_to'])
+
+        self.connected_to = None
+        self.save(update_fields=['connected_to'])
+        return None
+
+    # def save(self, *args, **kwargs):
+    #     recur_stop = kwargs.get("recur_stop", 0)
+    #     super(UnitPort, self).save()
+    #     if self.connected_to and recur_stop == 0:
+    #         self.connected_to.connected_to = self
+    #         self.connected_to.save(recur_stop=recur_stop + 1)
 
 
 class SwitchPort(Port):
@@ -155,16 +182,21 @@ class SwitchPort(Port):
     def __str__(self):
         return f"Switch: {self.switch.name} - Port: {self.name}"
 
-# class UnitsPortSwitchPort(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     unit_port = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False)
-#     switch_port = models.OneToOneField(SwitchPort, on_delete=models.CASCADE, blank=False, unique=True)
+    def connect_to(self, instance):
+        self.connected_to = instance
+        instance.connected_to = self
 
+        self.save(update_fields=['connected_to'])
+        instance.save(update_fields=['connected_to'])
+        return [self.connected_to, instance.connected_to]
 
-# class UnitPortUnitPort(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     port1 = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False, unique=True, related_name='port1')
-#     port2 = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False, unique=True, related_name='port2')
+    def disconnect(self):
+        self.connected_to.connected_to = None
+        self.connected_to = None
+
+        self.connected_to.save(update_fields=['connected_to'])
+        self.save(update_fields=['connected_to'])
+        return None
 
 
 class Vlan(models.Model):
@@ -175,3 +207,17 @@ class Vlan(models.Model):
         constraints = [models.UniqueConstraint(fields=["switch_port", "name"], name='switch_port_vlan_uniq')]
 
 
+# class UnitSwitchConnection(models.Model):
+#     id = models.BigAutoField(primary_key=True)
+#     unit_port = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False, related_name="switch_connection")
+#     switch_port = models.OneToOneField(SwitchPort, on_delete=models.CASCADE, blank=False, related_name="unit_connection")
+
+
+# class UnitConnections(models.Model):
+#     id = models.BigAutoField(primary_key=True)
+#     port1 = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False, unique=True, related_name='connection')
+#     port2 = models.OneToOneField(UnitPort, on_delete=models.CASCADE, blank=False, unique=True, related_name='connection')
+
+    # def save(self, *args, **kwargs):
+    #     super(UnitConnections, self).save()
+    #     UnitConnections.objects.get_or_create(port1=self.port2, port2=self.port1)
