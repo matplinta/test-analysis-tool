@@ -59,30 +59,69 @@ class SwitchSerializer(serializers.ModelSerializer):
 
 
 class UnitPortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UnitPort
+        fields = ('id', 'name')
+
+
+class CustomUnitPortSerializer(serializers.ModelSerializer):
     connected_to = GenericPortSerializer(read_only=True)
     class Meta:
         model = UnitPort
         fields = ('id', 'name', 'connected_to')
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if isinstance(instance.connected_to, UnitPort):
+            serializer = UnitPortSerializer
+        elif isinstance(instance.connected_to, SwitchPort):
+            serializer = SwitchPortSerializer
+        else:
+            return ret
+        connected_to_serialized = serializer(instance.connected_to).data
+        ret['connected_to'] = connected_to_serialized
+        return ret
+
+
+class VlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vlan
+        fields = ('id', 'name')
+
 
 class SwitchPortSerializer(serializers.ModelSerializer):
     switch = SwitchSerializer()
+    vlans = VlanSerializer(read_only=True, many=True)
 
     class Meta:
         model = SwitchPort
-        fields = ('id', 'name', 'status', 'trunk_mode', 'switch')
+        fields = ('id', 'name', 'status', 'trunk_mode', 'switch', 'vlans')
 
 
 class UnitSerializer(serializers.ModelSerializer):
     hardware_type = HardwareTypeSerializer()
     one_lab_reservation = OneLabReservationSerializer()
     pdu_port = PowerDistributionUnitPortSerializer()
-    ports = UnitPortSerializer(read_only=True, many=True)
+    ports = CustomUnitPortSerializer(read_only=True, many=True)
 
     class Meta:
         model = Unit
         fields = ('id', 'name', 'hardware_type', 'serial_number', 
                   'version', 'one_lab_reservation', 'pdu_port', 'ports')
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        new_ports = {'switch_ports': [], 'unit_ports': [], 'unconnected': []}
+        for port in ret['ports']:
+            if port['connected_to']:
+                if 'switch' in port['connected_to'].keys():
+                    new_ports['switch_ports'].append(port)
+                else:
+                    new_ports['unit_ports'].append(port)
+            else:
+                new_ports['unconnected'].append(port)
+        ret['ports'] = new_ports
+        return ret
 
 
 class TestlineSerializer(serializers.ModelSerializer):
