@@ -214,8 +214,8 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
         regression_filter_instance = RegressionFilter.objects.create(test_set=test_set_instance,
                                                                      testline_type=testline_type_instance,
                                                                      **validated_data)
-        for fmtg_id in fail_message_type_groups_data:
-            fmtg_instance = FailMessageTypeGroup.objects.get(pk=fmtg_id)
+        for fmtg in fail_message_type_groups_data:
+            fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg)
             regression_filter_instance.fail_message_type_groups.add(fmtg_instance)
         return regression_filter_instance
 
@@ -223,10 +223,17 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # testline_type_data = validated_data.pop('testline_type')
         test_set_data = validated_data.pop('test_set')
+        fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
         # testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
         test_set_instance = TestSet.objects.get(**test_set_data)
         # test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
         instance.test_set = test_set_instance
         # instance.testline_type = testline_type_instance
+        for fmtg_id in fail_message_type_groups_data:
+            fmtg_instance = FailMessageTypeGroup.objects.get(pk=fmtg_id)
+            # instance.fail_message_type_groups.add(fmtg_instance)
+            instance.fail_message_type_groups
+
+
         instance.save()
         return instance
