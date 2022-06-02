@@ -23,6 +23,12 @@
 .p-treetable .p-treetable-tbody>tr.p-highlight {
     background-color: #f6f6f6;
     color: #495057;
+    font-weight: bold;
+}
+
+.p-treetable .p-treetable-tbody>tr.highlight-expanded.p-highlight {
+    background-color: #d5e8fc;
+    font-weight: bold;
 }
 
 .toggle-button-expand.p-togglebutton.p-button:not(.p-disabled):not(.p-highlight):hover {

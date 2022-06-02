@@ -1,8 +1,16 @@
 import axios from "axios";
 import authHeader from "../auth-header";
 
-export const getTestFilters = async () => {
-    return (await axios.get('api/regression_filters/', { headers: authHeader() }));
+export const getTestFilters = async (type) => {
+    let url = "";
+    if (type === 'all') {
+        url = 'api/regression_filters/';
+    } else if (type === 'owned') {
+        url = 'api/regression_filters/owned/';
+    } else if (type === 'subscribed') {
+        url = 'api/regression_filters/subscribed/';
+    }
+    return (await axios.get(url, { headers: authHeader() }));
 }
 
 export const postTestFilter = async (testFilter) => {

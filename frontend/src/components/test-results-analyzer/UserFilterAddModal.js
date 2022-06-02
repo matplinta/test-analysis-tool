@@ -22,6 +22,7 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
     const [testSetsOptions, setTestSetsOptions] = useState([]);
     const [testLinesTypes, setTestLinesTypes] = useState([]);
     const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
+    const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
 
     const [filterName, setFilterName] = useState("");
     const [testLineType, setTestLineType] = useState(null);
@@ -70,6 +71,7 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
         getFailMessageTypeGroups().then(
             (response) => {
                 if (response.data.length > 0) {
+                    setFailMessageTypeGroupsList(response.data);
                     const failMessageTypeGroupsValue = response.data.map(item => {
                         return { label: item.name + ", Author: " + item.author, value: item.id }
                     })
@@ -119,6 +121,13 @@ let UserFilterAddModal = ({ showForm, handleFormClose, handleFormShow }) => {
         filterToAdd.testline_type = testLineType;
         filterToAdd.test_set.name = testSetToAdd.name;
         filterToAdd.test_set.test_lab_path = testSetToAdd.test_lab_path;
+        filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
+            console.log(group)
+            let tmp = failMessageTypeGroup.includes(group.id);
+            console.log(tmp)
+            return tmp
+        });
+        console.log(filterToAdd);
 
         postTestFilter(filterToAdd).then(
             (response) => {

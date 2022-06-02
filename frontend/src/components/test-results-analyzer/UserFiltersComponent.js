@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { VscExpandAll } from 'react-icons/vsc';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
@@ -13,7 +14,7 @@ import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js'
 import 'react-toastify/dist/ReactToastify.css';
 import './UserFiltersComponent.css';
 
-let UserFiltersComponent = () => {
+let UserFiltersComponent = ({ type }) => {
 
     const [testFilters, setTestFilters] = useState([]);
 
@@ -23,20 +24,37 @@ let UserFiltersComponent = () => {
 
     const [filters, setFilters] = useState({
         'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'test_set.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'test_set.branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS }
+        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'subscribers': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
 
     const [loading, setLoading] = useState(true);
 
-
     let fetchTestFilters = () => {
-        getTestFilters().then(
+        setLoading(true);
+        getTestFilters(type).then(
             (response) => {
-                setTestFilters(response.data.results);
+
+                let parsedTestFilters = response.data.results.map((filter) => {
+                    return {
+                        "id": filter.id,
+                        "name": filter.name,
+                        "test_set_id": filter.test_set.id,
+                        "test_set_name": filter.test_set.name,
+                        "branch": filter.test_set.branch,
+                        "test_lab_path": filter.test_set.test_lab_path,
+                        "testline_type": filter.testline_type,
+                        "owners": filter.owners.map(owner => owner.username).join(', '),
+                        "subscribers": filter.subscribers.map(subscriber => subscriber.username).join(', '),
+                        "description": filter.description,
+                        "fail_message_type_groups": filter.fail_message_type_groups
+                    }
+                })
+                setTestFilters(parsedTestFilters);
                 setLoading(false);
             },
             (error) => {
@@ -81,17 +99,22 @@ let UserFiltersComponent = () => {
         );
     }
 
-    const ownersListBody = (rowData) => {
-        let owners = "";
-        for (let owner of rowData.owners) {
-            owners += owner.username + ', ';
-        }
-        return <span>{owners.slice(0, -2)}</span>
+    let click = (id) => {
+        console.log("klik" + id)
+    }
+
+    const failMessageGroupsBody = (rowData) => {
+        // let groups = "";
+        // for (let group of rowData.fail_message_type_groups) {
+        //     groups += <span>group.name</span>;
+        // }
+        // return <span>{groups}</span>
+        return <ul style={{ listStyleType: 'none' }}>{rowData.fail_message_type_groups.map(group => <li key={group.id}><VscExpandAll size='20' onClick={() => click(group.id)} />{group.name}</li>)}</ul>
     }
 
     useEffect(() => {
         fetchTestFilters();
-    }, [])
+    }, [type])
 
     return (
         <>
@@ -103,12 +126,15 @@ let UserFiltersComponent = () => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
                 resizableColumns columnResizeMode="fit">
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '15%' }}></Column>
-                <Column field="test_set.name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '30%' }}></Column>
-                <Column field="test_set.branch" header="Branch" sortable filter filterPlaceholder="Search by branch" style={{ width: '15%' }}></Column>
+                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '10%' }}></Column>
+                <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '23%' }}></Column>
+                <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" style={{ width: '8%' }}></Column>
                 <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" style={{ width: '20%' }}></Column>
-                <Column body={ownersListBody} header="Owners" filterField="owners" filter filterPlaceholder="Search by owner" style={{ width: '15%' }} />
-                <Column body={removeButton} header="Remove" style={{ width: '5%' }} />
+                <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" style={{ width: '13%' }} />
+                <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" style={{ width: '13%' }} />
+                <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description" style={{ width: '15%' }}></Column>
+                <Column body={failMessageGroupsBody} header="Fail Message Groups" style={{ width: '15%' }}></Column>
+                <Column body={removeButton} header="Remove" style={{ display: type === "owned" ? ' ' : 'none' }} />
 
             </DataTable>
 

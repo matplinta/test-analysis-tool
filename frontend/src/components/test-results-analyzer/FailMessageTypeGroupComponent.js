@@ -88,7 +88,12 @@ let FailMessageTypeGroupComponent = () => {
     }
 
     const rowClassName = (node) => {
-        return { 'p-highlight': (!node.key.includes('-')) };
+        if (node.key in expandedKeys) {
+            return { 'highlight-expanded p-highlight': (!node.key.includes('-')) };
+        }
+        else {
+            return { 'p-highlight': (!node.key.includes('-')) };
+        }
     }
 
     useEffect(() => {
