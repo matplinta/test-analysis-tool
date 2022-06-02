@@ -36,6 +36,15 @@ It is advisable to create python virtual environment for local development. Then
 
 ### Run jupyter notebook for django development
 `backend/$ python manage.py shell_plus --notebook`
+For jupyter setup to work asynchronically, firstly run
+```python
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rest.settings')
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+django.setup()
+```
+
 
 ## Database - Postgre SQL installation
 Tutorial: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04

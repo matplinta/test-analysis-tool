@@ -16,12 +16,14 @@ from .models import (
 )
 
 
+@admin.register(FeatureBuild)
 class FeatureBuildAdmin(admin.ModelAdmin):
     list_display = ['name', 'start_time', 'end_time']
     list_filter = ['name']
     search_fields = ['name', 'start_time', 'end_time']
 
 
+@admin.register(FailMessageType)
 class FailMessageTypeAdmin(admin.ModelAdmin):
     list_display = ['regex', 'id', 'name', 'author', 'env_issue_type']
     list_filter = ['name', 'author', 'env_issue_type']
@@ -35,6 +37,7 @@ class FailMessageTypeInline(admin.TabularInline):
     # filter_horizontal = ('fail_message_types',)
 
 
+@admin.register(FailMessageTypeGroup)
 class FailMessageTypeGroupAdmin(admin.ModelAdmin):
     list_display = ['name', 'id', 'author',]
     list_filter = ['name', 'author']
@@ -42,48 +45,56 @@ class FailMessageTypeGroupAdmin(admin.ModelAdmin):
     inlines = [FailMessageTypeInline]
 
 
+@admin.register(TestRunResult)
 class TestRunResultAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(EnvIssueType)
 class EnvIssueTypeAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(TestlineType)
 class TestlineTypeAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
     list_display = ['name']
     list_filter = ['name']
     search_fields = ['name']
 
 
+@admin.register(TestSet)
 class TestSetAdmin(admin.ModelAdmin):
     list_display = ['name', 'id', 'test_lab_path', 'branch']
     list_filter = ['branch']
     search_fields = ['name', 'test_lab_path']
 
 
+@admin.register(TestInstance)
 class TestInstanceAdmin(admin.ModelAdmin):
     list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
     list_filter = ['execution_suspended', 'test_set']
     search_fields = ['test_set__name', 'test_case_name']
 
 
+@admin.register(TestRun)
 class TestRunAdmin(admin.ModelAdmin):
     list_display = [
         'id', 
@@ -111,28 +122,16 @@ class TestRunAdmin(admin.ModelAdmin):
     search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id']
 
 
+@admin.register(RepPortalUserToken)
 class RepPortalUserTokenAdmin(admin.ModelAdmin):
     list_display = ['user', 'token']
     list_filter = []
     search_fields = ['user', 'token']
 
 
+@admin.register(RegressionFilter)
 class RegressionFilterAdmin(admin.ModelAdmin):
     list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
     list_filter = ['test_set', 'testline_type']
     search_fields = ['name', 'test_set__name']
 
-
-admin.site.register(FeatureBuild, FeatureBuildAdmin)
-admin.site.register(FailMessageType, FailMessageTypeAdmin)
-admin.site.register(EnvIssueType, EnvIssueTypeAdmin)
-admin.site.register(Organization, OrganizationAdmin)
-admin.site.register(TestRunResult, TestRunResultAdmin)
-admin.site.register(Branch, BranchAdmin)
-admin.site.register(TestlineType, TestlineTypeAdmin)
-admin.site.register(TestSet, TestSetAdmin)
-admin.site.register(TestInstance, TestInstanceAdmin)
-admin.site.register(TestRun, TestRunAdmin)
-admin.site.register(RepPortalUserToken, RepPortalUserTokenAdmin)
-admin.site.register(RegressionFilter, RegressionFilterAdmin)
-admin.site.register(FailMessageTypeGroup, FailMessageTypeGroupAdmin)

@@ -215,7 +215,7 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
                                                                      testline_type=testline_type_instance,
                                                                      **validated_data)
         for fmtg_instance in fail_message_type_groups_data:
-            # fmtg_instance = FailMessageTypeGroup.objects.get(pk=elem_id)
+            fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg_instance)
             regression_filter_instance.fail_message_type_groups.add(fmtg_instance)
         return regression_filter_instance
 

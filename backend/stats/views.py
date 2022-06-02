@@ -6,8 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSerializer, FilterSerializerListOnly
 
+from .permissions import IsAuthorOfRelatedObject
+from backend.permissions import IsAuthorOfObject
 from stats.models import * 
 import tra.models as tra_models
 from tra.views import TestRunsBasedOnQueryDictinctValues
@@ -33,30 +36,67 @@ class FilterSetView(viewsets.ModelViewSet):
     serializer_class = FilterSetSerializer
     queryset = FilterSet.objects.all()
 
+    @action(detail=False, url_path="my")
+    def user_is_owner(self, request):
+        filtersets = FilterSet.objects.all().filter(author=self.request.user)
+        page = self.paginate_queryset(filtersets)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(filtersets, many=True)
+        return Response(serializer.data)
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsAuthorOfObject()]
+        return permissions
 
-class UserFilterSetView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = FilterSetSerializer
 
-    def get_queryset(self):
-        return FilterSet.objects.all().filter(author=self.request.user)
+
+class FilterSetDetailView(APIView):
+    def get(self, request, filterset_id=None):
+        def serialize_data_with_filters(filtersets):
+            all = []
+            for filterset in filtersets:
+                filters = Filter.objects.filter(filter_set=filterset)
+                serialized_filters = FilterSerializerListOnly(filters, many=True).data
+                serialized_data = FilterSetSerializer(filterset).data
+                serialized_data["filters"] = serialized_filters
+                all.append(serialized_data)
+            return all
+
+        if filterset_id:
+            filtersets = FilterSet.objects.filter(pk=filterset_id)
+        else:
+            filtersets = FilterSet.objects.all()
+        return Response(serialize_data_with_filters(filtersets))
+
+    
 
 
 class FilterView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
     serializer_class = FilterSerializer
     queryset = Filter.objects.all()
     pagination_class = None
+
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['POST', 'PUT', 'DELETE']:
+            return permissions + [IsAuthorOfRelatedObject()]
+        return permissions
 
 
 class FilterFieldView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)   
     serializer_class = FilterFieldSerializer
     queryset = FilterField.objects.all()
-
+    pagination_class = None
 
 
 class GetDataForFailChartBase(APIView):
@@ -99,17 +139,19 @@ class GetDataForFailChartBase(APIView):
 
     def get_filters_and_failmessagetypes_from_post_data(self):
         data = self.request.data
-        # TODO
-        pass
+        filters = data["filters"]
+        fmtgs = data["fail_message_type_groups"]
+        fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
+        return fail_message_dict, filters
 
     def init_analyzer_and_get_chart_data(self, fail_message_dict, filters):
         dates = self._handle_dates_in_request(self.request)
         analyzer = Analyzer(fail_message_dict, filters)
         analyzer.get_data_from_rp()
         if dates:
-            data = analyzer.plot_runs_by_exception_types_by_date_ranges(**dates, plot=True)
+            data = analyzer.plot_runs_by_exception_types_by_date_ranges(**dates)
         else:
-            data = analyzer.plot_runs_by_exception_types(plot=True)
+            data = analyzer.plot_runs_by_exception_types()
         return data
 
 

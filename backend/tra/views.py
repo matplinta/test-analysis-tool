@@ -20,6 +20,10 @@ import distutils
 import distutils.util
 from django.core.serializers import serialize
 from rest_framework import serializers
+
+from backend.permissions import IsAuthorOfObject
+from .permissions import IsOwnerOfObject, IsSubscribedToObject
+
 from .serializers import (
     TestInstanceSerializer,
     TestRunSerializer, 
@@ -72,6 +76,7 @@ class FailMessageTypeView(viewsets.ModelViewSet):
     serializer_class = FailMessageTypeSerializer
     queryset = FailMessageType.objects.all()
     pagination_class = None
+    permission_classes = (IsAuthenticated,)
 
     @action(detail=False, url_path="my")
     def my(self, request):
@@ -82,6 +87,12 @@ class FailMessageTypeView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsAuthorOfObject()]
+        return permissions
+        
 
 class FailMessageTypeGroupView(viewsets.ModelViewSet):
     serializer_class = FailMessageTypeGroupSerializer
@@ -96,6 +107,12 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsAuthorOfObject()]
+        return permissions
 
 
 
@@ -158,6 +175,12 @@ class RegressionFilterView(viewsets.ModelViewSet):
         instance.owners.add(self.request.user)
         instance.subscribers.add(self.request.user)
 
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        if self.request.method in ['PUT', 'DELETE']:
+            return permissions + [IsOwnerOfObject()]
+        return permissions
+
 
 class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
@@ -192,19 +215,6 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
         regression_filter = RegressionFilter.objects.get(pk=rfid)
         return queryset.filter(testline_type=regression_filter.testline_type, 
                                test_instance__test_set=regression_filter.test_set)
-
-
-class RegressionFilterCustomView(APIView):
-
-    def get(self, request):
-        response = []
-        queryset = RegressionFilter.objects.all()
-        for item in queryset:
-            serialized = RegressionFilterCustomSerializer(item).data
-            serialized['owners'] = ", ".join([owner.username for owner in item.owners.all()])
-            serialized['subscribers'] = ", ".join([subs.username for subs in item.subscribers.all()])
-            response.append(serialized)
-        return Response(response)
 
 
 class TestRunsBasedOnQueryDictinctValues(APIView):

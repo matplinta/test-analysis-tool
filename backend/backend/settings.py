@@ -96,9 +96,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'dj_rest_auth',
+    'polymorphic',
     'corsheaders',
     'tra',
     'stats',
+    'testline_manager',
 ]
 
 if DEBUG:
