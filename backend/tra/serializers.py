@@ -189,7 +189,7 @@ class RegressionFilterCustomSerializer(serializers.ModelSerializer):
 class RegressionFilterSerializer(serializers.ModelSerializer):
     test_set = TestSetSerializer()
     testline_type = serializers.CharField(source='testline_type.name')
-    fail_message_type_groups = FailMessageTypeGroupSerializer(many=True)
+    fail_message_type_groups = FailMessageTypeGroupROSerializer(many=True)
     owners = UserSerializer(read_only=True, many=True)
     subscribers = UserSerializer(read_only=True, many=True)
 
