@@ -29,5 +29,6 @@ urlpatterns = [
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
     # path('api/trs/', include('trs.urls'), name="api_trs"),
     path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
+    path('api/users/', views.UsersList.as_view(), name="users"),
 
 ]

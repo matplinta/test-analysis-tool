@@ -4,8 +4,9 @@ from tra import views
 
 router = routers.DefaultRouter()
 # API to handle RegressionFilters model
-# special actions: /owned         to display RegressionFilters that the user is the owner of
-# special actions: /subscribed    to display RegressionFilters that the user is subscribed to
+# special actions: /owned            to display RegressionFilters that the user is the owner of
+# special actions: /subscribed       to display RegressionFilters that the user is subscribed to
+# special actions: /pk/subscribe/    to subscribe the current user to the specified regression filter
 router.register(r'regression_filters', views.RegressionFilterView, 'RegressionFilters')
 
 # API to handle FailMessageType model

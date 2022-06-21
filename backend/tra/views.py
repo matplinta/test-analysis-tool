@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework import status
 from django.views.generic import ListView
 from dj_rest_auth.views import LogoutView
 from rest_framework import generics, mixins, views
@@ -168,6 +169,17 @@ class RegressionFilterView(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(regfilters, many=True)
         return Response(serializer.data)
+
+
+    @action(detail=True, methods=['post'])
+    def subscribe(self, request, pk=None):
+        regfilter = self.get_object()
+        if self.request.user not in regfilter.subscribers.all():
+            regfilter.subscribers.add(self.request.user)
+            regfilter.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
     def perform_create(self, serializer):
@@ -349,3 +361,9 @@ class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
 
 class SummaryStatisticsView(APIView):
     pass
+
+
+class UsersList(generics.ListAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    pagination_class = None
