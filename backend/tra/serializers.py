@@ -221,19 +221,34 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        # testline_type_data = validated_data.pop('testline_type')
+        instance.name = validated_data.pop('name')
+        testline_type_data = validated_data.pop('testline_type')
+        testline_type_instance = TestlineType.objects.get(**testline_type_data)
+        instance.testline_type = testline_type_instance
         test_set_data = validated_data.pop('test_set')
-        fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
-        # testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
         test_set_instance = TestSet.objects.get(**test_set_data)
-        # test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
         instance.test_set = test_set_instance
-        # instance.testline_type = testline_type_instance
+        fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
         for fmtg_id in fail_message_type_groups_data:
-            fmtg_instance = FailMessageTypeGroup.objects.get(pk=fmtg_id)
-            # instance.fail_message_type_groups.add(fmtg_instance)
-            instance.fail_message_type_groups
-
-
+            fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg_id)
+            instance.fail_message_type_groups.add(fmtg_instance)
         instance.save()
         return instance
+
+
+        # # testline_type_data = validated_data.pop('testline_type')
+        # test_set_data = validated_data.pop('test_set')
+        # fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
+        # # testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
+        # test_set_instance = TestSet.objects.get(**test_set_data)
+        # # test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+        # instance.test_set = test_set_instance
+        # # instance.testline_type = testline_type_instance
+        # for fmtg_id in fail_message_type_groups_data:
+        #     fmtg_instance = FailMessageTypeGroup.objects.get(pk=fmtg_id)
+        #     # instance.fail_message_type_groups.add(fmtg_instance)
+        #     instance.fail_message_type_groups
+
+
+        # instance.save()
+        # return instance
