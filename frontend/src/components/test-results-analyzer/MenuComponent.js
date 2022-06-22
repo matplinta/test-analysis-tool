@@ -22,7 +22,7 @@ let MenuComponent = () => {
             label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Regression Filters</span>,
             items: [{
                 label: "All Filters",
-                command: () => { navigate('subscribed-regression-filters') },
+                command: () => { navigate('regression-filters') },
             }, {
                 label: "Subscribed Filters",
                 command: () => { navigate('subscribed-regression-filters') },

@@ -58,11 +58,11 @@ const App = () => {
             </Route>
             <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-              <Route path="regression-filters" index element={<UserFiltersComponent type={'all'} />} />
-              <Route path="subscribed-regression-filters" index element={<UserFiltersComponent type={'subscribed'} />} />
-              <Route path="owned-regression-filters" index element={<UserFiltersComponent type={'owned'} />} />
-              <Route path="fail-regex" index element={<FailRegexTypesComponent />} />
-              <Route path="fail-regex-groups" index element={<FailMessageTypeGroupComponent />} />
+              <Route path="regression-filters" element={<UserFiltersComponent type={'all'} />} />
+              <Route path="subscribed-regression-filters" element={<UserFiltersComponent type={'subscribed'} />} />
+              <Route path="owned-regression-filters" element={<UserFiltersComponent type={'owned'} />} />
+              <Route path="fail-regex" element={<FailRegexTypesComponent />} />
+              <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
             </Route>
           </Routes>
           <ToastContainer autoClose={2500} />

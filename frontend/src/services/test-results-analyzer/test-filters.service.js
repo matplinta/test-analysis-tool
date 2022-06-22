@@ -13,8 +13,16 @@ export const getTestFilters = async (type) => {
     return (await axios.get(url, { headers: authHeader() }));
 }
 
+export const getTestFilter = async (id) => {
+    return (await axios.get('api/tra/regression_filters/' + id, { headers: authHeader() }));
+}
+
 export const postTestFilter = async (testFilter) => {
     return (await axios.post('api/tra/regression_filters/', testFilter, { headers: authHeader() }));
+}
+
+export const putTestFilter = async (id, testFilter) => {
+    return (await axios.put('api/tra/regression_filters/' + id + '/', testFilter, { headers: authHeader() }));
 }
 
 export const deleteTestFilter = async (id) => {
@@ -31,4 +39,8 @@ export const postTestSet = async (testSet) => {
 
 export const getTestLineTypes = async () => {
     return (await axios.get('api/tra/testline_types/', { headers: authHeader() }));
+}
+
+export const getUsers = async () => {
+    return (await axios.get('api/tra/users/', { headers: authHeader() }));
 }
