@@ -374,7 +374,12 @@ class SummaryStatisticsView(APIView):
     pass
 
 
-class UsersList(generics.ListAPIView):
+class UsersList(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     pagination_class = None
+
+    @action(detail=False, url_path="me")
+    def me(self, request):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)

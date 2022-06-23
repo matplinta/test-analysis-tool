@@ -20,6 +20,8 @@ from rest_framework import routers
 from dj_rest_auth.views import LoginView, LogoutView
 from tra import views
 
+router = routers.DefaultRouter()
+router.register(r'users', views.UsersList, 'users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +31,7 @@ urlpatterns = [
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
     # path('api/trs/', include('trs.urls'), name="api_trs"),
     path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
-    path('api/users/', views.UsersList.as_view(), name="users"),
+    # path('api/users/', views.UsersList.as_view(), name="users"),
+    path('api/', include(router.urls)),
 
 ]
