@@ -182,6 +182,17 @@ class RegressionFilterView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
+    @action(detail=True, methods=['post'])
+    def unsubscribe(self, request, pk=None):
+        regfilter = self.get_object()
+        if self.request.user in regfilter.subscribers.all():
+            regfilter.subscribers.remove(self.request.user)
+            regfilter.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_304_NOT_MODIFIED)
+
+
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.owners.add(self.request.user)
