@@ -1,15 +1,22 @@
 import React from "react";
 
-import getCurrentUser from './/auth.service';
-
 export const CurrentUserContext = React.createContext();
 
-export const CurrentUSerProvider = ({ children }) => {
+const getLocalStorageItemName = () => {
+    if (window.location.origin === "http://localhost:3000" || window.location.origin === "http://127.0.0.1:3000") {
+        return "user_dev";
+    } else {
+        return "user_prod";
+    }
+}
+
+export const CurrentUserProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = React.useState(null)
 
-    const fetchCurrentUser = async () => {
-        let response = getCurrentUser();
-        setCurrentUser(response);
+    const fetchCurrentUser = () => {
+        let response = JSON.parse(localStorage.getItem(getLocalStorageItemName()));
+        console.log(response)
+        setCurrentUser(response.username);
     }
 
     return (

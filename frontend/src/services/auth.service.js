@@ -9,17 +9,16 @@ const getLocalStorageItemName = () => {
     }
 }
 
-const login = (username, password) => {
-    return axios.post("api-auth/login/", { username, password })
-        .then(response => {
-            if (response.data.key) {
-                let valueToSave = response.data;
-                valueToSave.username = username;
-                localStorage.setItem(getLocalStorageItemName(), JSON.stringify(valueToSave));
+const login = async (username, password) => {
+    const response = await axios.post("api-auth/login/", { username, password });
+    if (response.data.key) {
+        let valueToSave = response.data;
+        valueToSave.username = username;
 
-            }
-            return response.data;
-        })
+        localStorage.setItem(getLocalStorageItemName(), JSON.stringify(valueToSave));
+
+    }
+    return response.data;
 }
 
 const logout = () => {
@@ -40,11 +39,16 @@ const checkUserLoggedIn = () => {
     return user ? true : false;
 }
 
+const getUsers = async () => {
+    return (await axios.get('api/users/', { headers: authHeader() }));
+}
+
 const AuthService = {
     login,
     logout,
     getCurrentUser,
-    checkUserLoggedIn
+    checkUserLoggedIn,
+    getUsers
 }
 
 export default AuthService;

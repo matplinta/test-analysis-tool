@@ -10,10 +10,11 @@ import { MultiSelect } from 'primereact/multiselect';
 
 import TestSetAddModal from './TestSetAddModal';
 
-import { getTestSets, getTestLineTypes, postTestFilter, getTestFilter, putTestFilter, getUsers } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestSets, getTestLineTypes, postTestFilter, getTestFilter, putTestFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import AuthService from './../../services/auth.service.js';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import { useCurrentUser } from '../../services/CurrentUserContext';
 
 import './UserFilterAddModal.css';
 
@@ -26,7 +27,7 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
     const [usersList, setUsersList] = useState([]);
 
-    const [currentUser, setCurrentUser] = useState(null);
+    const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     const [filterName, setFilterName] = useState("");
     const [testLineType, setTestLineType] = useState(null);
@@ -88,11 +89,10 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     }
 
     let fetchUsers = () => {
-        getUsers().then(
+        AuthService.getUsers().then(
             (response) => {
-                if (response.data.results.length > 0) {
-                    setUsersList(response.data.results);
-                    console.log(response.data.results)
+                if (response.data.length > 0) {
+                    setUsersList(response.data);
                 }
             },
             (error) => {
@@ -129,7 +129,9 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
         setFilterName("");
         setTestLineType(null);
         setTestSetId(null);
-        setFailMessageTypeGroup(null)
+        setFailMessageTypeGroup(null);
+        setOwners(null);
+        setSubscribers(null);
     }
 
     let handleFilterAdd = () => {
@@ -217,18 +219,18 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     }
 
     useEffect(() => {
-        setCurrentUser(AuthService.getCurrentUser().username);
-
+        fetchCurrentUser();
         fetchTestSets();
         fetchTestLines();
         fetchFailMessageTypeGroups();
         fetchUsers();
-        console.log("use effect")
 
         if (filterIdToEdit !== null) {
             fetchFilterToEdit(filterIdToEdit);
         } else {
             clearForm();
+            // setOwners([currentUser.id]);
+            // setSubscribers([currentUser.id]);
         }
 
     }, [filterIdToEdit, showForm])

@@ -10,14 +10,17 @@ import { FiSettings } from 'react-icons/fi';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
-import AuthService from './../../services/auth.service.js';
+import { useCurrentUser } from '../../services/CurrentUserContext';
+
 
 import 'react-toastify/dist/ReactToastify.css';
 import './UserFiltersComponent.css';
 
 let UserFiltersComponent = ({ type }) => {
+
+    const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     const [testFilters, setTestFilters] = useState([]);
 
@@ -126,52 +129,53 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     const subscribeFilter = (rowData) => {
-        let filterToSubscribe = null;
-        getTestFilter(rowData.id).then(
+        console.log(rowData)
+        postTestFilterSubscribe(rowData.id).then(
             (response) => {
-                filterToSubscribe = response.data;
-
-                filterToSubscribe.subscribers.push({
-                    "username": AuthService.getCurrentUser().username
+                console.log(testFilters)
+                let testFiltersTmp = testFilters.map(testFilter => {
+                    if (testFilter.id === rowData.id) {
+                        if (testFilter.subscribers === "")
+                            testFilter.subscribers += currentUser;
+                        else testFilter.subscribers += ', ' + currentUser;
+                    }
+                    return testFilter;
                 })
+                setTestFilters(testFiltersTmp);
 
-                console.log(filterToSubscribe)
+                console.log(testFilters)
+                console.log("success")
 
             }, (error) => {
-                console.log("Error during editing")
+                console.log("Error during subcscribe")
             }
         )
 
     }
 
     const unsubscribeFilter = (rowData) => {
-        let filterToSubscribe = null;
-        getTestFilter(rowData.id).then(
+        postTestFilterUnsubscribe(rowData.id).then(
             (response) => {
-                filterToSubscribe = response.data;
-
-                let newSubscribersList = [...filterToSubscribe.subscribers].filter(subscriber => subscriber.username !== AuthService.getCurrentUser().username)
-                filterToSubscribe.subscribers = newSubscribersList;
-                filterToSubscribe.fail_message_type_groups = []; // tymczasowe usuwa całkowicie grupy ale srawdza czy działa subskrybowanie
-
-                putTestFilter(rowData.id, filterToSubscribe).then(
-                    (response) => {
-                        console.log("success")
-                        fetchTestFilters();
-                    }, (error) => {
-                        console.log("Error during editing")
+                let testFiltersTmp = testFilters.map(testFilter => {
+                    if (testFilter.id === rowData.id) {
+                        let subscribersTmp = testFilter.subscribers;
+                        subscribersTmp = subscribersTmp.replace(currentUser, ',').replace(', ,', '').replace(', ,,', '');
+                        if (subscribersTmp == ',') subscribersTmp = subscribersTmp.replace(',', '');
+                        testFilter.subscribers = subscribersTmp;
                     }
-                )
+                    return testFilter;
+                })
+                setTestFilters(testFiltersTmp);
+                console.log("success")
 
             }, (error) => {
-                console.log("Error during editing")
+                console.log("Error during subcscribe")
             }
         )
+
     }
 
     let subscribeOrUnsubscribedButton = (rowData) => {
-
-        let currentUser = AuthService.getCurrentUser().username;
         if (rowData.subscribers.includes(currentUser)) {
             return (
                 <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
@@ -198,6 +202,7 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     useEffect(() => {
+        fetchCurrentUser();
         fetchTestFilters();
     }, [type])
 
