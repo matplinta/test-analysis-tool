@@ -19,9 +19,10 @@ from django.urls import path, include
 from rest_framework import routers
 from dj_rest_auth.views import LoginView, LogoutView
 from tra import views
+from .views import UsersList
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UsersList, 'users')
+router.register(r'users', UsersList, 'users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,9 +30,8 @@ urlpatterns = [
     path('api-auth/logout/', views.LogoutViewEx.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/tra/', include('tra.urls'), name="api_tra"),
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
-    # path('api/trs/', include('trs.urls'), name="api_trs"),
     path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
-    # path('api/users/', views.UsersList.as_view(), name="users"),
+    # path('api/trs/', include('trs.urls'), name="api_trs"),
     path('api/', include(router.urls)),
 
 ]

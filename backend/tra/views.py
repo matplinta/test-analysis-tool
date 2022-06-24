@@ -209,14 +209,6 @@ class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
 
-    # @action(detail=True, methods=['put'], url_path="analyze")
-    # def analyze(self, request, pk=None):
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save(analyzed=True, analyzed_by=self.request.user)
-    #     return Response(serializer.data)
-
 
 class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
     serializer_class = TestRunSerializer
@@ -373,13 +365,3 @@ class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
 class SummaryStatisticsView(APIView):
     pass
 
-
-class UsersList(viewsets.ReadOnlyModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    pagination_class = None
-
-    @action(detail=False, url_path="me")
-    def me(self, request):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)
