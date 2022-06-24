@@ -2,6 +2,30 @@ from .models import *
 from rest_framework import serializers
 
 
+class LabLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabLocation
+        fields = ('id', 'name')
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabLocation
+        fields = ('id', 'name')
+
+
+class LabKeeperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabLocation
+        fields = ('id', 'name', 'team')
+
+
+class LaboratorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Laboratory
+        fields = ('id', 'name', 'lab_location')
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -11,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
 class VirtualMachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = VirtualMachine
-        fields = ('id', 'name', 'address', 'cpu', 'ram')
+        fields = ('id', 'name', 'address', 'kvm', 'cpu', 'ram')
 
 
 class RackSerializer(serializers.ModelSerializer):
@@ -37,7 +61,13 @@ class HardwareTypeSerializer(serializers.ModelSerializer):
 class OneLabReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = OneLabReservation
-        fields = ('id', 'one_lab_status')
+        fields = ('id', 'status', 'owner')
+
+
+class PowerDistributionUnitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PowerDistributionUnit
+        fields = ('id', 'name', 'address', 'rack')
 
 
 class PowerDistributionUnitPortSerializer(serializers.ModelSerializer):
@@ -53,9 +83,10 @@ class GenericPortSerializer(serializers.ModelSerializer):
 
 
 class SwitchSerializer(serializers.ModelSerializer):
+    rack = RackSerializer()
     class Meta:
         model = Switch
-        fields = ('id', 'name', 'address')
+        fields = ('id', 'name', 'address', 'rack')
 
 
 class UnitPortSerializer(serializers.ModelSerializer):
@@ -98,6 +129,14 @@ class SwitchPortSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'status', 'trunk_mode', 'switch', 'vlans')
 
 
+class SwitchPortOmitSwitchSerializer(serializers.ModelSerializer):
+    vlans = VlanSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = SwitchPort
+        fields = ('id', 'name', 'status', 'trunk_mode', 'vlans')
+
+
 class UnitSerializer(serializers.ModelSerializer):
     hardware_type = HardwareTypeSerializer()
     one_lab_reservation = OneLabReservationSerializer()
@@ -134,4 +173,4 @@ class TestlineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Testline
         fields = ('id', 'name', 'maintainer', 'virtual_machine', 
-                  'rack', 'topologies', 'vnc', 'units')
+                  'rack', 'topologies', 'vnc', 'units', 'team')

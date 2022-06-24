@@ -10,6 +10,20 @@ class LabLocationAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    list_filter = ['name']
+    search_fields = ['name']
+
+
+@admin.register(LabKeeper)
+class LabKeeperAdmin(admin.ModelAdmin):
+    list_display = ['name', 'team']
+    list_filter = ['name', 'team']
+    search_fields = ['name', 'team']
+
+
 @admin.register(Laboratory)
 class LaboratoryAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'lab_location']
@@ -40,9 +54,9 @@ class HardwareTypeAdmin(admin.ModelAdmin):
 
 @admin.register(OneLabReservation)
 class OneLabReservationAdmin(admin.ModelAdmin):
-    list_display = ['id', 'one_lab_status']
-    list_filter = ['id', 'one_lab_status']
-    search_fields = ['id', 'one_lab_status']
+    list_display = ['id', 'status']
+    list_filter = ['id', 'status']
+    search_fields = ['id', 'status']
 
 
 @admin.register(PowerDistributionUnit)
@@ -90,18 +104,6 @@ class SwitchPortAdmin(admin.ModelAdmin):
     search_fields = ['id', 'switch', 'name', 'status', 'trunk_mode']
 
 
-# class UnitsPortSwitchPortAdmin(admin.ModelAdmin):
-#     list_display = ['id', 'unit_port', 'switch_port']
-#     list_filter = ['id', 'unit_port', 'switch_port']
-#     search_fields = ['id', 'unit_port', 'switch_port']
-
-
-# class UnitPortUnitPortAdmin(admin.ModelAdmin):
-#     list_display = ['id', 'port1', 'port2']
-#     list_filter = ['id', 'port1', 'port2']
-#     search_fields = ['id', 'port1', 'port2']
-
-
 @admin.register(Vlan)
 class VlanAdmin(admin.ModelAdmin):
     list_display = ['switch_port', 'name']
@@ -118,7 +120,7 @@ class TopologyAdmin(admin.ModelAdmin):
 
 @admin.register(VirtualMachine)
 class VirtualMachineAdmin(admin.ModelAdmin):
-    list_display = ['name', 'address', 'cpu', 'ram']
-    list_filter = ['cpu', 'ram']
-    search_fields = ['name', 'address', 'cpu', 'ram']
+    list_display = ['name', 'address', 'cpu', 'ram', 'kvm']
+    list_filter = ['cpu', 'ram', 'kvm']
+    search_fields = ['name', 'address', 'cpu', 'ram', 'kvm']
 
