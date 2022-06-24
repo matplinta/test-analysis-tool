@@ -4,18 +4,27 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { VscExpandAll } from 'react-icons/vsc';
+import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
+import { FiSettings } from 'react-icons/fi';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, deleteTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import { useCurrentUser } from '../../services/CurrentUserContext';
+
 
 import 'react-toastify/dist/ReactToastify.css';
 import './UserFiltersComponent.css';
 
-let UserFiltersComponent = () => {
+let UserFiltersComponent = ({ type }) => {
+
+    const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     const [testFilters, setTestFilters] = useState([]);
+
+    const [filterIdToEdit, setFilterIdToEdit] = useState(null);
 
     const [showForm, setShowForm] = useState(false);
     const handleFormClose = () => setShowForm(false);
@@ -23,20 +32,37 @@ let UserFiltersComponent = () => {
 
     const [filters, setFilters] = useState({
         'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'test_set.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'test_set.branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS }
+        'owners': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'subscribers': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
 
     const [loading, setLoading] = useState(true);
 
-
     let fetchTestFilters = () => {
-        getTestFilters().then(
+        setLoading(true);
+        getTestFilters(type).then(
             (response) => {
-                setTestFilters(response.data.results);
+
+                let parsedTestFilters = response.data.results.map((filter) => {
+                    return {
+                        "id": filter.id,
+                        "name": filter.name,
+                        "test_set_id": filter.test_set.id,
+                        "test_set_name": filter.test_set.name,
+                        "branch": filter.test_set.branch,
+                        "test_lab_path": filter.test_set.test_lab_path,
+                        "testline_type": filter.testline_type,
+                        "owners": filter.owners.map(owner => owner.username).join(', '),
+                        "subscribers": filter.subscribers.map(subscriber => subscriber.username).join(', '),
+                        "description": filter.description,
+                        "fail_message_type_groups": filter.fail_message_type_groups
+                    }
+                })
+                setTestFilters(parsedTestFilters);
                 setLoading(false);
             },
             (error) => {
@@ -50,7 +76,7 @@ let UserFiltersComponent = () => {
         deleteTestFilter(id).then(
             (response) => {
                 let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
-                setTestFilters(testFiltersList);
+                // setTestFilters(testFiltersList);
                 fetchTestFilters();
                 Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
 
@@ -77,25 +103,112 @@ let UserFiltersComponent = () => {
 
     let removeButton = (rowData) => {
         return (
-            <Button icon="pi pi-times" className="p-button-primary p-button-sm" style={{ height: '30px', width: '30px' }} onClick={() => confirmRemove(rowData.id)} />
+            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData.id)} >
+                <BiTrash size='20' />
+            </Button>
         );
     }
 
-    const ownersListBody = (rowData) => {
-        let owners = "";
-        for (let owner of rowData.owners) {
-            owners += owner.username + ', ';
+    const editFilter = (id) => {
+        console.log(id)
+        setFilterIdToEdit(id);
+        handleFormShow();
+    }
+
+    const addFilter = () => {
+        setFilterIdToEdit(null);
+        handleFormShow();
+    }
+
+    let editButton = (rowData) => {
+        return (
+            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFilter(rowData.id)} >
+                <FiSettings size='20' />
+            </Button>
+        );
+    }
+
+    const subscribeFilter = (rowData) => {
+        console.log(rowData)
+        postTestFilterSubscribe(rowData.id).then(
+            (response) => {
+                console.log(testFilters)
+                let testFiltersTmp = testFilters.map(testFilter => {
+                    if (testFilter.id === rowData.id) {
+                        if (testFilter.subscribers === "")
+                            testFilter.subscribers += currentUser;
+                        else testFilter.subscribers += ', ' + currentUser;
+                    }
+                    return testFilter;
+                })
+                setTestFilters(testFiltersTmp);
+
+                console.log(testFilters)
+                console.log("success")
+
+            }, (error) => {
+                console.log("Error during subcscribe")
+            }
+        )
+
+    }
+
+    const unsubscribeFilter = (rowData) => {
+        postTestFilterUnsubscribe(rowData.id).then(
+            (response) => {
+                let testFiltersTmp = testFilters.map(testFilter => {
+                    if (testFilter.id === rowData.id) {
+                        let subscribersTmp = testFilter.subscribers;
+                        subscribersTmp = subscribersTmp.replace(currentUser, ',').replace(', ,', '').replace(', ,,', '');
+                        if (subscribersTmp == ',') subscribersTmp = subscribersTmp.replace(',', '');
+                        testFilter.subscribers = subscribersTmp;
+                    }
+                    return testFilter;
+                })
+                setTestFilters(testFiltersTmp);
+                console.log("success")
+
+            }, (error) => {
+                console.log("Error during subcscribe")
+            }
+        )
+
+    }
+
+    let subscribeOrUnsubscribedButton = (rowData) => {
+        if (rowData.subscribers.includes(currentUser)) {
+            return (
+                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
+                    <div><BiBellOff size='20' /></div>
+                </Button>
+            );
+        } else {
+            return (
+                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => subscribeFilter(rowData)} >
+                    <div><BiBell size='20' /></div>
+                </Button>
+            );
         }
-        return <span>{owners.slice(0, -2)}</span>
+    }
+
+    let click = (id) => {
+        console.log("klik" + id)
+    }
+
+    const failMessageGroupsBody = (rowData) => {
+        return <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
+            {rowData.fail_message_type_groups.map(group => <li key={group.id}><VscExpandAll size='20' onClick={() => click(group.id)} />{group.name}</li>)}
+        </ul>
     }
 
     useEffect(() => {
+        fetchCurrentUser();
         fetchTestFilters();
-    }, [])
+    }, [type])
 
     return (
         <>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleFormShow}>Add Regression Filter</Button>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={addFilter}>Add Regression Filter</Button>
 
             <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row"
                 showGridlines dataKey="id"
@@ -103,16 +216,21 @@ let UserFiltersComponent = () => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
                 resizableColumns columnResizeMode="fit">
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '15%' }}></Column>
-                <Column field="test_set.name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name" style={{ width: '30%' }}></Column>
-                <Column field="test_set.branch" header="Branch" sortable filter filterPlaceholder="Search by branch" style={{ width: '15%' }}></Column>
-                <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" style={{ width: '20%' }}></Column>
-                <Column body={ownersListBody} header="Owners" filterField="owners" filter filterPlaceholder="Search by owner" style={{ width: '15%' }} />
-                <Column body={removeButton} header="Remove" style={{ width: '5%' }} />
+                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name"></Column>
+                <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
+                <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
+                <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
+                <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
+                <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
+                <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>
+                <Column body={failMessageGroupsBody} header="Fail Message Groups" ></Column>
+                <Column body={subscribeOrUnsubscribedButton} header="Follow" style={{ textAlign: "center" }} />
+                <Column body={editButton} header="Edit" style={{ display: type === "owned" ? ' ' : 'none', textAlign: "center", minWidth: "60px" }} />
+                <Column body={removeButton} header="Remove" style={{ display: type === "owned" ? ' ' : 'none', textAlign: "center" }} />
 
             </DataTable>
 
-            <UserFilterAddModal showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
+            <UserFilterAddModal filterIdToEdit={filterIdToEdit} showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
         </>
     )
 }

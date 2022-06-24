@@ -17,9 +17,12 @@ import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
 import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 import CommonMenuComponent from './home/CommonMenuComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
+import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
+
+import { CurrentUserProvider } from '../services/CurrentUserContext';
 
 import './App.css';
-import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
+
 
 
 const App = () => {
@@ -38,35 +41,39 @@ const App = () => {
   }, [])
 
   return (
-    <BrowserRouter>
-      <>
-        <header className="App-header">
-          <img src={NOKIA_LOGO_WHITE_50px} className="App-logo" alt="-logo" />
-        </header>
+    <CurrentUserProvider>
+      <BrowserRouter>
+        <>
+          <header className="App-header">
+            <img src={NOKIA_LOGO_WHITE_50px} className="App-logo" alt="-logo" />
+          </header>
 
-        <nav>
-          <CommonMenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />
-        </nav>
-        <section>
-          <Routes>
-            <Route index element={<GridApplications isUserLoggedIn={isUserLoggedIn} />} />
-            <Route path="test-line-reservation-scheduler" element={<TestLineReservationSchedulerApp />} />
-            <Route path="test-line-manager" element={<TestLineManagerApp />} >
-              <Route index element={<TestLineListComponent />} />
-              <Route path="test-lines" element={<TestLineListComponent />} />
-              <Route path="my-test-lines" element={<MyTestLineComponentList />} />
-            </Route>
-            <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
-              <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-              <Route path="regression-filters" index element={<UserFiltersComponent />} />
-              <Route path="fail-regex" index element={<FailRegexTypesComponent />} />
-              <Route path="fail-regex-groups" index element={<FailMessageTypeGroupComponent />} />
-            </Route>
-          </Routes>
-          <ToastContainer autoClose={2500} />
-        </section>
-      </>
-    </BrowserRouter>
+          <nav>
+            <CommonMenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />
+          </nav>
+          <section>
+            <Routes>
+              <Route index element={<GridApplications isUserLoggedIn={isUserLoggedIn} />} />
+              <Route path="test-line-reservation-scheduler" element={<TestLineReservationSchedulerApp />} />
+              <Route path="test-line-manager" element={<TestLineManagerApp />} >
+                <Route index element={<TestLineListComponent />} />
+                <Route path="test-lines" element={<TestLineListComponent />} />
+                <Route path="my-test-lines" element={<MyTestLineComponentList />} />
+              </Route>
+              <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
+                <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
+                <Route path="regression-filters" element={<UserFiltersComponent type={'all'} />} />
+                <Route path="subscribed-regression-filters" element={<UserFiltersComponent type={'subscribed'} />} />
+                <Route path="owned-regression-filters" element={<UserFiltersComponent type={'owned'} />} />
+                <Route path="fail-regex" element={<FailRegexTypesComponent />} />
+                <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
+              </Route>
+            </Routes>
+            <ToastContainer autoClose={2500} />
+          </section>
+        </>
+      </BrowserRouter>
+    </CurrentUserProvider>
   );
 }
 

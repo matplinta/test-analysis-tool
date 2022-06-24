@@ -19,8 +19,17 @@ let MenuComponent = () => {
             command: () => { navigate('regression-test-runs') }
         },
         {
-            label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Regression Filter</span>,
-            command: () => { navigate('regression-filters') }
+            label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Regression Filters</span>,
+            items: [{
+                label: "All Filters",
+                command: () => { navigate('regression-filters') },
+            }, {
+                label: "Subscribed Filters",
+                command: () => { navigate('subscribed-regression-filters') },
+            }, {
+                label: "Owned Filters",
+                command: () => { navigate('owned-regression-filters') },
+            }]
         },
         {
             label: <span><VscGroupByRefType size='20' style={{ marginBottom: '3px' }} /> Fail Message Groups</span>,
