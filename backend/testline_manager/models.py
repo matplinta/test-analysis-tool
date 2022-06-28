@@ -98,7 +98,8 @@ class HardwareType(models.Model):
 class OneLabReservation(models.Model):
     id = models.BigAutoField(primary_key=True)
     status = models.CharField(max_length=100, blank=True, null=True)
-    owner = models.ForeignKey(LabKeeper, on_delete=models.CASCADE, blank=True, null=True, related_name="onelab_reservations")
+    user_email = models.CharField(max_length=255, blank=False, null=False)
+    # user_email = models.ForeignKey(LabKeeper, on_delete=models.CASCADE, blank=True, null=True, related_name="onelab_reservations")
     location = models.CharField(max_length=255, blank=True, null=True)
 
 

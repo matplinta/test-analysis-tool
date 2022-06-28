@@ -30,7 +30,7 @@ urlpatterns = [
     path('api-auth/logout/', views.LogoutViewEx.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/tra/', include('tra.urls'), name="api_tra"),
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
-    path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
+    # path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
     # path('api/trs/', include('trs.urls'), name="api_trs"),
     path('api/', include(router.urls)),
 

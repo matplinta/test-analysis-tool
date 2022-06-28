@@ -100,7 +100,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'tra',
     'stats',
-    'testline_manager',
+    # 'testline_manager',
 ]
 
 if DEBUG:
