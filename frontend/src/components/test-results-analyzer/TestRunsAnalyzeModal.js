@@ -12,7 +12,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
 
-const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFormClose }) => {
+const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) => {
 
     const [result, setResult] = useState(null);
     const [envIssueType, setEnvIssueType] = useState(null);
@@ -40,29 +40,37 @@ const TestRunsAnalyzeModal = ({ selectedRuns, showForm, handleFormShow, handleFo
 
     const handleAnalyzeTestRun = () => {
         let testRunToUpdate = {
-            'rp_ids': selectedRuns.map(run => run.rp_id),
+            'rp_ids': selectedTestRuns.map(run => run.rp_id),
             'comment': comment,
             'result': "environment issue",
             'env_issue_type': envIssueType
         }
+        console.log(testRunToUpdate)
         postTestRun(testRunToUpdate).then(
             (success) => {
                 console.log("Success!")
                 clearForm();
-                handleFormClose();
+                handleFormCloseAndRefresh();
             },
             (error) => {
                 console.log("Error!")
             })
     }
 
+    const handleFormCloseAndRefresh = () => {
+        handleFormClose();
+        clearForm();
+    }
+
     useEffect(() => {
+        console.log("otwieram okno")
         fetchEnvIssueTypes();
+        console.log(selectedTestRuns)
     }, [])
 
     return (
         <div>
-            <Dialog header="Analyze selected test runs" visible={showForm} className="dialog-style" onHide={handleFormClose}>
+            <Dialog header="Analyze selected test runs" visible={showForm} className="dialog-style" onHide={handleFormCloseAndRefresh}>
                 <div className="form-item">
                     <label htmlFor="result" className="block">Result</label>
                     <br />

@@ -201,9 +201,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const handleAnalizeTestRuns = () => {
+        console.log(selectedTestRuns)
         if (selectedTestRuns.length > 0) {
             handleFormShow();
-            setSelectedTestRuns([]);
         } else {
             Notify.sendNotification(Warnings.RP_URL_No_RUN_SELECTED, AlertTypes.warn);
         }
@@ -245,9 +245,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const handleFormCloseAndRefresh = () => {
         handleFormClose();
+
         refreshTestRunsFetching();
     }
-
 
     useEffect(
         () => {
@@ -284,7 +284,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 {columnComponents}
             </DataTable>
 
-            <TestRunsAnalyzeModal selectedRuns={selectedTestRuns} showForm={showForm} handleFormShow={handleFormShow} handleFormClose={handleFormCloseAndRefresh} />
+            <TestRunsAnalyzeModal selectedTestRuns={selectedTestRuns} showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
         </>
     )
 }
