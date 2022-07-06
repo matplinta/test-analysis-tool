@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom'
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -19,6 +20,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './UserFiltersComponent.css';
 
 let UserFiltersComponent = ({ type }) => {
+
+    const navigate = useNavigate();
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
@@ -191,14 +194,14 @@ let UserFiltersComponent = ({ type }) => {
         }
     }
 
-    let click = (id) => {
-        console.log("klik" + id)
-    }
-
     const failMessageGroupsBody = (rowData) => {
         return <ul style={{ listStyleType: 'none', margin: 0, padding: 0 }}>
-            {rowData.fail_message_type_groups.map(group => <li key={group.id}><VscExpandAll size='20' onClick={() => click(group.id)} />{group.name}</li>)}
-        </ul>
+            {rowData.fail_message_type_groups.map(group =>
+                <li key={group.id}><VscExpandAll size='20' />
+                    <a href={`fail-regex-groups/${group.id}`} target="_blanc">{group.name}</a>
+                </li>
+            )}
+        </ul >
     }
 
     useEffect(() => {

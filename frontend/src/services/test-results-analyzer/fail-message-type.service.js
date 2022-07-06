@@ -13,8 +13,11 @@ export const getEnvIssueTypes = async () => {
     return (await axios.get('api/tra/env_issue_types/', { headers: authHeader() }));
 }
 
-export const getFailMessageTypeGroups = async () => {
-    return (await axios.get('api/tra/fail_message_type_groups/', { headers: authHeader() }));
+export const getFailMessageTypeGroups = async (group) => {
+    if (group === undefined)
+        return (await axios.get('api/tra/fail_message_type_groups/', { headers: authHeader() }));
+    else
+        return (await axios.get('api/tra/fail_message_type_groups/' + group, { headers: authHeader() }));
 }
 
 export const postFailMessageTypeGroup = async (failMessageTypeGroup) => {
