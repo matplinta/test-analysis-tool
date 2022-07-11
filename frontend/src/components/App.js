@@ -67,6 +67,7 @@ const App = () => {
                 <Route path="owned-regression-filters" element={<UserFiltersComponent type={'owned'} />} />
                 <Route path="fail-regex" element={<FailRegexTypesComponent />} />
                 <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
+                <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupComponent />} />
               </Route>
             </Routes>
             <ToastContainer autoClose={2500} />

@@ -151,8 +151,11 @@ class GetDataForFailChartBase(APIView):
         if dates:
             data = analyzer.plot_runs_by_exception_types_by_date_ranges(**dates)
         else:
-            data = analyzer.plot_runs_by_exception_types()
+            data = analyzer.plot_runs_by_exception_types(plot=False)
         return data
+
+    def download_df_csv_data(self):
+        return self.df.to_csv()
 
 
 class GetChartForFailAnalysis(GetDataForFailChartBase):

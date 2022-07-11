@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
@@ -23,11 +24,20 @@ let FailMessageTypeGroupComponent = () => {
     const handleFormClose = () => setShowForm(false);
     const handleFormShow = () => setShowForm(true);
 
+    let { group } = useParams();
 
     let fetchFailMessageGroups = () => {
-        getFailMessageTypeGroups().then(
+        getFailMessageTypeGroups(group).then(
             (response) => {
-                let parsedData = response.data.map(group => {
+
+                let dataToParse = null;
+                if (Array.isArray(response.data)) {
+                    dataToParse = response.data;
+                } else {
+                    dataToParse = [response.data];
+                }
+
+                let parsedData = dataToParse.map(group => {
                     return {
                         "key": group.id.toString(),
                         "data": {
@@ -51,7 +61,11 @@ let FailMessageTypeGroupComponent = () => {
                     };
                 })
                 setFailMessageTypeGroups(parsedData);
+                if (group !== undefined) {
+                    handleExpandAll(parsedData);
+                }
                 setLoading(false);
+
             },
             (error) => {
                 console.log(error);
@@ -60,9 +74,15 @@ let FailMessageTypeGroupComponent = () => {
         )
     }
 
-    const handleExpandAll = () => {
+    const handleExpandAll = (data = undefined) => {
+        let dataToExpand = undefined;
         let _expandedKeys = {};
-        for (let node of failMessageTypeGroups) {
+        if (data !== undefined) {
+            dataToExpand = data;
+        } else {
+            dataToExpand = failMessageTypeGroups;
+        }
+        for (let node of dataToExpand) {
             _expandedKeys[node.key.toString()] = true;
         }
         setExpandedKeys(_expandedKeys);
@@ -97,7 +117,7 @@ let FailMessageTypeGroupComponent = () => {
     }
 
     useEffect(() => {
-        fetchFailMessageGroups();
+        fetchFailMessageGroups(group);
     }, [])
 
     return (
