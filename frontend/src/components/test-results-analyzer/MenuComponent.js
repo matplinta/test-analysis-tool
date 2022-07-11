@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
 import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
+import { AiOutlineBarChart } from 'react-icons/ai';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
 
@@ -38,6 +39,10 @@ let MenuComponent = () => {
         {
             label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Message Regex</span>,
             command: () => { navigate('fail-regex') }
+        },
+        {
+            label: <span><AiOutlineBarChart size='20' style={{ marginBottom: '3px' }} /> Statistics</span>,
+            command: () => { navigate('statistics') }
         }
     ]
 

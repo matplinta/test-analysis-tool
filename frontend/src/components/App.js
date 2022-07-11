@@ -18,6 +18,7 @@ import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
 import CommonMenuComponent from './home/CommonMenuComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
+import ChartsComponent from './test-results-analyzer/ChartsComponent';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 
@@ -68,6 +69,7 @@ const App = () => {
                 <Route path="fail-regex" element={<FailRegexTypesComponent />} />
                 <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupComponent />} />
+                <Route path="statistics" element={<ChartsComponent />} />
               </Route>
             </Routes>
             <ToastContainer autoClose={2500} />
