@@ -62,7 +62,8 @@ export const Errors = {
     'REMOVE_GLOBAL_FILTER_ERROR': 'Error during global filter removing!',
     'ADD_TEST_SET_ERROR': 'Test set added failed!',
     'GET_TEST_RUNS': "Cannot get test runs!",
-    'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!"
+    'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!",
+    'EMPTY_FIELDS': "Cannot send due to empty fields. Please fulfil form."
 }
 
 export const Warnings = {

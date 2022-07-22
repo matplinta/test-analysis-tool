@@ -13,8 +13,12 @@ import Col from 'react-bootstrap/Col';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
+import { ScrollPanel } from 'primereact/scrollpanel';
 
-import { getFilterFields, getFilterSets } from './../../services/test-results-analyzer/statistics.service';
+import { getFilterFields, getFilterSets, postFilters } from './../../services/test-results-analyzer/statistics.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+
+import './ChartsComponent.css';
 
 
 let ChartsComponent = () => {
@@ -30,7 +34,7 @@ let ChartsComponent = () => {
     const [loading, setLoading] = useState(true);
 
     const filterTemplate = {
-        filter_set: filtersetName,
+        // filter_set: filtersetName,
         field: "",
         value: ""
     }
@@ -46,7 +50,6 @@ let ChartsComponent = () => {
     const fetchFilterFields = () => {
         getFilterFields().then(
             (results) => {
-                console.log(results)
                 setFilterFields(results.data);
                 setUnselectedFilterFields(results.data);
             }, (error) => {
@@ -57,7 +60,6 @@ let ChartsComponent = () => {
     const fetchFilterSets = () => {
         getFilterSets().then(
             (results) => {
-                console.log(results)
                 setFilterSets(results.data.results)
                 setLoading(false);
             }, (error) => {
@@ -109,7 +111,7 @@ let ChartsComponent = () => {
         let tmp = [...filters];
         tmp = tmp.map(filter => {
             return {
-                filter_set: e.target.value,
+                // filter_set: e.target.value,
                 field: filter.field,
                 value: filter.value
             }
@@ -118,11 +120,30 @@ let ChartsComponent = () => {
     }
 
     const selectFilterSet = (filterSet) => {
-        console.log(filterSet)
         setSelectedFilterSet(filterSet)
     }
 
     const saveFilterSet = () => {
+        if(filtersetName !== "") {
+            let filterSetsToSend = [];
+            for(let filter of filters) {
+                console.log(filter)
+                if (filter.field !== "" && filter.value !== "") {
+                    let filterSetTmp = {};
+                    filterSetTmp.filter_set = filtersetName;
+                    filterSetTmp.value = filter.value;
+                    filterSetTmp.field = filter.field.name;
+                    filterSetsToSend.push(filterSetTmp);
+                } else {
+                    filterSetsToSend = [];
+                    Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
+                }
+
+            }
+            console.log(filterSetsToSend)
+        } else {
+            Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
+        }
 
     }
 
@@ -153,24 +174,28 @@ let ChartsComponent = () => {
                         </Row>
 
                         Filters
-                        {filters.map((item, index) => {
-                            return (
-                                <Row key={index} id={index} style={{ paddingLeft: '8px' }}>
-                                    <Col xl={5} style={{ padding: '2px' }}>
-                                        <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)} optionLabel="name" placeholder="Select filter" style={{ width: '100%' }} />
-                                    </Col>
-                                    <Col xl={6} style={{ padding: '2px' }}>
-                                        <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1} cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
-                                    </Col>
-                                    <Col xl={'auto'} style={{ padding: '2px' }}>
-                                        <Button className="p-button-primary p-button-sm" onClick={() => removeFilter(item, index)} style={{ padding: '5px', height: '47px', marginBottom: '3px' }} >
-                                            <VscClose size='30' />
-                                        </Button>
-                                    </Col>
+                        <ScrollPanel style={{ width: '100%', height: '275px' }} className="custombar">
+                            <div style={{ padding: '3px', lineHeight: '1.5' }}>
+                                {filters.map((item, index) => {
+                                    return (
+                                        <Row key={index} id={index} style={{ paddingLeft: '8px' }}>
+                                            <Col xl={5} style={{ padding: '2px' }}>
+                                                <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)} optionLabel="name" placeholder="Select filter" style={{ width: '100%' }} />
+                                            </Col>
+                                            <Col xl={6} style={{ padding: '2px' }}>
+                                                <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1} cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
+                                            </Col>
+                                            <Col xl={'auto'} style={{ padding: '2px' }}>
+                                                <Button className="p-button-primary p-button-sm" onClick={() => removeFilter(item, index)} style={{ padding: '5px', height: '47px', marginBottom: '3px' }} >
+                                                    <VscClose size='30' />
+                                                </Button>
+                                            </Col>
 
-                                </Row>
-                            );
-                        })}
+                                        </Row>
+                                    );
+                                })}
+                            </div>
+                        </ScrollPanel>
 
                         <Row style={{ paddingLeft: '8px' }}>
                             <Col style={{ padding: '2px' }}>
