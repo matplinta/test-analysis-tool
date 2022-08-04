@@ -9,11 +9,10 @@ from .models import (
     Organization, 
     TestRunResult, 
     TestlineType, 
-    TestSet, 
+    TestSetFilter, 
     TestInstance, 
     TestRun, 
     Branch, 
-    RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
@@ -22,7 +21,7 @@ from .models import (
 class TestRunFilter(filters.FilterSet):
     reg_filters = filters.ModelMultipleChoiceFilter(
         field_name='reg_filters',
-        queryset=RegressionFilter.objects.all(),
+        queryset=TestSetFilter.objects.all(),
         method='reg_filter_filter_method'
     )
 
@@ -34,9 +33,8 @@ class TestRunFilter(filters.FilterSet):
         )
         return queryset
 
-    test_set_name = filters.ModelMultipleChoiceFilter(field_name='test_instance__test_set__name', queryset=TestSet.objects.all(), to_field_name="name")
+    test_set_name = filters.ModelMultipleChoiceFilter(field_name='test_instance__test_set__test_set_name', queryset=TestSetFilter.objects.all(), to_field_name="test_set_name")
     branch = filters.ModelMultipleChoiceFilter(field_name='test_instance__test_set__branch__name', queryset=Branch.objects.all(), to_field_name="name")
-    test_instance = filters.ModelMultipleChoiceFilter(field_name='test_instance', queryset=TestInstance.objects.all())
     test_instance = filters.ModelMultipleChoiceFilter(field_name='test_instance', queryset=TestInstance.objects.all())
     fb = filters.ModelMultipleChoiceFilter(field_name='fb', queryset=FeatureBuild.objects.all())
     result = filters.ModelMultipleChoiceFilter(field_name='result', queryset=TestRunResult.objects.all())

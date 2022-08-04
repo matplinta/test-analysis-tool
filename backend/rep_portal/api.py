@@ -38,6 +38,7 @@ class RepPortal():
                                 "Env_gNB", "Pre Check", "iphy", "UE", "RTG", "Renesas", "Core", "SCF", "TestLine", "Lib", "Software", "PowerSupply"]
         self.basic_fields_list = [
             'id', 
+            'airphone', 
             'qc_test_set', 
             'qc_test_instance', 
             'organization', 

@@ -17,10 +17,9 @@ from .models import (
     Organization, 
     TestRunResult, 
     TestlineType, 
-    TestSet, 
+    TestSetFilter, 
     TestInstance, 
     TestRun, 
-    RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
@@ -35,7 +34,7 @@ class TestRunFBOlderThan3ConsecFBs(Exception):
     pass
 
 
-def get_fail_message_types_from_regfilter(regfilter: RegressionFilter) -> List[FailMessageType]:
+def get_fail_message_types_from_regfilter(regfilter: TestSetFilter) -> List[FailMessageType]:
     fmtgs = regfilter.fail_message_type_groups.all()
     fmtg_fmt_list = [fmtg.fail_message_types.all() for fmtg in fmtgs]
     fmts = list(chain(*fmtg_fmt_list))
@@ -105,12 +104,12 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, pass_old_testruns: bo
                 raise TestRunFBOlderThan3ConsecFBs(f"RPID: {rp_id}; this test run with time={end} is older than last 3 consecutive FeatureBuilds ({FeatureBuild.objects.all()[2].start_time})")
     fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
     
-    test_set, _ = TestSet.objects.get_or_create(
-        name=rp_test_run["qc_test_set"],
+    test_set_filter = TestSetFilter.objects.get(
+        test_set_name=rp_test_run["qc_test_set"],
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", "")
     )
     test_instance, _ = TestInstance.objects.get_or_create(
-        test_set=test_set,
+        test_set=test_set_filter,
         test_case_name=rp_test_run["test_case"]["name"]
     )
     testline_type, _ = TestlineType.objects.get_or_create(
@@ -142,6 +141,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, pass_old_testruns: bo
         test_line=rp_test_run["test_line"],
         test_suite=rp_test_run["test_suite"],
         builds=rp_test_run["builds"],
+        airphone=rp_test_run["airphone"],
         ute_exec_url=ute_exec_url,
         log_file_url=log_file_url,
         # log_file_url_ext
@@ -152,7 +152,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, pass_old_testruns: bo
     return tr
 
 
-def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, regfilter: RegressionFilter=None):
+def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, regfilter: TestSetFilter=None):
     tr_list, tr_skipped_list = [], []
     token = None
     if regfilter:
@@ -165,7 +165,8 @@ def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, 
     for test_run in data:
         try:
             tr = create_testrun_obj_based_on_rp_data(test_run, pass_old_testruns=False)
-            if try_to_analyze and regfilter:
+            not_analyzed = TestRunResult.objects.get_or_create(name="not analyzed")
+            if try_to_analyze and regfilter and tr.result == not_analyzed:
                 tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types, token=token)
             tr.save()
             tr_list.append(tr.rp_id)
@@ -179,12 +180,12 @@ def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, 
 
 
 def pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id: int, query_limit: int=None):
-    regression_filter = RegressionFilter.objects.get(id=regression_filter_id)
+    regression_filter = TestSetFilter.objects.get(id=regression_filter_id)
     filters = {
-        "result": "not analyzed",
+        "result": "not analyzed,environment issue",
         "testline_type": regression_filter.testline_type.name,
-        "test_set": regression_filter.test_set.name,
-        "test_lab_path": regression_filter.test_set.test_lab_path
+        "test_set": regression_filter.test_set_name,
+        "test_lab_path": regression_filter.test_lab_path
     }
     if not query_limit:
         query_limit = regression_filter.limit
@@ -192,7 +193,7 @@ def pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id: int
 
 
 def pull_and_analyze_notanalyzed_testruns_by_all_regfilters(query_limit: int=None):
-    regression_filters = RegressionFilter.objects.all()
+    regression_filters = TestSetFilter.objects.all()
     tr_by_rf = {regression_filter.id: [] for regression_filter in regression_filters} 
     tr_by_rf_skipped = {regression_filter.id: [] for regression_filter in regression_filters} 
     for regression_filter in regression_filters:

@@ -29,9 +29,8 @@ from .serializers import (
     TestInstanceSerializer,
     TestRunSerializer, 
     TestlineTypeSerializer, 
-    RegressionFilterSerializer, 
-    RegressionFilterCustomSerializer, 
     TestSetSerializer, 
+    TestSetFilterSerializer,
     FailMessageTypeSerializer,
     FailMessageTypeGroupSerializer,
     EnvIssueTypeSerializer,
@@ -47,10 +46,9 @@ from .models import (
     Organization, 
     TestRunResult, 
     TestlineType, 
-    TestSet, 
+    TestSetFilter, 
     TestInstance, 
     TestRun, 
-    RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
@@ -66,11 +64,6 @@ import logging
 
 from .test_runs_processing import *
 from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters
-
-
-class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication)
-    permission_classes = (IsAuthenticated,)  
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -135,19 +128,14 @@ class EnvIssueTypeView(viewsets.ModelViewSet):
     pagination_class = None
 
 
-class TestsSetView(viewsets.ModelViewSet):
-    serializer_class = TestSetSerializer
-    queryset = TestSet.objects.all()
-
-
-class RegressionFilterView(viewsets.ModelViewSet):
-    serializer_class = RegressionFilterSerializer
-    queryset = RegressionFilter.objects.all()
+class TestSetFilterView(viewsets.ModelViewSet):
+    serializer_class = TestSetFilterSerializer
+    queryset = TestSetFilter.objects.all()
 
 
     @action(detail=False, url_path="owned")
     def user_is_owner(self, request):
-        regfilters = RegressionFilter.objects.filter(owners=request.user)
+        regfilters = TestSetFilter.objects.filter(owners=request.user)
 
         page = self.paginate_queryset(regfilters)
         if page is not None:
@@ -160,7 +148,7 @@ class RegressionFilterView(viewsets.ModelViewSet):
 
     @action(detail=False, url_path="subscribed")
     def user_is_subscribed(self, request):
-        regfilters = RegressionFilter.objects.filter(subscribers=request.user)
+        regfilters = TestSetFilter.objects.filter(subscribers=request.user)
 
         page = self.paginate_queryset(regfilters)
         if page is not None:
@@ -216,7 +204,7 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
     def get_queryset(self):
         queryset = TestRun.objects.all()
         rfid = self.kwargs['rfid']
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        regression_filter = TestSetFilter.objects.get(pk=rfid)
         return queryset.filter(testline_type=regression_filter.testline_type, 
                                test_instance__test_set=regression_filter.test_set)
 
@@ -227,7 +215,7 @@ class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
     def get_queryset(self):
         queryset = TestRun.objects.all()
         rfid = self.kwargs['rfid']
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        regression_filter = TestSetFilter.objects.get(pk=rfid)
         return queryset.filter(testline_type=regression_filter.testline_type, 
                                test_instance__test_set=regression_filter.test_set)
 
@@ -244,10 +232,10 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
             fields_dict[key] = json.loads(data)
 
         queryset = TestRun.objects.all()
-        regfilters = RegressionFilter.objects.filter(subscribers=self.request.user)
+        regfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter.test_set), regfilters, Q())
+                                               test_instance__test_set=reg_filter), regfilters, Q())
         )
 
         fields_dict["regfilters"] = json.loads(serialize("json", regfilters))
@@ -260,9 +248,8 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
         get_distinct_values_and_serialize('test_instance__test_set__branch', Branch, key_override="branch",
                                           order_by_param="test_instance__test_set__branch__name")
-        distinct_values = queryset.order_by("test_instance__test_set__id").distinct("test_instance__test_set").values_list("test_instance__test_set", flat=True)
-        objects = TestSet.objects.filter(pk__in=distinct_values).distinct("name").values_list("name", flat=True)
-        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(objects)]
+        test_set_distinct_values = regfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
+        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
         return fields_dict
 
     def get(self, request):
@@ -296,17 +283,17 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         'analyzed',
 
         "test_instance__test_case_name", 
-        "test_instance__test_set__name",
+        "test_instance__test_set__test_set_name",
         "test_instance__test_set__branch",
         "test_instance__test_set__test_lab_path",
     )
 
     def get_queryset(self):
         queryset = TestRun.objects.all()
-        regfilters = RegressionFilter.objects.filter(subscribers=self.request.user)
+        regfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter.test_set), regfilters, Q())
+                                               test_instance__test_set=reg_filter), regfilters, Q())
         )
         return queryset
 
@@ -343,7 +330,7 @@ class TestRunsAnalyzeToRP(APIView):
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     def get(self, request, rfid):
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        regression_filter = TestSetFilter.objects.get(pk=rfid)
         limit = self.request.query_params.get('limit', None)
         content = pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter.id, limit)
         return Response(content)

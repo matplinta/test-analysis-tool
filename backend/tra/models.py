@@ -108,35 +108,9 @@ class FailMessageTypeGroup(models.Model):
         return self.name
 
 
-class TestSet(models.Model):
-    id             = models.BigAutoField(primary_key=True)
-    name           = models.TextField(max_length=300, blank=False, null=True, help_text="QC Test Set")
-    test_lab_path  = models.TextField(max_length=300, blank=False, null=True, help_text="Test Lab Path")
-    branch         = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, help_text="Branch, field set automatically")
-
-    class Meta:
-        constraints = [models.UniqueConstraint(fields=["name", "test_lab_path"], name='testset_uniq')]
-        ordering = ['name']
-
-
-    def __str__(self):
-        return f"{self.id}: {self.name[:40]}... on {self.branch}"
-
-    def save(self, *args, **kwargs):
-        match = re.search(r'Root\\+Test_Sets\\+(\w+)\\+', self.test_lab_path)
-        if match:
-            branch = match.group(1)
-        else:
-            branch = None
-        branch_instance, _ = Branch.objects.all().get_or_create(name=branch)
-        self.branch = branch_instance
-        self.test_lab_path = self.test_lab_path.replace('\\\\', '\\')
-        super(TestSet, self).save(*args, **kwargs)
-
-
 class TestInstance(models.Model):
     id                  = models.BigAutoField(primary_key=True)
-    test_set            = models.ForeignKey(TestSet, on_delete=models.CASCADE, blank=False, help_text="Test set")
+    test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     
@@ -163,6 +137,7 @@ class TestRun(models.Model):
     test_line        = models.TextField(max_length=100, blank=True, null=True, help_text="Testline")
     test_suite       = models.TextField(max_length=200, blank=False, null=True, help_text="Testsuite name")
     builds           = models.TextField(max_length=100, blank=False, null=True, help_text="Builds")
+    airphone         = models.TextField(max_length=100, blank=True, null=True, help_text="Airphone Build")
     ute_exec_url     = models.TextField(max_length=1000, blank=True, null=True, help_text="URL of ute execution details")
     log_file_url     = models.TextField(max_length=1000, blank=True, null=True, help_text="UTE Cloud log file url")
     log_file_url_ext = models.TextField(max_length=1000, blank=True, null=True, help_text="External log file url")
@@ -186,21 +161,32 @@ class RepPortalUserToken(models.Model):
         return self.user.username
 
 
-class RegressionFilter(models.Model):
+class TestSetFilter(models.Model):
     id                       = models.BigAutoField(primary_key=True)
-    name                     = models.CharField(max_length=50, blank=False, null=True, help_text="Name of test filter")
     limit                    = models.IntegerField(blank=False, default=50, 
                                                    help_text="Number of test runs pulled from Reporting Portal during every refresh")
-    test_set                 = models.ForeignKey(TestSet, on_delete=models.CASCADE, blank=False, help_text="Test set")
+    test_set_name            = models.TextField(max_length=300, blank=False, null=True, help_text="QC Test Set")
+    test_lab_path            = models.TextField(max_length=300, blank=False, null=True, help_text="Test Lab Path")
+    branch                   = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, help_text="Branch, field set automatically")
     testline_type            = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline type")
-    owners                   = models.ManyToManyField(User, related_name="owned_reg_filters", blank=True)
-    subscribers              = models.ManyToManyField(User, related_name="subscribed_reg_filters", blank=True)
+    owners                   = models.ManyToManyField(User, related_name="owned_testsets", blank=True)
+    subscribers              = models.ManyToManyField(User, related_name="subscribed_testsets", blank=True)
     fail_message_type_groups = models.ManyToManyField(FailMessageTypeGroup, blank=True)
     
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["test_set", "testline_type"], name='test_set_testline_hw_uniq')]
+        constraints = [models.UniqueConstraint(fields=["test_set_name", "test_lab_path", "testline_type"], name='test_set_uniq_constr')]
         ordering = ['id']
 
     def __str__(self):
-        return self.name
+        return self.test_set_name
 
+    def save(self, *args, **kwargs):
+        match = re.search(r'Root\\+Test_Sets\\+(\w+)\\+', self.test_lab_path)
+        if match:
+            branch = match.group(1)
+        else:
+            branch = None
+        branch_instance, _ = Branch.objects.all().get_or_create(name=branch)
+        self.branch = branch_instance
+        self.test_lab_path = self.test_lab_path.replace('\\\\', '\\')
+        super(TestSetFilter, self).save(*args, **kwargs)

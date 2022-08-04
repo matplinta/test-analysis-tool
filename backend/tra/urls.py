@@ -7,7 +7,7 @@ router = routers.DefaultRouter()
 # special actions: /owned            to display RegressionFilters that the user is the owner of
 # special actions: /subscribed       to display RegressionFilters that the user is subscribed to
 # special actions: /pk/subscribe/    to subscribe the current user to the specified regression filter
-router.register(r'regression_filters', views.RegressionFilterView, 'RegressionFilters')
+router.register(r'test_set_filters', views.TestSetFilterView, 'test_set_filters')
 
 # API to handle FailMessageType model
 # special actions: /my         to display FailMessageType objects that the user is the author of
@@ -17,9 +17,6 @@ router.register(r'fail_message_types', views.FailMessageTypeView, 'failmessagety
 # special actions: /my         to display FailMessageTypeGroup objects that the user is the author of
 router.register(r'fail_message_type_groups', views.FailMessageTypeGroupView, 'failmessagetypegroups')
 # router.register(r'fail_message_type_groups_ro', views.FailMessageTypeGroupROView, 'failmessagetypegroupsro')
-
-# API to handle TestSet model
-router.register(r'test_sets', views.TestsSetView, 'testsets')
 
 # API to handle TestlineType model
 router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
