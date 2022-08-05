@@ -11,7 +11,7 @@ import { FiSettings } from 'react-icons/fi';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestSetFilters, deleteTestSetFilter, getTestSetFilter, putTestSetFilter, postTestSetFilterSubscribe, postTestSetFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
@@ -25,7 +25,7 @@ let UserFiltersComponent = ({ type }) => {
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
-    const [testFilters, setTestFilters] = useState([]);
+    const [testFilters, setTestSetFilters] = useState([]);
 
     const [filterIdToEdit, setFilterIdToEdit] = useState(null);
 
@@ -45,12 +45,12 @@ let UserFiltersComponent = ({ type }) => {
 
     const [loading, setLoading] = useState(true);
 
-    let fetchTestFilters = () => {
+    let fetchTestSetFilters = () => {
         setLoading(true);
-        getTestFilters(type).then(
+        getTestSetFilters(type).then(
             (response) => {
 
-                let parsedTestFilters = response.data.results.map((filter) => {
+                let parsedTestSetFilters = response.data.results.map((filter) => {
                     return {
                         "id": filter.id,
                         "test_set_name": filter.test_set_name,
@@ -63,7 +63,7 @@ let UserFiltersComponent = ({ type }) => {
                         "fail_message_type_groups": filter.fail_message_type_groups
                     }
                 })
-                setTestFilters(parsedTestFilters);
+                setTestSetFilters(parsedTestSetFilters);
                 setLoading(false);
             },
             (error) => {
@@ -74,10 +74,10 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     let removeUserFilter = (id) => {
-        deleteTestFilter(id).then(
+        deleteTestSetFilter(id).then(
             (response) => {
                 let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
-                fetchTestFilters();
+                fetchTestSetFilters();
                 Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
 
             },
@@ -97,7 +97,7 @@ let UserFiltersComponent = ({ type }) => {
 
     let handleTestSetFormCloseAndRefresh = () => {
         handleFormClose();
-        fetchTestFilters();
+        fetchTestSetFilters();
         
     }
 
@@ -130,7 +130,7 @@ let UserFiltersComponent = ({ type }) => {
 
     const subscribeFilter = (rowData) => {
         console.log(rowData)
-        postTestFilterSubscribe(rowData.id).then(
+        postTestSetFilterSubscribe(rowData.id).then(
             (response) => {
                 console.log(testFilters)
                 let testFiltersTmp = testFilters.map(testFilter => {
@@ -141,7 +141,7 @@ let UserFiltersComponent = ({ type }) => {
                     }
                     return testFilter;
                 })
-                setTestFilters(testFiltersTmp);
+                setTestSetFilters(testFiltersTmp);
 
                 console.log(testFilters)
                 console.log("success")
@@ -154,7 +154,7 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     const unsubscribeFilter = (rowData) => {
-        postTestFilterUnsubscribe(rowData.id).then(
+        postTestSetFilterUnsubscribe(rowData.id).then(
             (response) => {
                 let testFiltersTmp = testFilters.map(testFilter => {
                     if (testFilter.id === rowData.id) {
@@ -165,7 +165,7 @@ let UserFiltersComponent = ({ type }) => {
                     }
                     return testFilter;
                 })
-                setTestFilters(testFiltersTmp);
+                setTestSetFilters(testFiltersTmp);
                 console.log("success")
 
             }, (error) => {
@@ -203,7 +203,7 @@ let UserFiltersComponent = ({ type }) => {
 
     useEffect(() => {
         fetchCurrentUser();
-        fetchTestFilters();
+        fetchTestSetFilters();
     }, [type])
 
     return (
@@ -216,8 +216,8 @@ let UserFiltersComponent = ({ type }) => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
                 resizableColumns columnResizeMode="fit">
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name"></Column>
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
+                <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
                 <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
                 <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
                 <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />

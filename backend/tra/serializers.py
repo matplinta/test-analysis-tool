@@ -175,7 +175,7 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestSetFilter
-        fields = ('id', 'name', 'limit', 'test_set_name', 'test_lab_path', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
+        fields = ('id', 'limit', 'test_set_name', 'test_lab_path', 'branch', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
         read_only_fields = ('owners', 'subscribers',)
         extra_kwargs = {
             'fail_message_type_groups': {'validators': []},

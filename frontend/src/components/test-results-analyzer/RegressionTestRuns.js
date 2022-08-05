@@ -90,7 +90,7 @@ let RegressionTestRuns = () => {
         setSelectedNodesKeys(selectedFilters)
     }
 
-    // let fetchTestFilters = (data) => {
+    // let fetchTestSetFilters = (data) => {
     //     if (regressionFiltersNodes.length === 0) {
     //         let filters = {
     //             key: 'reg_filters',

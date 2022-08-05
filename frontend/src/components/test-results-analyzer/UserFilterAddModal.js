@@ -5,7 +5,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
 
-import { getTestLineTypes, postTestFilter, getTestFilter, putTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestLineTypes, postTestSetFilter, getTestSetFilter, putTestSetFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import AuthService from './../../services/auth.service.js';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -120,7 +120,7 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
             if (tmp === true) return { "id": group.id, "name": group.name }
         });
 
-        postTestFilter(filterToAdd).then(
+        postTestSetFilter(filterToAdd).then(
             (response) => {
                 Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
                 clearForm();
@@ -146,7 +146,7 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
             if (tmp === true) return { "id": group.id, "name": group.name }
         });
 
-        putTestFilter(filterIdToEdit, filterToEdit).then(
+        putTestSetFilter(filterIdToEdit, filterToEdit).then(
             (response) => {
                 console.log("Success!")
                 clearForm();
@@ -158,7 +158,7 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     }
 
     let fetchFilterToEdit = (id) => {
-        getTestFilter(id).then(
+        getTestSetFilter(id).then(
             (result) => {
                 setTestSetName(result.data.test_set_name);
                 setTestLabPath(result.data.test_lab_path);
