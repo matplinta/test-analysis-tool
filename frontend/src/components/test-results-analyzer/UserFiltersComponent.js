@@ -34,8 +34,8 @@ let UserFiltersComponent = ({ type }) => {
     const handleFormShow = () => setShowForm(true);
 
     const [filters, setFilters] = useState({
-        'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -53,11 +53,9 @@ let UserFiltersComponent = ({ type }) => {
                 let parsedTestFilters = response.data.results.map((filter) => {
                     return {
                         "id": filter.id,
-                        "name": filter.name,
-                        "test_set_id": filter.test_set.id,
-                        "test_set_name": filter.test_set.name,
-                        "branch": filter.test_set.branch,
-                        "test_lab_path": filter.test_set.test_lab_path,
+                        "test_set_name": filter.test_set_name,
+                        "test_lab_path": filter.test_lab_path,
+                        "branch": filter.branch,
                         "testline_type": filter.testline_type,
                         "owners": filter.owners.map(owner => owner.username).join(', '),
                         "subscribers": filter.subscribers.map(subscriber => subscriber.username).join(', '),
@@ -79,7 +77,6 @@ let UserFiltersComponent = ({ type }) => {
         deleteTestFilter(id).then(
             (response) => {
                 let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
-                // setTestFilters(testFiltersList);
                 fetchTestFilters();
                 Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
 
@@ -101,7 +98,7 @@ let UserFiltersComponent = ({ type }) => {
     let handleTestSetFormCloseAndRefresh = () => {
         handleFormClose();
         fetchTestFilters();
-        Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+        
     }
 
     let removeButton = (rowData) => {

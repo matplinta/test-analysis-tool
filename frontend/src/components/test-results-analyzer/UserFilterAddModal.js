@@ -3,14 +3,9 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { Tooltip } from 'primereact/tooltip';
-import { Badge } from 'primereact/badge'
-import { FaPlus } from 'react-icons/fa';
 import { MultiSelect } from 'primereact/multiselect';
 
-import TestSetAddModal from './TestSetAddModal';
-
-import { getTestSets, getTestLineTypes, postTestFilter, getTestFilter, putTestFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestLineTypes, postTestFilter, getTestFilter, putTestFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import AuthService from './../../services/auth.service.js';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -20,8 +15,6 @@ import './UserFilterAddModal.css';
 
 let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
 
-    const [testSets, setTestSets] = useState([]);
-    const [testSetsOptions, setTestSetsOptions] = useState([]);
     const [testLinesTypes, setTestLinesTypes] = useState([]);
     const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
@@ -29,33 +22,12 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
-    const [filterName, setFilterName] = useState("");
+    const [testSetName, setTestSetName] = useState("");
+    const [testLabPath, setTestLabPath] = useState("");
     const [testLineType, setTestLineType] = useState(null);
-    const [testSetId, setTestSetId] = useState(null);
     const [failMessageTypeGroup, setFailMessageTypeGroup] = useState(null);
     const [owners, setOwners] = useState(null);
     const [subscribers, setSubscribers] = useState(null);
-
-
-    const [showTestSetForm, setShowTestSetForm] = useState(false);
-    const handleTestSetFormClose = () => setShowTestSetForm(false);
-    const handleTestSetFormShow = () => setShowTestSetForm(true);
-
-    let fetchTestSets = () => {
-        getTestSets().then(
-            (response) => {
-                if (response.data.results.length > 0) {
-                    setTestSets(response.data.results);
-                    const testSetsOptionsValue = response.data.results.map(item => {
-                        return { label: item.branch + " " + item.name, value: item.id }
-                    })
-                    setTestSetsOptions(testSetsOptionsValue);
-                }
-            },
-            (error) => {
-                console.log(error);
-            })
-    }
 
     let fetchTestLines = () => {
         getTestLineTypes().then(
@@ -100,21 +72,20 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
             })
     }
 
-    let handleFilterNameChange = (e) => {
-        setFilterName(e.target.value);
+    let handleTestSetNameChange = (e) => {
+        setTestSetName(e.target.value);
+    }
+
+    let handleTestLabPathChange = (e) => {
+        setTestLabPath(e.target.value);
     }
 
     let handleTestLineTypeChange = (e) => {
         setTestLineType(e.target.value);
     }
 
-    let handleTestSetChange = (e) => {
-        setTestSetId(e.target.value);
-    }
-
     let handleFailMessageTypeGroupsChange = (e) => {
         setFailMessageTypeGroup(e.target.value);
-        console.log(failMessageTypeGroup)
     }
 
     let handleOwnersChange = (e) => {
@@ -126,9 +97,9 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     }
 
     let clearForm = () => {
-        setFilterName("");
+        setTestSetName("");
+        setTestLabPath("");
         setTestLineType(null);
-        setTestSetId(null);
         setFailMessageTypeGroup(null);
         setOwners(null);
         setSubscribers(null);
@@ -136,19 +107,14 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
     let handleFilterAdd = () => {
         let filterToAdd = {
-            "name": "",
-            "test_set": {
-                "name": "",
-                "test_lab_path": ""
-            },
+            "test_set_name": "",
+            "test_lab_path": "",
             "testline_type": null,
             "fail_message_type_groups": []
         }
-        let testSetToAdd = testSets.find(item => item.id == testSetId);
-        filterToAdd.name = filterName;
         filterToAdd.testline_type = testLineType;
-        filterToAdd.test_set.name = testSetToAdd.name;
-        filterToAdd.test_set.test_lab_path = testSetToAdd.test_lab_path;
+        filterToAdd.test_set_name = testSetName;
+        filterToAdd.test_lab_path = testLabPath;
         filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = failMessageTypeGroup.includes(group.id);
             if (tmp === true) return { "id": group.id, "name": group.name }
@@ -156,30 +122,25 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
         postTestFilter(filterToAdd).then(
             (response) => {
-                console.log("Success!")
+                Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
                 clearForm();
                 handleFormClose();
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.REMOVE_GLOBAL_FILTER_ERROR, AlertTypes.error);
             })
     }
 
     let handleFilterEdit = () => {
         let filterToEdit = {
-            "name": "",
-            "test_set": {
-                "name": "",
-                "test_lab_path": ""
-            },
+            "test_set_name": "",
+            "test_lab_path": "",
             "testline_type": null,
             "fail_message_type_groups": []
         }
-        let testSetToAdd = testSets.find(item => item.id == testSetId);
-        filterToEdit.name = filterName;
         filterToEdit.testline_type = testLineType;
-        filterToEdit.test_set.name = testSetToAdd.name;
-        filterToEdit.test_set.test_lab_path = testSetToAdd.test_lab_path;
+        filterToEdit.test_set_name = testSetName;
+        filterToEdit.test_lab_path = testLabPath;
         filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = failMessageTypeGroup.includes(group.id);
             if (tmp === true) return { "id": group.id, "name": group.name }
@@ -196,21 +157,12 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
             })
     }
 
-    let showAddTestSetForm = () => {
-        handleTestSetFormShow(true);
-    }
-
-    let handleTestSetFormCloseAndRefresh = () => {
-        handleTestSetFormClose();
-        fetchTestSets();
-    }
-
     let fetchFilterToEdit = (id) => {
         getTestFilter(id).then(
             (result) => {
-                setFilterName(result.data.name);
+                setTestSetName(result.data.test_set_name);
+                setTestLabPath(result.data.test_lab_path);
                 setTestLineType(result.data.testline_type);
-                setTestSetId(result.data.test_set.id);
                 setFailMessageTypeGroup(result.data.fail_message_type_groups.map(group => group.id));
             }, (error) => {
                 console.log("error fetching filter to edit")
@@ -220,7 +172,6 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
     useEffect(() => {
         fetchCurrentUser();
-        fetchTestSets();
         fetchTestLines();
         fetchFailMessageTypeGroups();
         fetchUsers();
@@ -237,22 +188,19 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
     return (
         <div>
-            <Dialog header={filterIdToEdit === null ? "Create user filter" : "Edit user filter"} visible={showForm} className="dialog-style" onHide={handleFormClose}>
+            <Dialog header={filterIdToEdit === null ? "Create Test Set Filter" : "Edit Test Set Filter"} visible={showForm} className="dialog-style" onHide={handleFormClose}>
                 <div className="form-item">
-                    <label>Filter Name</label>
-                    <InputText value={filterName} onChange={handleFilterNameChange} style={{ width: "100%" }} />
+                    <label>Test Set Name (from Reporting Portal and QC)</label>
+                    <InputText value={testSetName} onChange={handleTestSetNameChange} style={{ width: "100%" }} />
                 </div>
                 <div className="form-item">
-                    <label>Test Line Type</label>
+                    <label>Test Lab Path (from Reporting Portal and QC)</label>
+                    <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} />
+                </div>
+                <div className="form-item">
+                    <label>Test Line Type (from UTE Cloud)</label>
                     <br />
                     <Dropdown value={testLineType} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" />
-                </div>
-                <div className="form-item">
-                    <label>Test Set</label>
-                    <Tooltip target=".custom-target-icon" />
-                    <FaPlus className="custom-target-icon add-icon" onClick={showAddTestSetForm} data-pr-tooltip="Click to add Test Set" />
-                    <Dropdown value={testSetId} options={testSetsOptions} onChange={handleTestSetChange} style={{ width: "100%" }}
                         optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
@@ -289,8 +237,6 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
                     </div>
                 }
             </Dialog >
-
-            <TestSetAddModal showTestSetForm={showTestSetForm} handleTestSetFormClose={handleTestSetFormCloseAndRefresh} />
 
         </div >
     )
