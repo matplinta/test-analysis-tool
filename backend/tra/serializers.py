@@ -102,7 +102,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         test_set_data = validated_data.pop('test_set')
-        test_set_instance, bool = TestSetFilter.objects.get(**test_set_data)
+        test_set_instance = TestSetFilter.objects.get(**test_set_data)
         test_instance_instance = TestInstance.objects.create(test_set=test_set_instance, **validated_data)
         return test_instance_instance
 
