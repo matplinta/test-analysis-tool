@@ -4,10 +4,9 @@ from .models import (
     Organization, 
     TestRunResult, 
     TestlineType, 
-    TestSet, 
+    TestSetFilter, 
     TestInstance, 
     TestRun, 
-    RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
     FeatureBuild
@@ -80,11 +79,11 @@ class EnvIssueTypeSerializer(serializers.ModelSerializer):
 class TestSetSerializer(serializers.ModelSerializer):
     branch = serializers.CharField(source="branch.name", read_only=True)
     class Meta:
-        model = TestSet
-        fields = ('id', 'branch', 'name', 'test_lab_path')
+        model = TestSetFilter
+        fields = ('id', 'branch', 'test_set_name', 'test_lab_path')
         read_only_fields = ('branch',)
         extra_kwargs = {
-            'name': {'validators': []},
+            'test_set_name': {'validators': []},
             'test_lab_path': {'validators': []},
         }
 
@@ -103,7 +102,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         test_set_data = validated_data.pop('test_set')
-        test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
+        test_set_instance = TestSetFilter.objects.get(**test_set_data)
         test_instance_instance = TestInstance.objects.create(test_set=test_set_instance, **validated_data)
         return test_instance_instance
 
@@ -140,7 +139,7 @@ class TestRunSerializer(serializers.ModelSerializer):
 
         test_instance_data = validated_data.pop('test_instance')
         test_set_data = test_instance_data.pop('test_set')
-        test_set_instance, _ = TestSet.objects.get_or_create(**test_set_data)
+        test_set_instance = TestSetFilter.objects.get(**test_set_data)
         test_instance_instance, _ = TestInstance.objects.get_or_create(test_set=test_set_instance, **test_instance_data)
 
         test_run_instance = TestRun.objects.create(testline_type=testline_type_instance, 
@@ -167,22 +166,7 @@ class TestRunSerializer(serializers.ModelSerializer):
         return instance
 
 
-class RegressionFilterCustomSerializer(serializers.ModelSerializer):
-    test_set = TestSetSerializer()
-    testline_type = serializers.CharField(source='testline_type.name')
-    fail_message_type_groups = FailMessageTypeGroupSerializer(many=True)
-
-
-    class Meta:
-        model = RegressionFilter
-        fields = ('id', 'name', 'limit', 'test_set', 'testline_type', 'fail_message_type_groups',)
-        extra_kwargs = {
-            'fail_message_type_groups': {'validators': []},
-        }
-
-
-class RegressionFilterSerializer(serializers.ModelSerializer):
-    test_set = TestSetSerializer()
+class TestSetFilterSerializer(serializers.ModelSerializer):
     testline_type = serializers.CharField(source='testline_type.name')
     fail_message_type_groups = FailMessageTypeGroupROSerializer(many=True)
     owners = UserSerializer(read_only=True, many=True)
@@ -190,8 +174,8 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = RegressionFilter
-        fields = ('id', 'name', 'limit', 'test_set', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
+        model = TestSetFilter
+        fields = ('id', 'limit', 'test_set_name', 'test_lab_path', 'branch', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
         read_only_fields = ('owners', 'subscribers',)
         extra_kwargs = {
             'fail_message_type_groups': {'validators': []},
@@ -201,14 +185,11 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         testline_type_data = validated_data.pop('testline_type')
-        test_set_data = validated_data.pop('test_set')
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
 
         testline_type_instance = TestlineType.objects.get(**testline_type_data)
-        test_set_instance = TestSet.objects.get(**test_set_data)
-        regression_filter_instance = RegressionFilter.objects.create(test_set=test_set_instance,
-                                                                     testline_type=testline_type_instance,
-                                                                     **validated_data)
+        regression_filter_instance = TestSetFilter.objects.create(testline_type=testline_type_instance,
+                                                                  **validated_data)
         for fmtg in fail_message_type_groups_data:
             fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg)
             regression_filter_instance.fail_message_type_groups.add(fmtg_instance)
@@ -220,30 +201,9 @@ class RegressionFilterSerializer(serializers.ModelSerializer):
         testline_type_data = validated_data.pop('testline_type')
         testline_type_instance = TestlineType.objects.get(**testline_type_data)
         instance.testline_type = testline_type_instance
-        test_set_data = validated_data.pop('test_set')
-        test_set_instance = TestSet.objects.get(**test_set_data)
-        instance.test_set = test_set_instance
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
         for fmtg_id in fail_message_type_groups_data:
             fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg_id)
             instance.fail_message_type_groups.add(fmtg_instance)
         instance.save()
         return instance
-
-
-        # # testline_type_data = validated_data.pop('testline_type')
-        # test_set_data = validated_data.pop('test_set')
-        # fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
-        # # testline_type_instance, bool = TestlineType.objects.get_or_create(**testline_type_data)
-        # test_set_instance = TestSet.objects.get(**test_set_data)
-        # # test_set_instance, bool = TestSet.objects.get_or_create(**test_set_data)
-        # instance.test_set = test_set_instance
-        # # instance.testline_type = testline_type_instance
-        # for fmtg_id in fail_message_type_groups_data:
-        #     fmtg_instance = FailMessageTypeGroup.objects.get(pk=fmtg_id)
-        #     # instance.fail_message_type_groups.add(fmtg_instance)
-        #     instance.fail_message_type_groups
-
-
-        # instance.save()
-        # return instance

@@ -29,7 +29,7 @@ def remove_old_feature_builds(keep_fb_threshold=3):
 
 @app.task()
 def celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters(query_limit: int=None):
-    regression_filters = RegressionFilter.objects.all()
+    regression_filters = TestSetFilter.objects.all()
     for regression_filter in regression_filters:
         celery_pull_and_analyze_notanalyzed_testruns_by_regfilter.delay(regression_filter_id=regression_filter.id, query_limit=query_limit)
 

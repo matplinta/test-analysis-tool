@@ -11,7 +11,7 @@ import { FiSettings } from 'react-icons/fi';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
+import { getTestSetFilters, deleteTestSetFilter, getTestSetFilter, putTestSetFilter, postTestSetFilterSubscribe, postTestSetFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
@@ -25,7 +25,7 @@ let UserFiltersComponent = ({ type }) => {
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
-    const [testFilters, setTestFilters] = useState([]);
+    const [testFilters, setTestSetFilters] = useState([]);
 
     const [filterIdToEdit, setFilterIdToEdit] = useState(null);
 
@@ -34,8 +34,8 @@ let UserFiltersComponent = ({ type }) => {
     const handleFormShow = () => setShowForm(true);
 
     const [filters, setFilters] = useState({
-        'name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -45,19 +45,17 @@ let UserFiltersComponent = ({ type }) => {
 
     const [loading, setLoading] = useState(true);
 
-    let fetchTestFilters = () => {
+    let fetchTestSetFilters = () => {
         setLoading(true);
-        getTestFilters(type).then(
+        getTestSetFilters(type).then(
             (response) => {
 
-                let parsedTestFilters = response.data.results.map((filter) => {
+                let parsedTestSetFilters = response.data.results.map((filter) => {
                     return {
                         "id": filter.id,
-                        "name": filter.name,
-                        "test_set_id": filter.test_set.id,
-                        "test_set_name": filter.test_set.name,
-                        "branch": filter.test_set.branch,
-                        "test_lab_path": filter.test_set.test_lab_path,
+                        "test_set_name": filter.test_set_name,
+                        "test_lab_path": filter.test_lab_path,
+                        "branch": filter.branch,
                         "testline_type": filter.testline_type,
                         "owners": filter.owners.map(owner => owner.username).join(', '),
                         "subscribers": filter.subscribers.map(subscriber => subscriber.username).join(', '),
@@ -65,7 +63,7 @@ let UserFiltersComponent = ({ type }) => {
                         "fail_message_type_groups": filter.fail_message_type_groups
                     }
                 })
-                setTestFilters(parsedTestFilters);
+                setTestSetFilters(parsedTestSetFilters);
                 setLoading(false);
             },
             (error) => {
@@ -76,11 +74,10 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     let removeUserFilter = (id) => {
-        deleteTestFilter(id).then(
+        deleteTestSetFilter(id).then(
             (response) => {
                 let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
-                // setTestFilters(testFiltersList);
-                fetchTestFilters();
+                fetchTestSetFilters();
                 Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
 
             },
@@ -100,8 +97,8 @@ let UserFiltersComponent = ({ type }) => {
 
     let handleTestSetFormCloseAndRefresh = () => {
         handleFormClose();
-        fetchTestFilters();
-        Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+        fetchTestSetFilters();
+        
     }
 
     let removeButton = (rowData) => {
@@ -133,7 +130,7 @@ let UserFiltersComponent = ({ type }) => {
 
     const subscribeFilter = (rowData) => {
         console.log(rowData)
-        postTestFilterSubscribe(rowData.id).then(
+        postTestSetFilterSubscribe(rowData.id).then(
             (response) => {
                 console.log(testFilters)
                 let testFiltersTmp = testFilters.map(testFilter => {
@@ -144,7 +141,7 @@ let UserFiltersComponent = ({ type }) => {
                     }
                     return testFilter;
                 })
-                setTestFilters(testFiltersTmp);
+                setTestSetFilters(testFiltersTmp);
 
                 console.log(testFilters)
                 console.log("success")
@@ -157,7 +154,7 @@ let UserFiltersComponent = ({ type }) => {
     }
 
     const unsubscribeFilter = (rowData) => {
-        postTestFilterUnsubscribe(rowData.id).then(
+        postTestSetFilterUnsubscribe(rowData.id).then(
             (response) => {
                 let testFiltersTmp = testFilters.map(testFilter => {
                     if (testFilter.id === rowData.id) {
@@ -168,7 +165,7 @@ let UserFiltersComponent = ({ type }) => {
                     }
                     return testFilter;
                 })
-                setTestFilters(testFiltersTmp);
+                setTestSetFilters(testFiltersTmp);
                 console.log("success")
 
             }, (error) => {
@@ -206,7 +203,7 @@ let UserFiltersComponent = ({ type }) => {
 
     useEffect(() => {
         fetchCurrentUser();
-        fetchTestFilters();
+        fetchTestSetFilters();
     }, [type])
 
     return (
@@ -219,8 +216,8 @@ let UserFiltersComponent = ({ type }) => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
                 resizableColumns columnResizeMode="fit">
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name"></Column>
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
+                <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
                 <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
                 <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
                 <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />

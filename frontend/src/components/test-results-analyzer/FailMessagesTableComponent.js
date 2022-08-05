@@ -24,7 +24,7 @@ const FailMessagesTableComponent = ({ selectedFailMessageTypes, setSelectedFailM
 
     const [loading, setLoading] = useState(true);
 
-    let fetchTestFilters = () => {
+    let fetchTestSetFilters = () => {
         getFailMessageTypes().then(
             (response) => {
                 console.log(response.data)
@@ -39,7 +39,7 @@ const FailMessagesTableComponent = ({ selectedFailMessageTypes, setSelectedFailM
     }
 
     useEffect(() => {
-        fetchTestFilters();
+        fetchTestSetFilters();
     }, [])
 
     return (
