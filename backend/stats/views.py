@@ -282,7 +282,7 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
             fail_barchart_param_date_end
         ],
         responses={
-            status.HTTP_200_OK: "",
+            status.HTTP_200_OK: fail_barchart_response_scheme,
             status.HTTP_400_BAD_REQUEST: ""
         },
         tags=["stats", "FailBarchart"]
@@ -305,7 +305,7 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
             fail_barchart_param_date_start,
             fail_barchart_param_date_end
         ],
-        responses={status.HTTP_200_OK: ""},
+        responses={status.HTTP_200_OK: fail_barchart_response_scheme},
         tags=["stats", "FailBarchart"]
     )
     def post(self, request):
@@ -353,7 +353,9 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
         user_allsubs_filterset, created = FilterSet.objects.get_or_create(name=user_allsubs_filterset_name, author=self.request.user)
         for key, value in filters.items():
             key = FilterField.objects.get(name=key)
-            obj, created = Filter.objects.update_or_create(field=key, value=value, filter_set=user_allsubs_filterset)
+            obj, created = Filter.objects.get_or_create(field=key, filter_set=user_allsubs_filterset)
+            setattr(obj, "value", value)
+            obj.save()
 
     @swagger_auto_schema(
         description="Generate barchart data of failed test runs from RP based on your subscribed TestSetFilter objects",
@@ -366,7 +368,7 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
             fail_barchart_param_fail_message_type_groups
         ],
         responses={
-            status.HTTP_200_OK: ""
+            status.HTTP_200_OK: fail_barchart_response_scheme
         },
         tags=["stats", "FailBarchart"]
     )

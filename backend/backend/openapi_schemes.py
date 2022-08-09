@@ -1,3 +1,4 @@
+from doctest import Example
 from drf_yasg.utils import swagger_auto_schema, no_body
 from drf_yasg import openapi
 
@@ -101,4 +102,21 @@ fail_barchart_param_fail_message_type_groups = openapi.Parameter(
     description="fail_message_type_groups ids separated by commas",
     type=openapi.TYPE_STRING,
     required=False
+)
+
+
+fail_barchart_response_scheme = openapi.Schema(
+    title="FailBarchart",
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "labels": openapi.Schema(
+            type=openapi.TYPE_ARRAY, 
+            items=openapi.Schema(type=openapi.TYPE_STRING)
+        ),
+        "Occurrences": openapi.Schema(
+            type=openapi.TYPE_ARRAY, 
+            items=openapi.Schema(type=openapi.TYPE_INTEGER)
+        ),
+        "info": openapi.Schema(type=openapi.TYPE_STRING, description="Data range")
+    }
 )
