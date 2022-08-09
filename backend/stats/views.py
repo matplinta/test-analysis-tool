@@ -14,6 +14,7 @@ from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSeria
 
 from .permissions import IsAuthorOfRelatedObject, IsAuthorOfFilterSetOrReadOnly
 from backend.permissions import IsAuthorOfObject
+from backend.openapi_schemes import *
 from stats.models import * 
 import tra.models as tra_models
 from tra.views import TestRunsBasedOnQueryDictinctValues
@@ -22,18 +23,20 @@ from datetime import date, datetime
 from itertools import chain
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
+from drf_yasg import openapi
+from .filters import FilterSetFilterClass
 
 
-class ListFiltersWithFilterSetView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
-    serializer_class = FilterSerializerListOnly
+# class ListFiltersWithFilterSetView(generics.ListAPIView):
+#     permission_classes = (IsAuthenticated,)   
+#     serializer_class = FilterSerializerListOnly
 
-    def get_queryset(self):
-        filterset_id = self.kwargs['filterset_id']
-        filter_set = FilterSet.objects.get(pk=filterset_id)
-        queryset = Filter.objects.all()
-        return queryset.filter(filter_set=filter_set)
+#     def get_queryset(self):
+#         filterset_id = self.kwargs['filterset_id']
+#         filter_set = FilterSet.objects.get(pk=filterset_id)
+#         queryset = Filter.objects.all()
+#         return queryset.filter(filter_set=filter_set)
 
 
 class FilterSetView(viewsets.ModelViewSet):
@@ -62,13 +65,14 @@ class FilterSetView(viewsets.ModelViewSet):
         return permissions
 
 
-
 class FilterSetDetailView(viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated, IsAuthorOfFilterSetOrReadOnly)
-    # serializer_class = FilterSetSerializer
+    serializer_class = FilterSetSerializer
+    filterset_class = FilterSetFilterClass
 
     def get_queryset(self):
         return FilterSet.objects.all()
+
 
     def _serialize_data_with_filters(self, filterset):
             filters = Filter.objects.filter(filter_set=filterset)
@@ -77,53 +81,68 @@ class FilterSetDetailView(viewsets.GenericViewSet):
             serialized_data["filters"] = serialized_filters
             return serialized_data
 
+
     def _paginate_response(self, filtersets):
         page = self.paginate_queryset(filtersets)
         data = [self._serialize_data_with_filters(filterset) for filterset in filtersets]
         if page is not None:
             return self.get_paginated_response(data)
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
 
+
+    @swagger_auto_schema(
+        description="Method to list FilterSets (detailed)",
+        operation_description="Method to list FilterSets (detailed)",
+        responses={status.HTTP_200_OK: get_paged_scheme(filterset_detailed_scheme)},
+        tags=["api", "FilterSetDetailed"]
+    )
     def list(self, request):
         filtersets = self.get_queryset()
-        return self._paginate_response(filtersets)
+        filtersets_filtered = self.filter_queryset(filtersets)
+        # name = request.query_params.get("name", None)
+        # author = request.query_params.get("author", None)
+        # if name:
+        #     filtersets = filtersets.filter(name__icontains=name)
+        # if author:
+        #     filtersets = filtersets.filter(author__username__icontains=author)
+        return self._paginate_response(filtersets_filtered)
 
+
+    @swagger_auto_schema(
+        description="Method to list FilterSets (detailed) owned by user",
+        operation_description="Method to list FilterSets (detailed) owned by user",
+        responses={status.HTTP_200_OK: get_paged_scheme(filterset_detailed_scheme)},
+        tags=["api", "FilterSetDetailed"]
+    )
     @action(detail=False, methods=['get'], url_path="my")
     def user_is_owner(self, request):
         filtersets = self.get_queryset().filter(author=request.user)
-        return self._paginate_response(filtersets)
+        filtersets_filtered = self.filter_queryset(filtersets)
+        return self._paginate_response(filtersets_filtered)
 
+
+    @swagger_auto_schema(
+        description="Method to retrieve FilterSet (detailed) by id",
+        operation_description="Method to retrieve FilterSet (detailed) by id",
+        responses={
+            status.HTTP_200_OK: filterset_detailed_scheme,
+            status.HTTP_404_NOT_FOUND: ""
+        },
+        tags=["api", "FilterSetDetailed"]
+    )
     def retrieve(self, request, pk=None):
         filterset = get_object_or_404(FilterSet.objects.all(), pk=pk)
         return Response(self._serialize_data_with_filters(filterset))
 
 
+    @swagger_auto_schema(
+        description="Use this method to edit and create filtersets with associated filters in one request.",
+        operation_description="Use this method to edit and create filtersets with associated filters in one request.",
+        request_body=filterset_detailed_scheme,
+        responses={204: filterset_detailed_scheme},
+        tags=["api", "FilterSetDetailed"]
+    )
     def create(self, request):
-        """ 
-        Use this method to edit and create filtersets with associated filters in one request.
-        Example input 
-        {
-            "name": "Our features",
-            "filters": [
-                {
-                    "value": "2175-RB, 2175-QB, 1085, 7883, 2640,8533",
-                    "field": "test_case"
-                },
-                {
-                    "value": "not analyzed,environment issue",
-                    "field": "result"
-                },
-                {
-                    "value": "1000",
-                    "field": "limit"
-                },
-                {
-                    "value": "1,2",
-                    "field": "fail_message_type_groups"
-                }
-            ]
-        }
-        """
         for elem in ['name', 'filters']:
             if elem not in request.data.keys():
                 raise serializers.ValidationError({elem: "value missing"})
@@ -157,6 +176,15 @@ class FilterSetDetailView(viewsets.GenericViewSet):
             return Response(self._serialize_data_with_filters(filterset), status=status.HTTP_200_OK)
 
 
+    @swagger_auto_schema(
+        description="Method to delete FilterSet (detailed) by id",
+        operation_description="Method to delete FilterSet (detailed) by id",
+        responses={
+            status.HTTP_204_NO_CONTENT: "",
+            status.HTTP_404_NOT_FOUND: ""
+        },
+        tags=["api", "FilterSetDetailed"]
+    )
     def destroy(self, request, pk=None):
         filterset = self.get_object()
         filterset.delete()
@@ -168,54 +196,6 @@ class FilterView(viewsets.ModelViewSet):
     serializer_class = FilterSerializer
     queryset = Filter.objects.all()
     pagination_class = None
-
-    @action(detail=False, url_path="batch", methods=['post'])
-    def create_or_edit_filters_in_batch(self, request):
-        """ Example input 
-        {
-            "name": "Our features",
-            "filters": [
-                {
-                    "value": "2175-RB, 2175-QB, 1085, 7883, 2640,8533",
-                    "field": "test_case"
-                },
-                {
-                    "value": "not analyzed,environment issue",
-                    "field": "result"
-                },
-                {
-                    "value": "1000",
-                    "field": "limit"
-                },
-                {
-                    "value": "1,2",
-                    "field": "fail_message_type_groups"
-                }
-            ]
-        }
-        """
-        filterset, created = FilterSet.objects.get_or_create(name=request.data["name"], author=request.user)
-        filters = request.data["filters"]
-        for filter in filters:
-            filter["filter_set"] = filterset.name
-
-        serializer = self.get_serializer(data=filters, many=True)
-        serializer.is_valid(raise_exception=True)
-        if created:
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-        else:
-            # serializer = self.get_serializer(data=list(filterset.filters.all()), many=True)
-            # serializer.is_valid(raise_exception=True)
-            return Response(filterset.filters.all())
-            # for filter in filters:
-            #     field = FilterField.objects.get(name=filter["field"])
-            #     Filter.objects.update_or_create(filter_set=filterset, field=field, value=filter["value"])
-            #     headers = self.get_success_headers(serializer.data)
-            #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
 
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]
@@ -270,9 +250,9 @@ class GetDataForFailChartBase(APIView):
         return fail_message_dict
 
     def get_filters_and_failmessagetypes_from_post_data(self):
-        data = self.request.data
-        filters = data["filters"]
-        fmtgs = data["fail_message_type_groups"]
+        filters_raw = self.request.data
+        filters = {filter["field"]: filter["value"] for filter in filters_raw}
+        fmtgs = filters.pop("fail_message_type_groups", [])
         fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
         return fail_message_dict, filters
 
@@ -292,15 +272,42 @@ class GetDataForFailChartBase(APIView):
 
 class GetChartForFailAnalysis(GetDataForFailChartBase):
 
+    @swagger_auto_schema(
+        description="Generate barchart data of failed test runs from RP",
+        operation_description="Generate barchart data of failed test runs from RP",
+        manual_parameters=[
+            fail_barchart_param_filterset,
+            fail_barchart_param_date_middle,
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end
+        ],
+        responses={
+            status.HTTP_200_OK: "",
+            status.HTTP_400_BAD_REQUEST: ""
+        },
+        tags=["stats", "FailBarchart"]
+    )
     def get(self, request):
         filterset_id = self._handle_filterset_id_in_request(self.request)
         if not filterset_id:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response("You need to provide filterset_id in query params!", status=status.HTTP_400_BAD_REQUEST)
         filters, fmtgs = self.parse_filters_and_fmtgs(filterset_id)
         fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
         data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
         return Response(data)
 
+    @swagger_auto_schema(
+        description="Generate barchart data of failed test runs from RP",
+        operation_description="Generate barchart data of failed test runs from RP",
+        request_body=filterset_detailed_filters_array_scheme,
+        manual_parameters=[
+            fail_barchart_param_date_middle,
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end
+        ],
+        responses={status.HTTP_200_OK: ""},
+        tags=["stats", "FailBarchart"]
+    )
     def post(self, request):
         fail_message_dict, filters = self.get_filters_and_failmessagetypes_from_post_data()
         data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
@@ -348,7 +355,21 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
             key = FilterField.objects.get(name=key)
             obj, created = Filter.objects.update_or_create(field=key, value=value, filter_set=user_allsubs_filterset)
 
-
+    @swagger_auto_schema(
+        description="Generate barchart data of failed test runs from RP based on your subscribed TestSetFilter objects",
+        operation_description="Generate barchart data of failed test runs from RP based on your subscribed TestSetFilter objects",
+        manual_parameters=[
+            fail_barchart_param_date_middle,
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end,
+            fail_barchart_param_limit,
+            fail_barchart_param_fail_message_type_groups
+        ],
+        responses={
+            status.HTTP_200_OK: ""
+        },
+        tags=["stats", "FailBarchart"]
+    )
     def get(self, request):
         fail_message_dict, _fmtgs = self.prepare_failmessagetypes_for_users_all_subs_regfilters(request)
         limit = self._handle_limit_in_request(request)

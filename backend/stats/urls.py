@@ -16,10 +16,10 @@ urlpatterns = [
     path('filter_fields', views.FilterFieldView.as_view(), name="filterfields"),
     # path('filtersets_detailed/', views.FilterSetDetailView.as_view(), name="filterset_detailed"),
     # path('filtersets_detailed/<int:filterset_id>', views.FilterSetDetailView.as_view(), name="filterset_detailed_pk"),
-    path('filters/by_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="filters_by_filterset"),
+    # path('filters/by_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="filters_by_filterset"),
     path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
     # fail_barchart
-    #   PARAMS:
+    #   QUERY PARAMS:
     #       - filterset    [REQUIRED]   Id of filterset
     #       - date_middle  [OPTIONAL]   Separation date (e.g. 2022-12-03)
     #       - date_start   [OPTIONAL]   Start date (e.g. 2022-12-03) to filter against; must be used with date_end

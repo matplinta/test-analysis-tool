@@ -44,7 +44,7 @@ urlpatterns = [
     #            env_issue_type     env issue type string
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
-    path('test_runs/by_reg_filter/<int:rfid>/', views.TestRunsBasedOnRegressionFiltersView.as_view(), name='by_reg_filter_pk'),
+    # path('test_runs/by_reg_filter/<int:rfid>/', views.TestRunsBasedOnRegressionFiltersView.as_view(), name='by_reg_filter_pk'),
 
     path('test_runs/load_by_reg_filter/<int:rfid>/', views.LoadTestRunsToDBBasedOnRegressionFilter.as_view(), name='load_filtered_trs'),
     # additional parameter limit=<int> can be provided to override default limit specified by regression filter
