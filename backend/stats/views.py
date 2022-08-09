@@ -1,5 +1,8 @@
+from email.header import Header
+from telnetlib import STATUS
 from django.shortcuts import render
 from rep_portal.api import RepPortal
+from rest_framework import pagination
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
@@ -9,7 +12,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSerializer, FilterSerializerListOnly
 
-from .permissions import IsAuthorOfRelatedObject
+from .permissions import IsAuthorOfRelatedObject, IsAuthorOfFilterSetOrReadOnly
 from backend.permissions import IsAuthorOfObject
 from stats.models import * 
 import tra.models as tra_models
@@ -17,7 +20,9 @@ from tra.views import TestRunsBasedOnQueryDictinctValues
 from stats.analyzer import Analyzer
 from datetime import date, datetime
 from itertools import chain
-
+from rest_framework import serializers
+from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 
 
 class ListFiltersWithFilterSetView(generics.ListAPIView):
@@ -58,25 +63,104 @@ class FilterSetView(viewsets.ModelViewSet):
 
 
 
-class FilterSetDetailView(APIView):
-    def get(self, request, filterset_id=None):
-        def serialize_data_with_filters(filtersets):
-            all = []
-            for filterset in filtersets:
-                filters = Filter.objects.filter(filter_set=filterset)
-                serialized_filters = FilterSerializerListOnly(filters, many=True).data
-                serialized_data = FilterSetSerializer(filterset).data
-                serialized_data["filters"] = serialized_filters
-                all.append(serialized_data)
-            return all
+class FilterSetDetailView(viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated, IsAuthorOfFilterSetOrReadOnly)
+    # serializer_class = FilterSetSerializer
 
-        if filterset_id:
-            filtersets = FilterSet.objects.filter(pk=filterset_id)
+    def get_queryset(self):
+        return FilterSet.objects.all()
+
+    def _serialize_data_with_filters(self, filterset):
+            filters = Filter.objects.filter(filter_set=filterset)
+            serialized_filters = FilterSerializerListOnly(filters, many=True).data
+            serialized_data = FilterSetSerializer(filterset).data
+            serialized_data["filters"] = serialized_filters
+            return serialized_data
+
+    def _paginate_response(self, filtersets):
+        page = self.paginate_queryset(filtersets)
+        data = [self._serialize_data_with_filters(filterset) for filterset in filtersets]
+        if page is not None:
+            return self.get_paginated_response(data)
+        return Response(data)
+
+    def list(self, request):
+        filtersets = self.get_queryset()
+        return self._paginate_response(filtersets)
+
+    @action(detail=False, methods=['get'], url_path="my")
+    def user_is_owner(self, request):
+        filtersets = self.get_queryset().filter(author=request.user)
+        return self._paginate_response(filtersets)
+
+    def retrieve(self, request, pk=None):
+        filterset = get_object_or_404(FilterSet.objects.all(), pk=pk)
+        return Response(self._serialize_data_with_filters(filterset))
+
+
+    def create(self, request):
+        """ 
+        Use this method to edit and create filtersets with associated filters in one request.
+        Example input 
+        {
+            "name": "Our features",
+            "filters": [
+                {
+                    "value": "2175-RB, 2175-QB, 1085, 7883, 2640,8533",
+                    "field": "test_case"
+                },
+                {
+                    "value": "not analyzed,environment issue",
+                    "field": "result"
+                },
+                {
+                    "value": "1000",
+                    "field": "limit"
+                },
+                {
+                    "value": "1,2",
+                    "field": "fail_message_type_groups"
+                }
+            ]
+        }
+        """
+        for elem in ['name', 'filters']:
+            if elem not in request.data.keys():
+                raise serializers.ValidationError({elem: "value missing"})
+        filterset_name = request.data["name"]
+        filters = request.data["filters"]
+        for elem in filters:
+            elem["filter_set"] = filterset_name
+
+        filterset, created = FilterSet.objects.get_or_create(name=filterset_name, author=request.user)
+        self.check_object_permissions(self.request, filterset)
+
+        serializer = FilterSerializer(data=filters, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        if created:
+            serializer.save()
+            return Response(self._serialize_data_with_filters(filterset), status=status.HTTP_201_CREATED)
         else:
-            filtersets = FilterSet.objects.all()
-        return Response(serialize_data_with_filters(filtersets))
+            to_delete = Filter.objects.filter(filter_set=filterset).exclude(field__name__in=[filter_data["field"] for filter_data in filters])
+            to_delete.delete()
+            to_update = []
 
-    
+            for filter_data in filters:
+                field = FilterField.objects.get(name=filter_data["field"])
+                obj, created = Filter.objects.get_or_create(filter_set=filterset, field=field)
+                obj.value = filter_data["value"]
+                to_update.append(obj)
+
+            
+            Filter.objects.bulk_update(to_update, ["value"])
+            return Response(self._serialize_data_with_filters(filterset), status=status.HTTP_200_OK)
+
+
+    def destroy(self, request, pk=None):
+        filterset = self.get_object()
+        filterset.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FilterView(viewsets.ModelViewSet):
@@ -84,6 +168,54 @@ class FilterView(viewsets.ModelViewSet):
     serializer_class = FilterSerializer
     queryset = Filter.objects.all()
     pagination_class = None
+
+    @action(detail=False, url_path="batch", methods=['post'])
+    def create_or_edit_filters_in_batch(self, request):
+        """ Example input 
+        {
+            "name": "Our features",
+            "filters": [
+                {
+                    "value": "2175-RB, 2175-QB, 1085, 7883, 2640,8533",
+                    "field": "test_case"
+                },
+                {
+                    "value": "not analyzed,environment issue",
+                    "field": "result"
+                },
+                {
+                    "value": "1000",
+                    "field": "limit"
+                },
+                {
+                    "value": "1,2",
+                    "field": "fail_message_type_groups"
+                }
+            ]
+        }
+        """
+        filterset, created = FilterSet.objects.get_or_create(name=request.data["name"], author=request.user)
+        filters = request.data["filters"]
+        for filter in filters:
+            filter["filter_set"] = filterset.name
+
+        serializer = self.get_serializer(data=filters, many=True)
+        serializer.is_valid(raise_exception=True)
+        if created:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            # serializer = self.get_serializer(data=list(filterset.filters.all()), many=True)
+            # serializer.is_valid(raise_exception=True)
+            return Response(filterset.filters.all())
+            # for filter in filters:
+            #     field = FilterField.objects.get(name=filter["field"])
+            #     Filter.objects.update_or_create(filter_set=filterset, field=field, value=filter["value"])
+            #     headers = self.get_success_headers(serializer.data)
+            #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
 
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]

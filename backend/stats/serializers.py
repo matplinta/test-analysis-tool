@@ -7,7 +7,7 @@ class FilterSerializerListOnly(serializers.ModelSerializer):
 
     class Meta:
         model = Filter
-        fields = ('id', 'value', 'field')
+        fields = ('field', 'value')
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -18,6 +18,19 @@ class FilterSerializer(serializers.ModelSerializer):
         model = Filter
         fields = ('id', 'value', 'filter_set', 'field')
 
+    def validate_filter_set(self, value):
+        try: 
+            fs = FilterSet.objects.get(name=value)
+        except FilterSet.DoesNotExist:
+            raise serializers.ValidationError(f"Specified FilterSet: {value} does not exist")
+        return value
+
+    def validate_field(self, value):
+        try: 
+            fs = FilterField.objects.get(name=value)
+        except FilterField.DoesNotExist:
+            raise serializers.ValidationError(f"Specified FilterField: {value} does not exist")
+        return value
 
     def create(self, validated_data):
         filter_set_data = validated_data.pop('filter_set')
