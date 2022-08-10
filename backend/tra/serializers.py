@@ -7,6 +7,7 @@ from .models import (
     TestSetFilter, 
     TestInstance, 
     TestRun, 
+    Branch,
     EnvIssueType, 
     FailMessageType,
     FeatureBuild
@@ -54,6 +55,12 @@ class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
 class FeatureBuildSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeatureBuild
+        fields = ('name',)
+
+
+class BranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
         fields = ('name',)
 
 

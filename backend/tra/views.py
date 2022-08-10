@@ -24,7 +24,7 @@ from rest_framework import serializers
 from drf_yasg.utils import swagger_auto_schema, no_body
 
 from backend.permissions import IsAuthorOfObject
-from backend.openapi_schemes import testsetfilter_id_schema
+from backend.openapi_schemes import *
 from .permissions import IsOwnerOfObject, IsSubscribedToObject
 
 from .serializers import (
@@ -37,7 +37,8 @@ from .serializers import (
     EnvIssueTypeSerializer,
     TestRunResultSerializer,
     FeatureBuildSerializer,
-    UserSerializer
+    UserSerializer,
+    BranchSerializer
 )
 
 from .models import (
@@ -62,6 +63,7 @@ import json
 from datetime import datetime
 import pytz
 import logging
+import copy
 
 from .test_runs_processing import *
 from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters
@@ -117,6 +119,12 @@ class TestlineTypeView(viewsets.ModelViewSet):
     pagination_class = None
 
 
+class BranchView(viewsets.ModelViewSet):
+    serializer_class = BranchSerializer
+    queryset = Branch.objects.all()
+    pagination_class = None
+
+
 class TestRunResultView(viewsets.ModelViewSet):
     serializer_class = TestRunResultSerializer
     queryset = TestRunResult.objects.all()
@@ -134,43 +142,33 @@ class TestSetFilterView(viewsets.ModelViewSet):
     queryset = TestSetFilter.objects.all()
 
 
-    @action(detail=False, url_path="owned")
-    def user_is_owner(self, request):
-        tsfilters = TestSetFilter.objects.filter(owners=request.user)
-
+    def _serialize_and_paginate_response(self, tsfilters, status=status.HTTP_200_OK):
         page = self.paginate_queryset(tsfilters)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(tsfilters, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status)
+
+
+    @action(detail=False, url_path="owned")
+    def user_is_owner(self, request):
+        tsfilters = TestSetFilter.objects.filter(owners=request.user)
+        return self._serialize_and_paginate_response(tsfilters)
 
 
     @action(detail=False, url_path="subscribed")
     def user_is_subscribed(self, request):
         tsfilters = TestSetFilter.objects.filter(subscribers=request.user)
-
-        page = self.paginate_queryset(tsfilters)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(tsfilters, many=True)
-        return Response(serializer.data)
+        return self._serialize_and_paginate_response(tsfilters)
 
 
     @action(detail=False, url_path="branched")
     def users_branch_only(self, request):
         tsfilters = TestSetFilter.objects.filter(owners=request.user).exclude(branch__name="Trunk")
+        return self._serialize_and_paginate_response(tsfilters)
 
-        page = self.paginate_queryset(tsfilters)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(tsfilters, many=True)
-        return Response(serializer.data)
 
     @swagger_auto_schema(
         description="Method to batch subscribe to TestSetFilters",
@@ -234,6 +232,60 @@ class TestSetFilterView(viewsets.ModelViewSet):
 
 
     @swagger_auto_schema(
+        description="Method to batch branchoff specified TestSetFilters",
+        operation_description="Method to batch branchoff specified TestSetFilters",
+        request_body=testsetfilter_branchoff_schema,
+        responses={204: ""},
+        tags=["api", "TestSetFilter: Batch"]
+    )
+    @action(detail=False, url_path="branchoff", methods=['post'])
+    def batch_branchoff(self, request):
+        pks = [tsdata['id'] for tsdata in request.data["testsetfilters"]]
+        should_delete = request.data.get("delete", False)
+        should_unsubscribe = request.data.get("unsubscribe", False)
+        new_branch_name = request.data["new_branch"]
+        try:
+            new_branch = Branch.objects.get(name=new_branch_name)
+        except Branch.DoesNotExist:
+            return Response("Branch matching query does not exist", status=status.HTTP_404_NOT_FOUND)
+
+        tsfilters = TestSetFilter.objects.filter(pk__in=pks)
+
+        for tsfilter in tsfilters:
+            self.check_object_permissions(self.request, tsfilter)
+        
+        branch_set = set([tsfilter.branch for tsfilter in tsfilters])
+        if len(branch_set) != 1:
+            return Response(f"Selected TestSetFilters do not have single common branch to branchoff: {branch_set}", status=status.HTTP_400_BAD_REQUEST)
+
+        old_branch = branch_set.pop()
+        new_tsfilters = []
+        for old_tsfilter in tsfilters:
+            new_tsfilter = copy.deepcopy(old_tsfilter)
+            new_tsfilter.pk = None
+            new_tsfilter.branch = new_branch
+            old_test_lab_path = str(new_tsfilter.test_lab_path)
+            new_tsfilter.test_lab_path = old_test_lab_path.replace(str(old_branch), str(new_branch.name), 1)
+            new_tsfilter.save()
+
+            new_tsfilter.owners.add(*old_tsfilter.owners.all()) 
+            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all()) 
+            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all()) 
+            new_tsfilters.append(new_tsfilter)
+
+        if should_delete:
+            tsfilters.delete()
+        else:
+            if should_unsubscribe:
+                for tsfilter in tsfilters:
+                    if self.request.user in tsfilter.subscribers.all():
+                        tsfilter.subscribers.remove(self.request.user)
+
+        serializer = self.get_serializer(new_tsfilters, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    @swagger_auto_schema(
         description="Method to subscribe to specified TestSetFilter",
         operation_description="Method to subscribe to specified TestSetFilter",
         request_body=no_body,
@@ -285,6 +337,8 @@ class TestSetFilterView(viewsets.ModelViewSet):
         if self.request.method in ['PUT', 'DELETE']:
             if self.action != 'delete':
                 return permissions + [IsOwnerOfObject()]
+        if self.request.method in ['POST'] and self.action == "batch_branchoff":
+            return permissions + [IsOwnerOfObject()]
         return permissions
 
 

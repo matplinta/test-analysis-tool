@@ -165,8 +165,8 @@ def pull_test_runs_from_rp_to_db(limit, filters, try_to_analyze: boolean=False, 
     for test_run in data:
         try:
             tr = create_testrun_obj_based_on_rp_data(test_run, pass_old_testruns=False)
-            not_analyzed = TestRunResult.objects.get_or_create(name="not analyzed")
-            if try_to_analyze and regfilter and tr.result == not_analyzed:
+            not_analyzed, _ = TestRunResult.objects.get_or_create(name="not analyzed")
+            if try_to_analyze and regfilter and (tr.result == not_analyzed):
                 tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types, token=token)
             tr.save()
             tr_list.append(tr.rp_id)

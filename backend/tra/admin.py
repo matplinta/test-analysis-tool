@@ -125,6 +125,6 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
 @admin.register(TestSetFilter)
 class TestSetFilterAdmin(admin.ModelAdmin):
     list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'testline_type', 'limit']
-    list_filter = ['test_set_name', 'testline_type']
+    list_filter = ['test_set_name', 'testline_type', 'branch']
     search_fields = ['test_set_name', ]
 

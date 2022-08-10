@@ -29,6 +29,17 @@ testsetfilter_id_schema = openapi.Schema(
     )
 )
 
+testsetfilter_branchoff_schema = openapi.Schema(
+    title="TestSetFilters params for branchoff",
+    type=openapi.TYPE_OBJECT,
+    properties ={
+        "new_branch": openapi.Schema(type=openapi.TYPE_STRING, description="FilterSet object ID"),
+        "unsubscribe": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Denotes if migrated(old) TestSetFilters should be unsubscribed after performing branchoff to new ones"),
+        "delete": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Denotes if migrated(old) TestSetFilters should be deleted after performing branchoff to new ones"),
+        "testsetfilters": testsetfilter_id_schema
+    }
+)
+
 filterset_detailed_filters_array_scheme = openapi.Schema(
     type=openapi.TYPE_ARRAY, 
     items=openapi.Schema(

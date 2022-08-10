@@ -22,13 +22,16 @@ router.register(r'fail_message_type_groups', views.FailMessageTypeGroupView, 'fa
 router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
 
 # API to handle EnvIssueType model
-router.register(r'env_issue_types', views.EnvIssueTypeView, 'testline_types')
+router.register(r'env_issue_types', views.EnvIssueTypeView, 'env_issue_types')
 
 # API to handle TestRunResult model
 router.register(r'test_run_results', views.TestRunResultView, 'testrunresults')
 
 # API to handle TestRun model
 router.register(r'test_runs', views.TestRunView, 'testruns')
+
+# API to handle TestRun model
+router.register(r'branches', views.BranchView, 'branches')
 
 urlpatterns = [
     # Filtering TestRuns queryset by the following fields:
