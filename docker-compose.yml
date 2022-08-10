@@ -60,6 +60,8 @@ services:
     depends_on:
       - redis
       - db
+      - celery_worker
+      - flower
     restart: on-failure
   
   flower:
@@ -77,6 +79,7 @@ services:
     depends_on:
       - redis
       - db
+      - celery_worker
 
   frontend:
     build:

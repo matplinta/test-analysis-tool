@@ -31,9 +31,12 @@ def remove_old_feature_builds(keep_fb_threshold=3):
 def celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters(query_limit: int=None):
     regression_filters = TestSetFilter.objects.all()
     for regression_filter in regression_filters:
-        celery_pull_and_analyze_notanalyzed_testruns_by_regfilter.delay(regression_filter_id=regression_filter.id, query_limit=query_limit)
+        subs_count = regression_filter.subscribers.all().count()
+        celery_pull_and_analyze_notanalyzed_testruns_by_regfilter.delay(regression_filter_id=regression_filter.id, query_limit=query_limit, subs_count=subs_count)
 
 
 @shared_task(name="celery_pull_and_analyze_notanalyzed_testruns_by_regfilter")
-def celery_pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id, query_limit: int=None):
+def celery_pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id, query_limit: int=None, subs_count: int=0):
+    if subs_count == 0:
+        return f"Regression filter id:{regression_filter_id} has 0 subscribers - will be skipped" 
     return pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id=regression_filter_id, query_limit=query_limit)
