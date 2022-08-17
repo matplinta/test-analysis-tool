@@ -11,7 +11,10 @@ import { FiSettings } from 'react-icons/fi';
 
 import UserFilterAddModal from './UserFilterAddModal';
 
-import { getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe } from '../../services/test-results-analyzer/test-filters.service';
+import {
+    getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe,
+    postSubscribeBatch, postUnsubscribeBatch
+} from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
@@ -26,6 +29,8 @@ let UserFiltersComponent = ({ type }) => {
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     const [testFilters, setTestFilters] = useState([]);
+
+    const [selectedTestFilters, setSelectedTestFilters] = useState([]);
 
     const [filterIdToEdit, setFilterIdToEdit] = useState(null);
 
@@ -204,6 +209,25 @@ let UserFiltersComponent = ({ type }) => {
         </ul >
     }
 
+    const selectSelectedTestFilters = (selectedTestFiltersValue) => {
+        setSelectedTestFilters(selectedTestFiltersValue);
+        console.log(selectedTestFilters)
+    }
+
+    const sunscribeSelectedTestFilters = () => {
+        postSubscribeBatch(selectedTestFilters.map(testFilter => testFilter.id)).then(
+            (response) => {
+                fetchTestFilters(type);
+            }, (error) => {
+                console.log("Error during subscribe")
+            }
+        )
+    }
+
+    const unsunscribeSelectedTestFilters = () => {
+
+    }
+
     useEffect(() => {
         fetchCurrentUser();
         fetchTestFilters();
@@ -212,13 +236,17 @@ let UserFiltersComponent = ({ type }) => {
     return (
         <>
             <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={addFilter}>Add Regression Filter</Button>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={sunscribeSelectedTestFilters}>Subscribe selected</Button>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={unsunscribeSelectedTestFilters}>Unsubscribe selected</Button>
 
             <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row"
                 showGridlines dataKey="id"
                 filters={filters} filterDisplay="row" loading={loading}
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 220px)"
-                resizableColumns columnResizeMode="fit">
+                resizableColumns columnResizeMode="fit"
+                selectionMode="multiple" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
+                <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
                 <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name"></Column>
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
                 <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
