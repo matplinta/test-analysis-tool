@@ -1,10 +1,9 @@
 from django.contrib import admin
 from .models import (
-    TestSet, 
     TestInstance, 
     TestlineType,
     TestRun, 
-    RegressionFilter, 
+    TestSetFilter,
     RepPortalUserToken,
     Branch, 
     Organization, 
@@ -80,13 +79,6 @@ class BranchAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 
-@admin.register(TestSet)
-class TestSetAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id', 'test_lab_path', 'branch']
-    list_filter = ['branch']
-    search_fields = ['name', 'test_lab_path']
-
-
 @admin.register(TestInstance)
 class TestInstanceAdmin(admin.ModelAdmin):
     list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
@@ -111,6 +103,7 @@ class TestRunAdmin(admin.ModelAdmin):
         'env_issue_type', 
         'comment', 
         'builds', 
+        'airphone', 
         'fail_message', 
         'ute_exec_url', 
         'log_file_url',  
@@ -129,9 +122,9 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
     search_fields = ['user', 'token']
 
 
-@admin.register(RegressionFilter)
-class RegressionFilterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'id', 'test_set', 'testline_type', 'limit']
-    list_filter = ['test_set', 'testline_type']
-    search_fields = ['name', 'test_set__name']
+@admin.register(TestSetFilter)
+class TestSetFilterAdmin(admin.ModelAdmin):
+    list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'testline_type', 'limit']
+    list_filter = ['test_set_name', 'testline_type', 'branch']
+    search_fields = ['test_set_name', ]
 

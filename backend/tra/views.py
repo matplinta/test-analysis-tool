@@ -21,23 +21,24 @@ import distutils
 import distutils.util
 from django.core.serializers import serialize
 from rest_framework import serializers
+from drf_yasg.utils import swagger_auto_schema, no_body
 
 from backend.permissions import IsAuthorOfObject
+from backend.openapi_schemes import *
 from .permissions import IsOwnerOfObject, IsSubscribedToObject
 
 from .serializers import (
     TestInstanceSerializer,
     TestRunSerializer, 
     TestlineTypeSerializer, 
-    RegressionFilterSerializer, 
-    RegressionFilterCustomSerializer, 
-    TestSetSerializer, 
+    TestSetFilterSerializer,
     FailMessageTypeSerializer,
     FailMessageTypeGroupSerializer,
     EnvIssueTypeSerializer,
     TestRunResultSerializer,
     FeatureBuildSerializer,
-    UserSerializer
+    UserSerializer,
+    BranchSerializer
 )
 
 from .models import (
@@ -47,10 +48,9 @@ from .models import (
     Organization, 
     TestRunResult, 
     TestlineType, 
-    TestSet, 
+    TestSetFilter, 
     TestInstance, 
     TestRun, 
-    RegressionFilter, 
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
@@ -63,14 +63,10 @@ import json
 from datetime import datetime
 import pytz
 import logging
+import copy
 
 from .test_runs_processing import *
 from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters
-
-
-class LogoutViewEx(LogoutView):
-    authentication_classes = (authentication.TokenAuthentication, authentication.SessionAuthentication)
-    permission_classes = (IsAuthenticated,)  
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -102,8 +98,8 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
 
     @action(detail=False, url_path="my")
     def my(self, request):
-        regfilters = FailMessageTypeGroup.objects.filter(author=request.user)
-        serializer = self.get_serializer(regfilters, many=True)
+        tsfilters = FailMessageTypeGroup.objects.filter(author=request.user)
+        serializer = self.get_serializer(tsfilters, many=True)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
@@ -123,6 +119,12 @@ class TestlineTypeView(viewsets.ModelViewSet):
     pagination_class = None
 
 
+class BranchView(viewsets.ModelViewSet):
+    serializer_class = BranchSerializer
+    queryset = Branch.objects.all()
+    pagination_class = None
+
+
 class TestRunResultView(viewsets.ModelViewSet):
     serializer_class = TestRunResultSerializer
     queryset = TestRunResult.objects.all()
@@ -135,42 +137,164 @@ class EnvIssueTypeView(viewsets.ModelViewSet):
     pagination_class = None
 
 
-class TestsSetView(viewsets.ModelViewSet):
-    serializer_class = TestSetSerializer
-    queryset = TestSet.objects.all()
+class TestSetFilterView(viewsets.ModelViewSet):
+    serializer_class = TestSetFilterSerializer
+    queryset = TestSetFilter.objects.all()
 
 
-class RegressionFilterView(viewsets.ModelViewSet):
-    serializer_class = RegressionFilterSerializer
-    queryset = RegressionFilter.objects.all()
+    def _serialize_and_paginate_response(self, tsfilters, status=status.HTTP_200_OK):
+        page = self.paginate_queryset(tsfilters)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(tsfilters, many=True)
+        return Response(serializer.data, status=status)
 
 
     @action(detail=False, url_path="owned")
     def user_is_owner(self, request):
-        regfilters = RegressionFilter.objects.filter(owners=request.user)
-
-        page = self.paginate_queryset(regfilters)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(regfilters, many=True)
-        return Response(serializer.data)
+        tsfilters = TestSetFilter.objects.filter(owners=request.user)
+        return self._serialize_and_paginate_response(tsfilters)
 
 
     @action(detail=False, url_path="subscribed")
     def user_is_subscribed(self, request):
-        regfilters = RegressionFilter.objects.filter(subscribers=request.user)
-
-        page = self.paginate_queryset(regfilters)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(regfilters, many=True)
-        return Response(serializer.data)
+        tsfilters = TestSetFilter.objects.filter(subscribers=request.user)
+        return self._serialize_and_paginate_response(tsfilters)
 
 
+    @action(detail=False, url_path="branched")
+    def users_branch_only(self, request):
+        tsfilters = TestSetFilter.objects.filter(owners=request.user).exclude(branch__name="Trunk")
+        return self._serialize_and_paginate_response(tsfilters)
+
+
+    @swagger_auto_schema(
+        description="Method to batch subscribe to TestSetFilters",
+        operation_description="Method to batch subscribe to TestSetFilters",
+        request_body=testsetfilter_id_schema,
+        responses={200: testsetfilter_id_schema},
+        tags=["api", "TestSetFilter: Batch"]
+    )
+    @action(detail=False, url_path="subscribe", methods=['post'])
+    def batch_subscribe(self, request):
+        pks = [tsdata['id'] for tsdata in request.data]
+        tsfilters = TestSetFilter.objects.filter(pk__in=pks)
+
+        for tsfilter in tsfilters:
+            if self.request.user not in tsfilter.subscribers.all():
+                tsfilter.subscribers.add(self.request.user)
+                tsfilter.save()
+                
+        serializer = self.get_serializer(tsfilters, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
+        description="Method to batch unsubscribe to TestSetFilters",
+        operation_description="Method to batch unsubscribe to TestSetFilters",
+        request_body=testsetfilter_id_schema,
+        responses={200: testsetfilter_id_schema},
+        tags=["api", "TestSetFilter: Batch"]
+    )
+    @action(detail=False, url_path="unsubscribe", methods=['post'])
+    def batch_unsubscribe(self, request):
+        pks = [tsdata['id'] for tsdata in request.data]
+        tsfilters = TestSetFilter.objects.filter(pk__in=pks)
+
+        for tsfilter in tsfilters:
+            if self.request.user in tsfilter.subscribers.all():
+                tsfilter.subscribers.remove(self.request.user)
+                tsfilter.save()
+
+        serializer = self.get_serializer(tsfilters, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    @swagger_auto_schema(
+        description="Method to batch delete TestSetFilters",
+        operation_description="Method to batch delete TestSetFilters",
+        request_body=testsetfilter_id_schema,
+        responses={204: ""},
+        tags=["api", "TestSetFilter: Batch"]
+    )
+    @action(detail=False, url_path="delete", methods=['delete'])
+    def batch_delete(self, request):
+        pks = [tsdata['id'] for tsdata in request.data]
+        tsfilters = TestSetFilter.objects.filter(pk__in=pks)
+
+        for tsfilter in tsfilters:
+            self.check_object_permissions(self.request, tsfilter)
+
+        tsfilters.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+    @swagger_auto_schema(
+        description="Method to batch branchoff specified TestSetFilters",
+        operation_description="Method to batch branchoff specified TestSetFilters",
+        request_body=testsetfilter_branchoff_schema,
+        responses={204: ""},
+        tags=["api", "TestSetFilter: Batch"]
+    )
+    @action(detail=False, url_path="branchoff", methods=['post'])
+    def batch_branchoff(self, request):
+        pks = [tsdata['id'] for tsdata in request.data["testsetfilters"]]
+        should_delete = request.data.get("delete", False)
+        should_unsubscribe = request.data.get("unsubscribe", False)
+        new_branch_name = request.data["new_branch"]
+        try:
+            new_branch = Branch.objects.get(name=new_branch_name)
+        except Branch.DoesNotExist:
+            return Response("Branch matching query does not exist", status=status.HTTP_404_NOT_FOUND)
+
+        tsfilters = TestSetFilter.objects.filter(pk__in=pks)
+
+        for tsfilter in tsfilters:
+            self.check_object_permissions(self.request, tsfilter)
+        
+        branch_set = set([tsfilter.branch for tsfilter in tsfilters])
+        if len(branch_set) != 1:
+            return Response(f"Selected TestSetFilters do not have single common branch to branchoff: {branch_set}", status=status.HTTP_400_BAD_REQUEST)
+
+        old_branch = branch_set.pop()
+        new_tsfilters = []
+        for old_tsfilter in tsfilters:
+            new_tsfilter = copy.deepcopy(old_tsfilter)
+            new_tsfilter.pk = None
+            new_tsfilter.branch = new_branch
+            old_test_lab_path = str(new_tsfilter.test_lab_path)
+            new_tsfilter.test_lab_path = old_test_lab_path.replace(str(old_branch), str(new_branch.name), 1)
+            new_tsfilter.save()
+
+            new_tsfilter.owners.add(*old_tsfilter.owners.all()) 
+            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all()) 
+            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all()) 
+            new_tsfilters.append(new_tsfilter)
+
+        if should_delete:
+            tsfilters.delete()
+        else:
+            if should_unsubscribe:
+                for tsfilter in tsfilters:
+                    if self.request.user in tsfilter.subscribers.all():
+                        tsfilter.subscribers.remove(self.request.user)
+
+        serializer = self.get_serializer(new_tsfilters, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    @swagger_auto_schema(
+        description="Method to subscribe to specified TestSetFilter",
+        operation_description="Method to subscribe to specified TestSetFilter",
+        request_body=no_body,
+        responses={
+            200: "",
+            304: ""
+        },
+        tags=["api", "TestSetFilter"]
+    )
     @action(detail=True, methods=['post'])
     def subscribe(self, request, pk=None):
         regfilter = self.get_object()
@@ -182,6 +306,16 @@ class RegressionFilterView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
+    @swagger_auto_schema(
+        description="Method to unsubscribe to specified TestSetFilter",
+        operation_description="Method to unsubscribe to specified TestSetFilter",
+        request_body=no_body,
+        responses={
+            200: "",
+            304: ""
+        },
+        tags=["api", "TestSetFilter"]
+    )
     @action(detail=True, methods=['post'])
     def unsubscribe(self, request, pk=None):
         regfilter = self.get_object()
@@ -201,6 +335,9 @@ class RegressionFilterView(viewsets.ModelViewSet):
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]
         if self.request.method in ['PUT', 'DELETE']:
+            if self.action != 'delete':
+                return permissions + [IsOwnerOfObject()]
+        if self.request.method in ['POST'] and self.action == "batch_branchoff":
             return permissions + [IsOwnerOfObject()]
         return permissions
 
@@ -209,35 +346,16 @@ class TestRunView(viewsets.ModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
 
-    # @action(detail=True, methods=['put'], url_path="analyze")
-    # def analyze(self, request, pk=None):
-    #     instance = self.get_object()
-    #     serializer = self.get_serializer(instance, data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save(analyzed=True, analyzed_by=self.request.user)
-    #     return Response(serializer.data)
 
+# class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
+#     serializer_class = TestRunSerializer
 
-class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
-    serializer_class = TestRunSerializer
-
-    def get_queryset(self):
-        queryset = TestRun.objects.all()
-        rfid = self.kwargs['rfid']
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
-        return queryset.filter(testline_type=regression_filter.testline_type, 
-                               test_instance__test_set=regression_filter.test_set)
-
-
-class TestRunsBasedOnRegressionFiltersView(generics.ListAPIView):
-    serializer_class = TestRunSerializer
-
-    def get_queryset(self):
-        queryset = TestRun.objects.all()
-        rfid = self.kwargs['rfid']
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
-        return queryset.filter(testline_type=regression_filter.testline_type, 
-                               test_instance__test_set=regression_filter.test_set)
+#     def get_queryset(self):
+#         queryset = TestRun.objects.all()
+#         rfid = self.kwargs['rfid']
+#         regression_filter = TestSetFilter.objects.get(pk=rfid)
+#         return queryset.filter(testline_type=regression_filter.testline_type, 
+#                                test_instance__test_set=regression_filter.test_set)
 
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
@@ -252,13 +370,13 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
             fields_dict[key] = json.loads(data)
 
         queryset = TestRun.objects.all()
-        regfilters = RegressionFilter.objects.filter(subscribers=self.request.user)
+        tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter.test_set), regfilters, Q())
+                                               test_instance__test_set=reg_filter), tsfilters, Q())
         )
 
-        fields_dict["regfilters"] = json.loads(serialize("json", regfilters))
+        fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
         fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
         get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer)
         get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
@@ -268,10 +386,10 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
         get_distinct_values_and_serialize('test_instance__test_set__branch', Branch, key_override="branch",
                                           order_by_param="test_instance__test_set__branch__name")
-        distinct_values = queryset.order_by("test_instance__test_set__id").distinct("test_instance__test_set").values_list("test_instance__test_set", flat=True)
-        objects = TestSet.objects.filter(pk__in=distinct_values).distinct("name").values_list("name", flat=True)
-        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(objects)]
+        test_set_distinct_values = tsfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
+        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
         return fields_dict
+
 
     def get(self, request):
         fields_dict = self.get_distinct_values_based_on_subscribed_regfilters()
@@ -304,17 +422,17 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         'analyzed',
 
         "test_instance__test_case_name", 
-        "test_instance__test_set__name",
+        "test_instance__test_set__test_set_name",
         "test_instance__test_set__branch",
         "test_instance__test_set__test_lab_path",
     )
 
     def get_queryset(self):
         queryset = TestRun.objects.all()
-        regfilters = RegressionFilter.objects.filter(subscribers=self.request.user)
+        tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
             reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter.test_set), regfilters, Q())
+                                               test_instance__test_set=reg_filter), tsfilters, Q())
         )
         return queryset
 
@@ -328,8 +446,10 @@ class TestRunsAnalyzeToRP(APIView):
         env_issue_type = data["env_issue_type"]
         
         result_obj = TestRunResult.objects.get(name=result)
-        rp_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
+        env_issue_type_obj = EnvIssueType.objects.get(name=env_issue_type)
+        test_runs_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
         user = self.request.user
+
         if hasattr(user, 'rp_token') and user.rp_token.token:
             token = user.rp_token.token
         else:
@@ -344,14 +464,14 @@ class TestRunsAnalyzeToRP(APIView):
             token=token
         )
 
-        rp_to_analyze.update(analyzed=True, analyzed_by=request.user, comment=comment, result=result_obj)
+        test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
 
         return Response(status=200)
 
 
 class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
     def get(self, request, rfid):
-        regression_filter = RegressionFilter.objects.get(pk=rfid)
+        regression_filter = TestSetFilter.objects.get(pk=rfid)
         limit = self.request.query_params.get('limit', None)
         content = pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter.id, limit)
         return Response(content)
@@ -373,13 +493,3 @@ class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
 class SummaryStatisticsView(APIView):
     pass
 
-
-class UsersList(viewsets.ReadOnlyModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    pagination_class = None
-
-    @action(detail=False, url_path="me")
-    def me(self, request):
-        serializer = self.get_serializer(request.user)
-        return Response(serializer.data)

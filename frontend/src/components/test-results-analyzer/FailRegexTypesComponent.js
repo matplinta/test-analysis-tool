@@ -31,10 +31,10 @@ const FailRegexTypesComponent = () => {
 
     const handleTestSetFormCloseAndRefresh = () => {
         handleFormClose();
-        fetchTestFilters();
+        fetchTestSetFilters();
     }
 
-    let fetchTestFilters = () => {
+    let fetchTestSetFilters = () => {
         getFailMessageTypes().then(
             (response) => {
                 console.log(response.data)
@@ -49,7 +49,7 @@ const FailRegexTypesComponent = () => {
     }
 
     useEffect(() => {
-        fetchTestFilters();
+        fetchTestSetFilters();
     }, [])
 
     return (

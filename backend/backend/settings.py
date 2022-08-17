@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
     #     # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     #     # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -96,11 +96,12 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'dj_rest_auth',
+    'drf_yasg',
     'polymorphic',
     'corsheaders',
     'tra',
     'stats',
-    'testline_manager',
+    # 'testline_manager',
 ]
 
 if DEBUG:

@@ -14,24 +14,45 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 
-from rest_framework import routers
-from dj_rest_auth.views import LoginView, LogoutView
-from tra import views
+from rest_framework import routers, permissions
+from dj_rest_auth.views import LoginView
+# from tra import views
+from .views import UsersList, LogoutViewOverride
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+)
+
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UsersList, 'users')
+router.register(r'users', UsersList, 'users')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/login/', LoginView.as_view(), name='rest_login'),
-    path('api-auth/logout/', views.LogoutViewEx.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
+    path('api-auth/logout/', LogoutViewOverride.as_view(), name='rest_logout'),  # URLs that require a user to be logged in with a valid session / token.
     path('api/tra/', include('tra.urls'), name="api_tra"),
     path('api/tra/stats/', include('stats.urls'), name="api_tra_stats"),
+    # path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
     # path('api/trs/', include('trs.urls'), name="api_trs"),
-    path('api/tlm/', include('testline_manager.urls'), name="api_tlm"),
-    # path('api/users/', views.UsersList.as_view(), name="users"),
     path('api/', include(router.urls)),
+    re_path(r'^api/swagger(?P<format>.json|.yaml)$', schema_view.without_ui(cache_timeout=0),
+            name='schema-json'),
+    path('api/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
 ]

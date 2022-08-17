@@ -15,6 +15,21 @@ class LabLocation(models.Model):
     def __str__(self):
         return self.name
 
+
+class Team(models.Model):
+    name = models.CharField(max_length=100, blank=False, unique=True, primary_key=True)
+
+    def __str__(self):
+        return self.name
+
+
+class LabKeeper(models.Model):
+    name = models.CharField(max_length=100, blank=False, unique=True, primary_key=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, related_name="labkeepers")
+
+    def __str__(self):
+        return self.name
+
 class Laboratory(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=False)
@@ -41,6 +56,7 @@ class Rack(models.Model):
 class VirtualMachine(models.Model):
     name = models.CharField(max_length=100, blank=False, unique=True)
     address = models.CharField(max_length=100, blank=False, unique=True)
+    kvm = models.CharField(max_length=200, blank=True)
     cpu = models.CharField(max_length=10, blank=True)
     ram = models.CharField(max_length=10, blank=True)
 
@@ -65,6 +81,7 @@ class Testline(models.Model):
     maintainer = models.ForeignKey(User, on_delete=models.CASCADE)
     virtual_machine = models.ForeignKey(VirtualMachine, on_delete=models.CASCADE)
     rack = models.ForeignKey(Rack, on_delete=models.CASCADE, blank=False, null=True, related_name="testlines")
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True, related_name="testlines")
     topologies = models.ManyToManyField(Topology)
     vnc = models.CharField(max_length=40, blank=True, unique=True)
 
@@ -80,7 +97,11 @@ class HardwareType(models.Model):
 
 class OneLabReservation(models.Model):
     id = models.BigAutoField(primary_key=True)
-    one_lab_status = models.CharField(max_length=30)
+    status = models.CharField(max_length=100, blank=True, null=True)
+    user_email = models.CharField(max_length=255, blank=False, null=False)
+    # user_email = models.ForeignKey(LabKeeper, on_delete=models.CASCADE, blank=True, null=True, related_name="onelab_reservations")
+    location = models.CharField(max_length=255, blank=True, null=True)
+
 
     def __str__(self):
         return str(self.id)
@@ -114,7 +135,7 @@ class Unit(models.Model):
     hardware_type = models.ForeignKey(HardwareType, on_delete=models.SET_NULL, blank=False, null=True)
     serial_number = models.CharField(max_length=30, blank=False, unique=True)
     version = models.CharField(max_length=10, blank=True, null=True, unique=True)
-    one_lab_reservation = models.OneToOneField(OneLabReservation, on_delete=models.SET_NULL, blank=True, unique=True, null=True)
+    one_lab_reservation = models.OneToOneField(OneLabReservation, on_delete=models.SET_NULL, blank=True, unique=True, null=True, related_name="unit")
     pdu_port = models.OneToOneField(PowerDistributionUnitPort,
                                                         on_delete=models.CASCADE,
                                                         blank=True,

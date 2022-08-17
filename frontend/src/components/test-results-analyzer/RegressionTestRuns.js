@@ -90,7 +90,7 @@ let RegressionTestRuns = () => {
         setSelectedNodesKeys(selectedFilters)
     }
 
-    // let fetchTestFilters = (data) => {
+    // let fetchTestSetFilters = (data) => {
     //     if (regressionFiltersNodes.length === 0) {
     //         let filters = {
     //             key: 'reg_filters',
@@ -117,7 +117,7 @@ let RegressionTestRuns = () => {
     //     }
     // }
 
-    const fetchTestSets = (data) => {
+    const fetchTestSetNames = (data) => {
         if (testSetFiltersNodes.length === 0) {
             let filters = {
                 key: 'test_set_name',
@@ -277,8 +277,7 @@ let RegressionTestRuns = () => {
         getTestRunsFilters().then(
             (response) => {
                 const data = response.data;
-                // fetchTestFilters(data['regfilters']);
-                fetchTestSets(data['test_set_name']);
+                fetchTestSetNames(data['test_set_name']);
                 fetchTestLineType(data['testline_type']);
                 fetchBranch(data['branch']);
                 fetchStatuses(data['result']);

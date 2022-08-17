@@ -6,13 +6,13 @@ from .models import (
 
 
 class FilterAdmin(admin.ModelAdmin):
-    list_display = ['field', 'filter_set', 'value']
+    list_display = ['field', 'id', 'value', 'filter_set']
     list_filter = ['filter_set', 'field']
     search_fields = ['field', 'filter_set', 'value']
 
 
-class FilterDefinitionAdmin(admin.ModelAdmin):
-    list_display = ['name']
+class FilterFieldAdmin(admin.ModelAdmin):
+    list_display = ['name', 'id']
     list_filter = ['name']
     search_fields = ['name']
 
@@ -22,6 +22,6 @@ class FilterSetAdmin(admin.ModelAdmin):
     search_fields = ['name', 'author']
 
     
-admin.site.register(FilterField, FilterDefinitionAdmin)
+admin.site.register(FilterField, FilterFieldAdmin)
 admin.site.register(Filter, FilterAdmin)
 admin.site.register(FilterSet, FilterSetAdmin)
