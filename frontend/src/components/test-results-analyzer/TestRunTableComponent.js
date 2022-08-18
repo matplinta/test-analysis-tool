@@ -245,7 +245,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const handleFormCloseAndRefresh = () => {
         handleFormClose();
-
         refreshTestRunsFetching();
     }
 
