@@ -140,6 +140,7 @@ class EnvIssueTypeView(viewsets.ModelViewSet):
 class TestSetFilterView(viewsets.ModelViewSet):
     serializer_class = TestSetFilterSerializer
     queryset = TestSetFilter.objects.all()
+    pagination_class = None
 
 
     def _serialize_and_paginate_response(self, tsfilters, status=status.HTTP_200_OK):
@@ -152,22 +153,27 @@ class TestSetFilterView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status)
 
 
+    def _serialize_response(self, tsfilters, status=status.HTTP_200_OK):
+        serializer = self.get_serializer(tsfilters, many=True)
+        return Response(serializer.data, status=status)
+
+
     @action(detail=False, url_path="owned")
     def user_is_owner(self, request):
         tsfilters = TestSetFilter.objects.filter(owners=request.user)
-        return self._serialize_and_paginate_response(tsfilters)
+        return self._serialize_response(tsfilters)
 
 
     @action(detail=False, url_path="subscribed")
     def user_is_subscribed(self, request):
         tsfilters = TestSetFilter.objects.filter(subscribers=request.user)
-        return self._serialize_and_paginate_response(tsfilters)
+        return self._serialize_response(tsfilters)
 
 
     @action(detail=False, url_path="branched")
     def users_branch_only(self, request):
         tsfilters = TestSetFilter.objects.filter(owners=request.user).exclude(branch__name="Trunk")
-        return self._serialize_and_paginate_response(tsfilters)
+        return self._serialize_response(tsfilters)
 
 
     @swagger_auto_schema(
@@ -187,9 +193,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
                 tsfilter.subscribers.add(self.request.user)
                 tsfilter.save()
                 
-        serializer = self.get_serializer(tsfilters, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        return self._serialize_response(tsfilters)
 
     @swagger_auto_schema(
         description="Method to batch unsubscribe to TestSetFilters",
@@ -208,8 +212,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
                 tsfilter.subscribers.remove(self.request.user)
                 tsfilter.save()
 
-        serializer = self.get_serializer(tsfilters, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return self._serialize_response(tsfilters)
 
 
     @swagger_auto_schema(
@@ -281,8 +284,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
                     if self.request.user in tsfilter.subscribers.all():
                         tsfilter.subscribers.remove(self.request.user)
 
-        serializer = self.get_serializer(new_tsfilters, many=True)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return self._serialize_response(new_tsfilters, status=status.HTTP_201_CREATED)
 
 
     @swagger_auto_schema(
