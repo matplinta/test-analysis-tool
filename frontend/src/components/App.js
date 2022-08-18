@@ -63,9 +63,9 @@ const App = () => {
               </Route>
               <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
                 <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-                <Route path="regression-filters" element={<UserFiltersComponent type={'all'} />} />
-                <Route path="subscribed-regression-filters" element={<UserFiltersComponent type={'subscribed'} />} />
-                <Route path="owned-regression-filters" element={<UserFiltersComponent type={'owned'} />} />
+                <Route path="test-set-filters" element={<UserFiltersComponent type={'all'} />} />
+                <Route path="subscribed-test-set-filters" element={<UserFiltersComponent type={'subscribed'} />} />
+                <Route path="owned-test-set-filters" element={<UserFiltersComponent type={'owned'} />} />
                 <Route path="fail-regex" element={<FailRegexTypesComponent />} />
                 <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupComponent />} />

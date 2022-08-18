@@ -148,12 +148,12 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
 
         putTestSetFilter(filterIdToEdit, filterToEdit).then(
             (response) => {
-                console.log("Success!")
+                Notify.sendNotification(Successes.TEST_SET_FILTER_EDITED, AlertTypes.success);
                 clearForm();
                 handleFormClose();
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.TEST_SET_FILTER_EDITED, AlertTypes.error);
             })
     }
 
