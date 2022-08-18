@@ -7,13 +7,13 @@ import { MultiSelect } from 'primereact/multiselect';
 
 import { getTestLineTypes, postTestSetFilter, getTestSetFilter, putTestSetFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
-import AuthService from './../../services/auth.service.js';
+import AuthService from '../../services/auth.service.js';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
-import './UserFilterAddModal.css';
+import './TestSetFilterAddModal.css';
 
-let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
+let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
 
     const [testLinesTypes, setTestLinesTypes] = useState([]);
     const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
@@ -242,4 +242,4 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     )
 }
 
-export default UserFilterAddModal;
+export default TestSetFilterAddModal;

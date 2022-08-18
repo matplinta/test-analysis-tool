@@ -33,7 +33,7 @@ let MenuComponent = () => {
             }]
         },
         {
-            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Rules Definitions</span>,
+            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages Definitions</span>,
             items: [{
                 label: <span>Fail Message Regex</span>,
                 command: () => { navigate('fail-regex') }

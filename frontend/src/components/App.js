@@ -14,7 +14,7 @@ import TestResultsAnalyzerApp from './test-results-analyzer/TestResultsAnalyzerA
 import TestLineListComponent from './test-line-manager/TestLineListComponent';
 import MyTestLineComponentList from './test-line-manager/MyTestLineComponentList';
 import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
-import UserFiltersComponent from './test-results-analyzer/UserFiltersComponent';
+import TestSetFiltersComponent from './test-results-analyzer/TestSetFiltersComponent';
 import CommonMenuComponent from './home/CommonMenuComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
@@ -63,9 +63,9 @@ const App = () => {
               </Route>
               <Route path="test-results-analyzer" element={<TestResultsAnalyzerApp />} >
                 <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-                <Route path="test-set-filters" element={<UserFiltersComponent type={'all'} />} />
-                <Route path="subscribed-test-set-filters" element={<UserFiltersComponent type={'subscribed'} />} />
-                <Route path="owned-test-set-filters" element={<UserFiltersComponent type={'owned'} />} />
+                <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
+                <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
+                <Route path="owned-test-set-filters" element={<TestSetFiltersComponent type={'owned'} />} />
                 <Route path="fail-regex" element={<FailRegexTypesComponent />} />
                 <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupComponent />} />

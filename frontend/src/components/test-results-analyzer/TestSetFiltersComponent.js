@@ -10,7 +10,7 @@ import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
 import { GrAddCircle } from 'react-icons/gr';
 import { FiSettings } from 'react-icons/fi';
 
-import UserFilterAddModal from './UserFilterAddModal';
+import UserFilterAddModal from './TestSetFilterAddModal';
 import {
     getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe,
     postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter, getTestSetFilter, putTestSetFilter,
@@ -21,9 +21,9 @@ import { useCurrentUser } from '../../services/CurrentUserContext';
 
 
 import 'react-toastify/dist/ReactToastify.css';
-import './UserFiltersComponent.css';
+import './TestSetFiltersComponent.css';
 
-let UserFiltersComponent = ({ type }) => {
+let TestSetFiltersComponent = ({ type }) => {
 
     const navigate = useNavigate();
 
@@ -288,4 +288,4 @@ let UserFiltersComponent = ({ type }) => {
     )
 }
 
-export default UserFiltersComponent;
+export default TestSetFiltersComponent;
