@@ -52,3 +52,11 @@ export const postUnsubscribeBatch = async (testFilters) => {
 export const deleteTestSetFilterBatch = async (testSetFilters) => {
     return (await axios.delete('/api/tra/test_set_filters/delete/', { headers: authHeader(), data: testSetFilters }));
 }
+
+export const getTestSetFiltersBranched = async () => {
+    return (await axios.get('/api/tra/test_set_filters/branched/', { headers: authHeader() }));
+}
+
+export const getBranches = async () => {
+    return (await axios.get('/api/tra/branches/', { headers: authHeader() }));
+}

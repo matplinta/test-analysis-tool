@@ -76,6 +76,7 @@ export const Errors = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter was not unsubscribed!',
     'TEST_SET_FILTERS_DELETED': 'Test set filters were not removed!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
+    'GET_BRANCHES': 'Error during fetching branches!'
 }
 
 export const Warnings = {

@@ -30,6 +30,9 @@ let MenuComponent = () => {
             }, {
                 label: "Owned",
                 command: () => { navigate('owned-test-set-filters') },
+            }, {
+                label: "Prapare to Branch off",
+                command: () => { navigate('test-set-filters-branch-off') },
             }]
         },
         {

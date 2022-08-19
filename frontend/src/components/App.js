@@ -19,6 +19,7 @@ import CommonMenuComponent from './home/CommonMenuComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTypeGroupComponent';
 import ChartsComponent from './test-results-analyzer/ChartsComponent';
+import BranchOffComponent from './test-results-analyzer/BranchOffComponent';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 
@@ -66,6 +67,7 @@ const App = () => {
                 <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
                 <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
                 <Route path="owned-test-set-filters" element={<TestSetFiltersComponent type={'owned'} />} />
+                <Route path="test-set-filters-branch-off" element={<BranchOffComponent />} />
                 <Route path="fail-regex" element={<FailRegexTypesComponent />} />
                 <Route path="fail-regex-groups" element={<FailMessageTypeGroupComponent />} />
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupComponent />} />
