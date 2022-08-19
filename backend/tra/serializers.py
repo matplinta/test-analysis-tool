@@ -176,41 +176,69 @@ class TestRunSerializer(serializers.ModelSerializer):
 class TestSetFilterSerializer(serializers.ModelSerializer):
     testline_type = serializers.CharField(source='testline_type.name')
     fail_message_type_groups = FailMessageTypeGroupROSerializer(many=True)
-    owners = UserSerializer(read_only=True, many=True)
-    subscribers = UserSerializer(read_only=True, many=True)
+    owners = UserSerializer(many=True)
+    subscribers = UserSerializer(many=True)
 
 
     class Meta:
         model = TestSetFilter
         fields = ('id', 'limit', 'test_set_name', 'test_lab_path', 'branch', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
-        read_only_fields = ('owners', 'subscribers',)
+        # read_only_fields = ('owners', 'subscribers',)
         extra_kwargs = {
             'fail_message_type_groups': {'validators': []},
+            'owners': {'validators': []},
+            'subscribers': {'validators': []},
         }
         
+    def validate_owners(self, value):
+        try: 
+            owners = [User.objects.get(**owner) for owner in value]
+            if len(owners) == 0:
+                raise serializers.ValidationError(f"Owners field must not be empty: there must be at least one owner for TestSetFilter")
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f"Specified owner does not exist")
+        return value
 
 
     def create(self, validated_data):
         testline_type_data = validated_data.pop('testline_type')
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
+        owners_data = validated_data.pop('owners')
+        subscribers_data = validated_data.pop('subscribers')
 
         testline_type_instance = TestlineType.objects.get(**testline_type_data)
         regression_filter_instance = TestSetFilter.objects.create(testline_type=testline_type_instance,
                                                                   **validated_data)
-        for fmtg in fail_message_type_groups_data:
-            fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg)
-            regression_filter_instance.fail_message_type_groups.add(fmtg_instance)
+        
+        fmtgs = [FailMessageTypeGroup.objects.get(**fmtg) for fmtg in fail_message_type_groups_data]
+        owners = [User.objects.get(**owner) for owner in owners_data]
+        subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
+        regression_filter_instance.owners.add(*owners)
+        regression_filter_instance.subscribers.add(*subscribers)
+        regression_filter_instance.fail_message_type_groups.add(*fmtgs)
         return regression_filter_instance
 
 
     def update(self, instance, validated_data):
-        instance.name = validated_data.pop('name')
+        instance.test_set_name = validated_data.pop('test_set_name')
+        _ = validated_data.pop('branch')
         testline_type_data = validated_data.pop('testline_type')
         testline_type_instance = TestlineType.objects.get(**testline_type_data)
         instance.testline_type = testline_type_instance
+
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
-        for fmtg_id in fail_message_type_groups_data:
-            fmtg_instance = FailMessageTypeGroup.objects.get(**fmtg_id)
-            instance.fail_message_type_groups.add(fmtg_instance)
+        owners_data = validated_data.pop('owners')
+        subscribers_data = validated_data.pop('subscribers')
+
+        fmtgs = [FailMessageTypeGroup.objects.get(**fmtg) for fmtg in fail_message_type_groups_data]
+        owners = [User.objects.get(**owner) for owner in owners_data]
+        subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
+
+        instance.fail_message_type_groups.set(fmtgs)
+        instance.owners.set(owners)
+        instance.subscribers.set(subscribers)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
         instance.save()
         return instance
