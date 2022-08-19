@@ -170,9 +170,12 @@ class TestSetFilterView(viewsets.ModelViewSet):
         return self._serialize_response(tsfilters)
 
 
-    @action(detail=False, url_path="branched")
+    @action(detail=False, url_path="branched", methods=['get'])
     def users_branch_only(self, request):
-        tsfilters = TestSetFilter.objects.filter(owners=request.user).exclude(branch__name="Trunk")
+        branch = self.request.query_params.get('branch', None)
+        tsfilters = TestSetFilter.objects.filter(owners=request.user)
+        if branch:
+            tsfilters = tsfilters.filter(branch__name=branch)
         return self._serialize_response(tsfilters)
 
 
