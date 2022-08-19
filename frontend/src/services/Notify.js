@@ -61,7 +61,8 @@ export const Successes = {
     'TEST_SET_FILTER_SUBSCRIBED': 'Test set filter was unsubscribed successfully!',
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter were unsubscribed successfully!',
     'TEST_SET_FILTER_DELETED': 'Test set filter was removed successfully!',
-    'TEST_SET_FILTER_EDITED': 'Test set filter was edited successfully!'
+    'TEST_SET_FILTER_EDITED': 'Test set filter was edited successfully!',
+    'BRANCH_OFF': 'Branch Off performed succesfully!'
 }
 
 export const Errors = {
@@ -76,11 +77,13 @@ export const Errors = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter was not unsubscribed!',
     'TEST_SET_FILTERS_DELETED': 'Test set filters were not removed!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
-    'GET_BRANCHES': 'Error during fetching branches!'
+    'GET_BRANCHES': 'Error during fetching branches!',
+    'BRANCH_OFF': 'Error during pewrforming Branch Off !'
 }
 
 export const Warnings = {
-    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!'
+    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!',
+    'BRANCH_OFF': 'Please select new branch!'
 }
 
 export const Infos = {

@@ -56,7 +56,7 @@ let TestSetFiltersComponent = ({ type }) => {
         getTestSetFilters(type).then(
             (response) => {
 
-                let parsedTestSetFilters = response.data.results.map((filter) => {
+                let parsedTestSetFilters = response.data.map((filter) => {
                     return {
                         "id": filter.id,
                         "test_set_name": filter.test_set_name,
