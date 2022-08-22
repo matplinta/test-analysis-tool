@@ -29,7 +29,8 @@ class FailMessageTypeSerializer(serializers.ModelSerializer):
 
 
 class FailMessageTypeGroupROSerializer(serializers.ModelSerializer):
-    author = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
+    id = serializers.IntegerField()
+    author = serializers.CharField(source="author.username")
 
     class Meta:
         model = FailMessageTypeGroup
