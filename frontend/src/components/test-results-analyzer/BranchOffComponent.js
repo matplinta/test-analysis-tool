@@ -78,12 +78,12 @@ const BranchOffComponent = () => {
 
     const selectSelectedTestFilters = (selectedTestFiltersValue) => {
         setSelectedTestFilters(selectedTestFiltersValue);
-        console.log(selectedTestFilters)
     }
 
     const onBranchChange = (e) => {
         setSelectedBranch(e.value)
         fetchTestSetFiltersBranched(e.value);
+        setSelectedTestFilters([]);
     }
 
     const makeBranchOff = () => {
@@ -104,34 +104,44 @@ const BranchOffComponent = () => {
             <Dropdown value={selectedBranch} options={branches} onChange={onBranchChange} optionLabel="name" optionValue="value"
                 placeholder="Select old Branch" style={{ marginLeft: "5px", marginTop: "5px" }} />
 
-            {selectedBranch !== null ?
-                < Button style={{ marginLeft: '5px', fontWeight: 'bold', height: '46px', marginBottom: '3px' }} className="p-button-primary p-button-color p-button-sm" onClick={makeBranchOff}>
+            {(selectedBranch !== null && selectedTestFilters.length !== 0) ?
+                < Button style={{ marginLeft: '5px', fontWeight: 'bold', height: '46px', marginBottom: '3px' }}
+                    className="p-button-primary p-button-color p-button-sm" onClick={makeBranchOff}>
                     <RiGitBranchFill size='20' />  Perform Branch Off
                 </Button>
-                : null
+                :
+                < Button style={{ marginLeft: '5px', fontWeight: 'bold', height: '46px', marginBottom: '3px' }}
+                    className="p-button-primary p-button-color p-button-sm" onClick={makeBranchOff} disabled>
+                    <RiGitBranchFill size='20' />  Perform Branch Off
+                </Button>
             }
 
             {selectedBranch !== null ?
-                <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row"
-                    showGridlines dataKey="id"
-                    filters={filters} filterDisplay="row" loading={loading}
-                    emptyMessage="No fail message types found."
-                    scrollHeight="calc(100vh - 220px)"
-                    resizableColumns columnResizeMode="fit"
-                    selectionMode="checkbox" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
-                    <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
-                    <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
-                    <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
-                    <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
-                    <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
-                    <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
-                    <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
-                    <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>
-                </DataTable>
+                <>
+                    <p style={{ fontWeight: 'bold', marginLeft: '7px', marginTop: '12px', marginBottom: '4px' }}>
+                        Select Test Set Filters for Branch Off and next click above button Perform Branch Off:
+                    </p>
+                    <DataTable value={testFilters} stripedRows responsiveLayout="scroll" size="small" className="table-style" editMode="row"
+                        showGridlines dataKey="id"
+                        filters={filters} filterDisplay="row" loading={loading}
+                        emptyMessage="No fail message types found."
+                        scrollHeight="calc(100vh - 220px)"
+                        resizableColumns columnResizeMode="fit"
+                        selectionMode="checkbox" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
+                        <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
+                        <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
+                        <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
+                        <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
+                        <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
+                        <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
+                        <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
+                        <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>
+                    </DataTable>
+                </>
                 : null
             }
 
-            <BranchOffModal selectedTestSetFilters={selectedTestFilters} showForm={showForm} handleFormClose={handleBranchOffFormClose} />
+            <BranchOffModal selectedTestSetFilters={selectedTestFilters} showForm={showForm} handleFormClose={handleBranchOffFormClose} oldBranch={selectedBranch} />
         </>
     )
 }

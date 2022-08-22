@@ -16,7 +16,7 @@ import './TestSetFilterAddModal.css';
 let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
 
     const [testLinesTypes, setTestLinesTypes] = useState([]);
-    const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
+    const [selectedFailMessageTypeGroup, setSelectedFailMessageTypeGroup] = useState([]);
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
     const [usersList, setUsersList] = useState([]);
 
@@ -48,11 +48,11 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         getFailMessageTypeGroups().then(
             (response) => {
                 if (response.data.length > 0) {
-                    setFailMessageTypeGroupsList(response.data);
+                    // setFailMessageTypeGroupsList(response.data);
                     const failMessageTypeGroupsValue = response.data.map(item => {
-                        return { label: item.name + ", Author: " + item.author, value: item.id }
+                        return { name: item.name + ", Author: " + item.author, id: item.id }
                     })
-                    setFailMessageTypeGroups(failMessageTypeGroupsValue);
+                    setFailMessageTypeGroupsList(failMessageTypeGroupsValue);
                 }
             },
             (error) => {
@@ -64,6 +64,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         AuthService.getUsers().then(
             (response) => {
                 if (response.data.length > 0) {
+                    console.log("users ", response.data)
                     setUsersList(response.data);
                 }
             },
@@ -85,7 +86,8 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
-        setFailMessageTypeGroup(e.target.value);
+        setSelectedFailMessageTypeGroup(e.target.value);
+        console.log(e.target.value)
     }
 
     let handleOwnersChange = (e) => {
@@ -100,9 +102,9 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         setTestSetName("");
         setTestLabPath("");
         setTestLineType(null);
-        setFailMessageTypeGroup(null);
-        setOwners(null);
-        setSubscribers(null);
+        setFailMessageTypeGroup([]);
+        setOwners([]);
+        setSubscribers([]);
     }
 
     let handleFilterAdd = () => {
@@ -110,16 +112,24 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
             "test_set_name": "",
             "test_lab_path": "",
             "testline_type": null,
-            "fail_message_type_groups": []
+            "fail_message_type_groups": [],
+            "owners": [],
+            "subscribers": []
         }
         filterToAdd.testline_type = testLineType;
         filterToAdd.test_set_name = testSetName;
         filterToAdd.test_lab_path = testLabPath;
+        console.log(failMessageTypeGroupsList)
+        console.log(selectedFailMessageTypeGroup)
         filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
-            let tmp = failMessageTypeGroup.includes(group.id);
+            let tmp = selectedFailMessageTypeGroup.includes(group.id);
+            console.log(group)
+            console.log("group id", group.id, " tmp ", tmp)
             if (tmp === true) return { "id": group.id, "name": group.name }
         });
-
+        filterToAdd.owners = owners.map(owner => ({ "username": owner }))
+        filterToAdd.subscribers = subscribers.map(subscriber => ({ "usenrame": subscriber }))
+        console.log(filterToAdd)
         postTestSetFilter(filterToAdd).then(
             (response) => {
                 Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
@@ -143,7 +153,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         filterToEdit.test_lab_path = testLabPath;
         filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = failMessageTypeGroup.includes(group.id);
-            if (tmp === true) return { "id": group.id, "name": group.name }
+            if (tmp === true) return { "id": group.id }
         });
 
         putTestSetFilter(filterIdToEdit, filterToEdit).then(
@@ -206,20 +216,20 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 <div className="form-item">
                     <label>Fail Message Type Groups</label>
                     <br />
-                    <MultiSelect value={failMessageTypeGroup} options={failMessageTypeGroups} onChange={handleFailMessageTypeGroupsChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" />
+                    <MultiSelect value={selectedFailMessageTypeGroup} options={failMessageTypeGroupsList} onChange={handleFailMessageTypeGroupsChange} style={{ width: "100%" }}
+                        optionLabel="name" optionValue="id" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <label>Additional owners</label>
                     <br />
                     <MultiSelect value={owners} options={usersList} onChange={handleOwnersChange} style={{ width: "100%" }}
-                        optionLabel="username" optionValue="id" filter showClear filterBy="username" />
+                        optionLabel="username" optionValue="username" filter showClear filterBy="username" />
                 </div>
                 <div className="form-item">
                     <label>Additional subscribers</label>
                     <br />
                     <MultiSelect value={subscribers} options={usersList} onChange={handleSubscribers} style={{ width: "100%" }}
-                        optionLabel="username" optionValue="id" filter showClear filterBy="username" />
+                        optionLabel="username" optionValue="username" filter showClear filterBy="username" />
                 </div>
                 {filterIdToEdit === null ?
                     <div className="form-item">

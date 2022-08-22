@@ -15,7 +15,7 @@ import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/
 import { AiFillEdit } from "react-icons/ai";
 
 
-const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose }) => {
+const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, oldBranch }) => {
 
     const [branches, setBranches] = useState([]);
     const [selectedBranch, setSelectedBranch] = useState(null);
@@ -27,7 +27,8 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose }) =
         getBranches().then(
             (response) => {
                 console.log(response)
-                let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '')
+                console.log(oldBranch)
+                let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '' && branch.name !== oldBranch)
                 let branchesParsed = branchesTmp.map(branch => ({ "name": branch.name, "value": branch.name }))
                 setBranches(branchesParsed);
             },
