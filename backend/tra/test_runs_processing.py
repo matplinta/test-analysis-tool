@@ -124,7 +124,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, pass_old_testruns: bo
     result, _ = TestRunResult.objects.get_or_create(name=rp_test_run["result"])
     hyperlink_set = rp_test_run.get("hyperlink_set", "")
     if hyperlink_set:
-        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", "")
+        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", [""])[0]
         log_file_url=rp_test_run["hyperlink_set"].get("log_file_url", "")
     else:
         ute_exec_url, log_file_url = "", ""
