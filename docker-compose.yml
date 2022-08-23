@@ -6,7 +6,7 @@ services:
     volumes:
       - ./postgres_db:/var/lib/postgresql/data
     env_file:
-      - ./.postgres.env
+      - ./.env
 
   web:
     build:
@@ -19,7 +19,7 @@ services:
       - "8000:8000"
       - "8888:8888"
     env_file:
-      - ./.postgres.env
+      - ./.env
     environment:
       - DEBUG=1
     depends_on:
@@ -35,7 +35,7 @@ services:
       dockerfile: ../docker/backend/Dockerfile.dev
     command: celery -A backend worker -l info
     env_file:
-      - ./.postgres.env
+      - ./.env
     environment:
       - DEBUG=1
     depends_on:
@@ -54,7 +54,7 @@ services:
       dockerfile: ../docker/backend/Dockerfile.dev
     command: celery -A backend beat -l info
     env_file:
-      - ./.postgres.env
+      - ./.env
     environment:
       - DEBUG=1
     depends_on:
@@ -71,7 +71,7 @@ services:
       dockerfile: ../docker/backend/Dockerfile.dev
     command: /start-flower
     env_file:
-      - ./.postgres.env
+      - ./.env
     environment:
       - DEBUG=1
     ports:
@@ -97,6 +97,11 @@ services:
       - web
 
 # volumes:
+#   logs_storage:
+#     driver: vieux/sshfs:latest
+#     driver_opts:
+#       sshcmd: ute@plinta-auto.sc5g.krk-lab.nsn-rdnet.net:/home/ute/logs/
+#       password: ute
 #   postgres_db:
 #     driver: local
 #     driver_opts:
