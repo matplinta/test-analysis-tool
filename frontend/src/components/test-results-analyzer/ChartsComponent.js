@@ -1,3 +1,10 @@
+// Description: File is responsible for managing form for creating filter sets and displaying charts
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
+
 import { useEffect, useState } from "react"
 import { Divider } from 'primereact/divider';
 import { Card } from 'primereact/card';
