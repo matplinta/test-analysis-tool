@@ -123,10 +123,8 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         console.log(selectedFailMessageTypeGroup)
         filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = selectedFailMessageTypeGroup.includes(group.id);
-            console.log(group)
-            console.log("group id", group.id, " tmp ", tmp)
-            if (tmp === true) return { "id": group.id, "name": group.name }
-        });
+            if (tmp === true) return group
+        }).map(mapGroup => ({ "id": mapGroup.id }));
         filterToAdd.owners = owners.map(owner => ({ "username": owner }))
         filterToAdd.subscribers = subscribers.map(subscriber => ({ "usenrame": subscriber }))
         console.log(filterToAdd)
