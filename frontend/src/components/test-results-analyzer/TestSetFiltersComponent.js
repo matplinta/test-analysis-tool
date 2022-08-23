@@ -1,3 +1,9 @@
+// Description: File is responsible for managing view to test set filters operations
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
 import { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom'
 import { FilterMatchMode, FilterOperator } from 'primereact/api';

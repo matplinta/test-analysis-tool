@@ -1,3 +1,9 @@
+// Description: File is responsible for managing view to perform Branch off procedure
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
 import { useState, useEffect, useRef } from 'react';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
