@@ -55,18 +55,35 @@ export const AlertTypes = Object.freeze({
 export const Successes = {
     'ADD_GLOBAL_FILTER_SUCCESS': 'Global filter added successfully!',
     'REMOVE_GLOBAL_FILTER_SUCCESS': 'Global filter removed successfully!',
-    'ADD_TEST_SET_SUCCESS': 'Test set added successfully!'
+    'ADD_TEST_SET_SUCCESS': 'Test set added successfully!',
+    'TEST_SET_FILTERS_SUBSCRIBED': 'Test set filters were subscribed successfully!',
+    'TEST_SET_FILTERS_UNSUBSCRIBED': 'Test set filters were unsubscribed successfully!',
+    'TEST_SET_FILTER_SUBSCRIBED': 'Test set filter was unsubscribed successfully!',
+    'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter were unsubscribed successfully!',
+    'TEST_SET_FILTER_DELETED': 'Test set filter was removed successfully!',
+    'TEST_SET_FILTER_EDITED': 'Test set filter was edited successfully!',
+    'BRANCH_OFF': 'Branch Off performed succesfully!'
 }
 
 export const Errors = {
     'REMOVE_GLOBAL_FILTER_ERROR': 'Error during global filter removing!',
     'ADD_TEST_SET_ERROR': 'Test set added failed!',
     'GET_TEST_RUNS': "Cannot get test runs!",
-    'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!"
+    'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!",
+    'EMPTY_FIELDS': "Cannot send due to empty fields. Please fulfil form.",
+    'TEST_SET_FILTERS_SUBSCRIBED': 'Test set filters were not subscribed!',
+    'TEST_SET_FILTERS_UNSUBSCRIBED': 'Test set filters were not subscribed!',
+    'TEST_SET_FILTER_SUBSCRIBED': 'Test set filter were not subscribed!',
+    'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter was not unsubscribed!',
+    'TEST_SET_FILTERS_DELETED': 'Test set filters were not removed!',
+    'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
+    'GET_BRANCHES': 'Error during fetching branches!',
+    'BRANCH_OFF': 'Error during pewrforming Branch Off !'
 }
 
 export const Warnings = {
-    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!'
+    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!',
+    'BRANCH_OFF': 'Please select new branch!'
 }
 
 export const Infos = {

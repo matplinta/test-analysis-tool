@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
 import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
+import { AiOutlineBarChart } from 'react-icons/ai';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
 
@@ -19,25 +20,34 @@ let MenuComponent = () => {
             command: () => { navigate('regression-test-runs') }
         },
         {
-            label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Regression Filters</span>,
+            label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Test Set Filters</span>,
             items: [{
-                label: "All Filters",
-                command: () => { navigate('regression-filters') },
+                label: "All Test Set Filters",
+                command: () => { navigate('test-set-filters') },
             }, {
-                label: "Subscribed Filters",
-                command: () => { navigate('subscribed-regression-filters') },
+                label: "Subscribed",
+                command: () => { navigate('subscribed-test-set-filters') },
             }, {
-                label: "Owned Filters",
-                command: () => { navigate('owned-regression-filters') },
+                label: "Owned",
+                command: () => { navigate('owned-test-set-filters') },
+            }, {
+                label: "Prapare to Branch off",
+                command: () => { navigate('test-set-filters-branch-off') },
             }]
         },
         {
-            label: <span><VscGroupByRefType size='20' style={{ marginBottom: '3px' }} /> Fail Message Groups</span>,
-            command: () => { navigate('fail-regex-groups') }
+            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages Definitions</span>,
+            items: [{
+                label: <span>Fail Message Regex</span>,
+                command: () => { navigate('fail-regex') }
+            }, {
+                label: <span>Fail Message Groups</span>,
+                command: () => { navigate('fail-regex-groups') }
+            }]
         },
         {
-            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Message Regex</span>,
-            command: () => { navigate('fail-regex') }
+            label: <span><AiOutlineBarChart size='20' style={{ marginBottom: '3px' }} /> Statistics</span>,
+            command: () => { navigate('statistics') }
         }
     ]
 

@@ -40,3 +40,27 @@ export const deleteTestSetFilter = async (id) => {
 export const getTestLineTypes = async () => {
     return (await axios.get('api/tra/testline_types/', { headers: authHeader() }));
 }
+
+export const postSubscribeBatch = async (testFilters) => {
+    return (await axios.post('/api/tra/test_set_filters/subscribe/', testFilters, { headers: authHeader() }));
+}
+
+export const postUnsubscribeBatch = async (testFilters) => {
+    return (await axios.post('/api/tra/test_set_filters/unsubscribe/', testFilters, { headers: authHeader() }));
+}
+
+export const deleteTestSetFilterBatch = async (testSetFilters) => {
+    return (await axios.delete('/api/tra/test_set_filters/delete/', { headers: authHeader(), data: testSetFilters }));
+}
+
+export const getTestSetFiltersBranched = async (branch) => {
+    return (await axios.get('/api/tra/test_set_filters/branched/?branch=' + branch, { headers: authHeader() }));
+}
+
+export const getBranches = async () => {
+    return (await axios.get('/api/tra/branches/', { headers: authHeader() }));
+}
+
+export const postBranchOff = async (branchOffData) => {
+    return (await axios.post('/api/tra/test_set_filters/branchoff/', branchOffData, { headers: authHeader() }));
+}

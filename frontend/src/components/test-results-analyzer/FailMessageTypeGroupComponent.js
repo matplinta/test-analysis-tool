@@ -51,7 +51,7 @@ let FailMessageTypeGroupComponent = () => {
                                 "data": {
                                     "id": type.id,
                                     "type_name": type.name,
-                                    "regex": type.name,
+                                    "regex": type.regex,
                                     "type_author": type.author,
                                     "description": type.description,
                                     "env_issue_type": type.env_issue_type

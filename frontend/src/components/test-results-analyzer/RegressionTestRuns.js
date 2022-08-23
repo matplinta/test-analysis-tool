@@ -490,6 +490,7 @@ let RegressionTestRuns = () => {
         if (Object.keys(searchParamsEntry).length !== 0) {
             let url = convertUrl(searchParamsEntry)
             setApiFilterUrl(url);
+            fetchTestRunsFilters();
         } else {
             setApiFilterUrl("");
         }
@@ -506,8 +507,8 @@ let RegressionTestRuns = () => {
                     {testLineTypeCheckboxList}
                     {branchCheckboxList}
                     {statusCheckboxList}
-                    {analyzerCheckboxList}
                     {fbCheckboxList}
+                    {analyzerCheckboxList}
                     <Button onClick={searchTestRuns} className="p-button-primary" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
                     {/* </ScrollPanel> */}
                 </div>
