@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
     #     # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     #     # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -80,6 +80,8 @@ RP_PASSWORD = 'Pico1234&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.environ.get("DEBUG", default=''))
+LOGS_STORAGE_PATH = os.environ.get("LOGS_STORAGE_PATH", default='')
+LOGS_STORAGE_HTTP_SERVER = os.environ.get("LOGS_STORAGE_HTTP_SERVER", default='')
 
 ALLOWED_HOSTS = ['*']
 

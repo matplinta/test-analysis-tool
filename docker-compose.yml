@@ -15,6 +15,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+      - logs_storage:${LOGS_STORAGE_PATH}
     ports:
       - "8000:8000"
       - "8888:8888"
@@ -96,12 +97,12 @@ services:
       - db
       - web
 
-# volumes:
-#   logs_storage:
-#     driver: vieux/sshfs:latest
-#     driver_opts:
-#       sshcmd: ute@plinta-auto.sc5g.krk-lab.nsn-rdnet.net:/home/ute/logs/
-#       password: ute
+volumes:
+  logs_storage:
+    driver: vieux/sshfs:latest
+    driver_opts:
+      sshcmd: ${LOGS_STORAGE_SSHCMD}
+      password: ${LOGS_STORAGE_PASSWD}
 #   postgres_db:
 #     driver: local
 #     driver_opts:

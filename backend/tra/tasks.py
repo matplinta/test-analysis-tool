@@ -2,8 +2,12 @@ from celery.utils.log import get_task_logger
 from celery import shared_task
 from celery.schedules import crontab
 from backend.celery import app
+import subprocess
+import os
+from django.conf import settings
 from .models import *
 from .test_runs_processing import pull_and_analyze_notanalyzed_testruns_by_regfilter
+
 
 
 logger = get_task_logger(__name__)
@@ -40,3 +44,16 @@ def celery_pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_
     if subs_count == 0:
         return f"Regression filter id:{regression_filter_id} has 0 subscribers - will be skipped" 
     return pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter_id=regression_filter_id, query_limit=query_limit)
+
+
+@app.task()
+def download_resursively_contents_to_storage(url, directory, cwd=settings.LOGS_STORAGE_PATH):
+    path = os.path.join(cwd, directory)
+    wget_cmd = f"wget -r -np -nH --cut-dirs=3 -R index.html -R index.html.tmp {url}"
+    os.makedirs(path, exist_ok=True)
+    proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
+    try:
+        outs, errs = proc.communicate(timeout=300)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        outs, errs = proc.communicate()

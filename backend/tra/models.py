@@ -113,6 +113,9 @@ class TestInstance(models.Model):
     test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
+    last_passing_logs   = models.TextField(blank=True, null=True, help_text="Last passing date in TRA Storage")
+    last_passing_date   = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing date in TRA Storage")
+    last_passing_build  = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing build in TRA Storage")
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
