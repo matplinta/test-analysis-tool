@@ -2,10 +2,10 @@ from django.core.files.storage import Storage
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime
+from urllib.parse import urlparse
 import subprocess
 import os
 import shutil
-
 
 class UTECloudLogsStorage(Storage):
     def __init__(self, storage_local_path=None, storage_http_server=None):
@@ -21,9 +21,13 @@ class UTECloudLogsStorage(Storage):
     def path(self, name):
         return os.path.join(self._storage_local_path, name)
 
-    def _save(self, directory, url):
+    def _save(self, directory, url, timeout):
         path = self.path(directory)
-        wget_cmd = f"wget -r -np -nH --cut-dirs=3 -R index.html -R index.html.tmp {url}"
+        url_path = urlparse(url).path
+        if url_path.endswith('/'):
+            url_path = url_path[:-1]
+        cut_dirs = url_path.count('/')
+        wget_cmd = f"wget -r -np -nH --cut-dirs={cut_dirs} -R index.html -R index.html.tmp {url}"
         os.makedirs(path, exist_ok=True)
         proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
         # try:
@@ -31,13 +35,13 @@ class UTECloudLogsStorage(Storage):
         # except subprocess.TimeoutExpired:
         #     proc.kill()
         #     outs, errs = proc.communicate()
-        proc.communicate(timeout=300)
+        proc.communicate(timeout=timeout)
         return True if proc.returncode == 0 else False 
 
     
-    def save(self, name, url, max_length=None):
+    def save(self, name, url, max_length=None, timeout=900):
         name = self.get_available_name(name, max_length=max_length)
-        is_saved = self._save(name, url)
+        is_saved = self._save(name, url, timeout)
         return is_saved
 
 
