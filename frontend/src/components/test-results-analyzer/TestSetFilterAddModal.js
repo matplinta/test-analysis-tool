@@ -7,16 +7,16 @@ import { MultiSelect } from 'primereact/multiselect';
 
 import { getTestLineTypes, postTestSetFilter, getTestSetFilter, putTestSetFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
-import AuthService from './../../services/auth.service.js';
+import AuthService from '../../services/auth.service.js';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
-import './UserFilterAddModal.css';
+import './TestSetFilterAddModal.css';
 
-let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
+let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
 
     const [testLinesTypes, setTestLinesTypes] = useState([]);
-    const [failMessageTypeGroups, setFailMessageTypeGroups] = useState([]);
+    const [selectedFailMessageTypeGroup, setSelectedFailMessageTypeGroup] = useState([]);
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
     const [usersList, setUsersList] = useState([]);
 
@@ -48,11 +48,11 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
         getFailMessageTypeGroups().then(
             (response) => {
                 if (response.data.length > 0) {
-                    setFailMessageTypeGroupsList(response.data);
+                    // setFailMessageTypeGroupsList(response.data);
                     const failMessageTypeGroupsValue = response.data.map(item => {
-                        return { label: item.name + ", Author: " + item.author, value: item.id }
+                        return { name: item.name + ", Author: " + item.author, id: item.id }
                     })
-                    setFailMessageTypeGroups(failMessageTypeGroupsValue);
+                    setFailMessageTypeGroupsList(failMessageTypeGroupsValue);
                 }
             },
             (error) => {
@@ -64,6 +64,7 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
         AuthService.getUsers().then(
             (response) => {
                 if (response.data.length > 0) {
+                    console.log("users ", response.data)
                     setUsersList(response.data);
                 }
             },
@@ -85,7 +86,8 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
-        setFailMessageTypeGroup(e.target.value);
+        setSelectedFailMessageTypeGroup(e.target.value);
+        console.log(e.target.value)
     }
 
     let handleOwnersChange = (e) => {
@@ -100,9 +102,9 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
         setTestSetName("");
         setTestLabPath("");
         setTestLineType(null);
-        setFailMessageTypeGroup(null);
-        setOwners(null);
-        setSubscribers(null);
+        setFailMessageTypeGroup([]);
+        setOwners([]);
+        setSubscribers([]);
     }
 
     let handleFilterAdd = () => {
@@ -110,16 +112,22 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
             "test_set_name": "",
             "test_lab_path": "",
             "testline_type": null,
-            "fail_message_type_groups": []
+            "fail_message_type_groups": [],
+            "owners": [],
+            "subscribers": []
         }
         filterToAdd.testline_type = testLineType;
         filterToAdd.test_set_name = testSetName;
         filterToAdd.test_lab_path = testLabPath;
+        console.log(failMessageTypeGroupsList)
+        console.log(selectedFailMessageTypeGroup)
         filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
-            let tmp = failMessageTypeGroup.includes(group.id);
-            if (tmp === true) return { "id": group.id, "name": group.name }
-        });
-
+            let tmp = selectedFailMessageTypeGroup.includes(group.id);
+            if (tmp === true) return group
+        }).map(mapGroup => ({ "id": mapGroup.id }));
+        filterToAdd.owners = owners.map(owner => ({ "username": owner }))
+        filterToAdd.subscribers = subscribers.map(subscriber => ({ "usenrame": subscriber }))
+        console.log(filterToAdd)
         postTestSetFilter(filterToAdd).then(
             (response) => {
                 Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
@@ -143,17 +151,17 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
         filterToEdit.test_lab_path = testLabPath;
         filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = failMessageTypeGroup.includes(group.id);
-            if (tmp === true) return { "id": group.id, "name": group.name }
+            if (tmp === true) return { "id": group.id }
         });
 
         putTestSetFilter(filterIdToEdit, filterToEdit).then(
             (response) => {
-                console.log("Success!")
+                Notify.sendNotification(Successes.TEST_SET_FILTER_EDITED, AlertTypes.success);
                 clearForm();
                 handleFormClose();
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.TEST_SET_FILTER_EDITED, AlertTypes.error);
             })
     }
 
@@ -206,20 +214,20 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
                 <div className="form-item">
                     <label>Fail Message Type Groups</label>
                     <br />
-                    <MultiSelect value={failMessageTypeGroup} options={failMessageTypeGroups} onChange={handleFailMessageTypeGroupsChange} style={{ width: "100%" }}
-                        optionLabel="label" filter showClear filterBy="label" />
+                    <MultiSelect value={selectedFailMessageTypeGroup} options={failMessageTypeGroupsList} onChange={handleFailMessageTypeGroupsChange} style={{ width: "100%" }}
+                        optionLabel="name" optionValue="id" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
                     <label>Additional owners</label>
                     <br />
                     <MultiSelect value={owners} options={usersList} onChange={handleOwnersChange} style={{ width: "100%" }}
-                        optionLabel="username" optionValue="id" filter showClear filterBy="username" />
+                        optionLabel="username" optionValue="username" filter showClear filterBy="username" />
                 </div>
                 <div className="form-item">
                     <label>Additional subscribers</label>
                     <br />
                     <MultiSelect value={subscribers} options={usersList} onChange={handleSubscribers} style={{ width: "100%" }}
-                        optionLabel="username" optionValue="id" filter showClear filterBy="username" />
+                        optionLabel="username" optionValue="username" filter showClear filterBy="username" />
                 </div>
                 {filterIdToEdit === null ?
                     <div className="form-item">
@@ -242,4 +250,4 @@ let UserFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFor
     )
 }
 
-export default UserFilterAddModal;
+export default TestSetFilterAddModal;
