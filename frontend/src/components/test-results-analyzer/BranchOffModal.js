@@ -32,7 +32,6 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, old
     let fetchBranches = () => {
         getBranches().then(
             (response) => {
-                console.log(response)
                 console.log(oldBranch)
                 let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '' && branch.name !== oldBranch)
                 let branchesParsed = branchesTmp.map(branch => ({ "name": branch.name, "value": branch.name }))
@@ -81,7 +80,7 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, old
 
     useEffect(() => {
         fetchBranches();
-    }, [])
+    }, [oldBranch])
 
     return (
         <div>
