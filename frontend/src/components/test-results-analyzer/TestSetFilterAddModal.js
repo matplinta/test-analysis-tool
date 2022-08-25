@@ -1,14 +1,22 @@
+// Description: File is responsible for add/edit form to managr test set filter object
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
+
 import { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
+import { Checkbox } from 'primereact/checkbox';
 
 import { getTestLineTypes, postTestSetFilter, getTestSetFilter, putTestSetFilter } from '../../services/test-results-analyzer/test-filters.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import AuthService from '../../services/auth.service.js';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
 import './TestSetFilterAddModal.css';
@@ -24,10 +32,11 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
 
     const [testSetName, setTestSetName] = useState("");
     const [testLabPath, setTestLabPath] = useState("");
-    const [testLineType, setTestLineType] = useState(null);
-    const [failMessageTypeGroup, setFailMessageTypeGroup] = useState(null);
-    const [owners, setOwners] = useState(null);
-    const [subscribers, setSubscribers] = useState(null);
+    const [testLineType, setTestLineType] = useState([]);
+    const [owners, setOwners] = useState([]);
+    const [subscribers, setSubscribers] = useState([]);
+    const [isOwnedByMe, setIsOwnedByMe] = useState(true);
+    const [isSubscribedByMe, setIsSubscribedByMe] = useState(true);
 
     let fetchTestLines = () => {
         getTestLineTypes().then(
@@ -40,7 +49,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 }
             },
             (error) => {
-                console.log(error)
+                Notify.sendNotification(Errors.FETCH_TEST_LINES_LIST, AlertTypes.error);
             })
     }
 
@@ -48,7 +57,6 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         getFailMessageTypeGroups().then(
             (response) => {
                 if (response.data.length > 0) {
-                    // setFailMessageTypeGroupsList(response.data);
                     const failMessageTypeGroupsValue = response.data.map(item => {
                         return { name: item.name + ", Author: " + item.author, id: item.id }
                     })
@@ -56,20 +64,20 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 }
             },
             (error) => {
-                console.log(error)
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_GROUPS_LIST, AlertTypes.error);
             })
     }
 
     let fetchUsers = () => {
+        console.log("uzytkownik ", currentUser)
         AuthService.getUsers().then(
             (response) => {
                 if (response.data.length > 0) {
-                    console.log("users ", response.data)
-                    setUsersList(response.data);
+                    setUsersList(response.data.filter(user => user.username !== currentUser & user.username !== "autoanalyzer"))
                 }
             },
             (error) => {
-                console.log(error)
+                Notify.sendNotification(Errors.FETCH_USERS_LIST, AlertTypes.error);
             })
     }
 
@@ -86,8 +94,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
-        setSelectedFailMessageTypeGroup(e.target.value);
-        console.log(e.target.value)
+        setSelectedFailMessageTypeGroup(e.target.value)
     }
 
     let handleOwnersChange = (e) => {
@@ -102,7 +109,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         setTestSetName("");
         setTestLabPath("");
         setTestLineType(null);
-        setFailMessageTypeGroup([]);
+        setSelectedFailMessageTypeGroup([]);
         setOwners([]);
         setSubscribers([]);
     }
@@ -119,23 +126,28 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         filterToAdd.testline_type = testLineType;
         filterToAdd.test_set_name = testSetName;
         filterToAdd.test_lab_path = testLabPath;
-        console.log(failMessageTypeGroupsList)
-        console.log(selectedFailMessageTypeGroup)
+
         filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
             let tmp = selectedFailMessageTypeGroup.includes(group.id);
             if (tmp === true) return group
         }).map(mapGroup => ({ "id": mapGroup.id }));
+
         filterToAdd.owners = owners.map(owner => ({ "username": owner }))
-        filterToAdd.subscribers = subscribers.map(subscriber => ({ "usenrame": subscriber }))
+        filterToAdd.owners.push({ "username": currentUser });
+
+        filterToAdd.subscribers = subscribers.map(subscriber => ({ "username": subscriber }));
+        if (isSubscribedByMe) filterToAdd.subscribers.push({ "username": currentUser });
+
         console.log(filterToAdd)
+
         postTestSetFilter(filterToAdd).then(
             (response) => {
-                Notify.sendNotification(Successes.ADD_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
+                Notify.sendNotification(Successes.ADD_TEST_SET_FILTER, AlertTypes.success);
                 clearForm();
                 handleFormClose();
             },
             (error) => {
-                Notify.sendNotification(Errors.REMOVE_GLOBAL_FILTER_ERROR, AlertTypes.error);
+                Notify.sendNotification(Errors.ADD_TEST_SET_FILTER, AlertTypes.error);
             })
     }
 
@@ -144,25 +156,39 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
             "test_set_name": "",
             "test_lab_path": "",
             "testline_type": null,
-            "fail_message_type_groups": []
+            "fail_message_type_groups": [],
+            "owners": [],
+            "subscribers": []
         }
         filterToEdit.testline_type = testLineType;
         filterToEdit.test_set_name = testSetName;
         filterToEdit.test_lab_path = testLabPath;
-        filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
-            let tmp = failMessageTypeGroup.includes(group.id);
-            if (tmp === true) return { "id": group.id }
-        });
 
-        putTestSetFilter(filterIdToEdit, filterToEdit).then(
-            (response) => {
-                Notify.sendNotification(Successes.TEST_SET_FILTER_EDITED, AlertTypes.success);
-                clearForm();
-                handleFormClose();
-            },
-            (error) => {
-                Notify.sendNotification(Errors.TEST_SET_FILTER_EDITED, AlertTypes.error);
-            })
+        filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
+            let tmp = selectedFailMessageTypeGroup.includes(group.id);
+            if (tmp === true) return group
+        }).map(mapGroup => ({ "id": mapGroup.id }));
+
+        filterToEdit.owners = owners.map(owner => ({ "username": owner }))
+        if (isOwnedByMe) filterToEdit.owners.push({ "username": currentUser })
+
+        filterToEdit.subscribers = subscribers.map(subscriber => ({ "username": subscriber }))
+        if (isSubscribedByMe) filterToEdit.subscribers.push({ "username": currentUser })
+
+        if (filterToEdit.owners.length === 0)
+            Notify.sendNotification(Warnings.EDIT_TEST_SET_FILTER_ANY_OWNER, AlertTypes.warn);
+        else {
+            putTestSetFilter(filterIdToEdit, filterToEdit).then(
+                (response) => {
+                    Notify.sendNotification(Successes.EDIT_TEST_SET_FILTER, AlertTypes.success);
+                    clearForm();
+                    handleFormClose();
+                },
+                (error) => {
+                    Notify.sendNotification(Errors.EDIT_TEST_SET_FILTER, AlertTypes.error);
+                })
+        }
+
     }
 
     let fetchFilterToEdit = (id) => {
@@ -171,9 +197,14 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 setTestSetName(result.data.test_set_name);
                 setTestLabPath(result.data.test_lab_path);
                 setTestLineType(result.data.testline_type);
-                setFailMessageTypeGroup(result.data.fail_message_type_groups.map(group => group.id));
+                if (result.data.fail_message_type_groups.length !== 0)
+                    setSelectedFailMessageTypeGroup(result.data.fail_message_type_groups.map(group => group.id));
+                if (result.data.owners.length !== 0)
+                    setOwners(result.data.owners.filter(owner => owner.username !== currentUser).map(owner => owner.username))
+                if (result.data.subscribers.length !== 0)
+                    setSubscribers(result.data.subscribers.filter(subscriber => subscriber.username !== currentUser).map(subscriber => subscriber.username))
             }, (error) => {
-                console.log("error fetching filter to edit")
+                Notify.sendNotification(Errors.FETCH_EDIT_TEST_SET_FILTER, AlertTypes.error);
             }
         )
     }
@@ -188,10 +219,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
             fetchFilterToEdit(filterIdToEdit);
         } else {
             clearForm();
-            // setOwners([currentUser.id]);
-            // setSubscribers([currentUser.id]);
         }
-
     }, [filterIdToEdit, showForm])
 
     return (
@@ -218,10 +246,22 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                         optionLabel="name" optionValue="id" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
+                    {filterIdToEdit !== null ?
+                        <Checkbox inputId="isOwned" onChange={e => setIsOwnedByMe(e.checked)} checked={isOwnedByMe}></Checkbox>
+                        :
+                        <Checkbox inputId="isOwned" onChange={e => setIsOwnedByMe(e.checked)} checked={isOwnedByMe} disabled></Checkbox>
+                    }
+                    <label htmlFor="isOwned" className="p-checkbox-label" style={{ marginLeft: '7px' }}> Owned by me</label>
+                </div>
+                <div className="form-item">
                     <label>Additional owners</label>
                     <br />
                     <MultiSelect value={owners} options={usersList} onChange={handleOwnersChange} style={{ width: "100%" }}
                         optionLabel="username" optionValue="username" filter showClear filterBy="username" />
+                </div>
+                <div className="form-item">
+                    <Checkbox inputId="isSubscribed" onChange={e => setIsSubscribedByMe(e.checked)} checked={isSubscribedByMe}></Checkbox>
+                    <label htmlFor="isSubscribed" className="p-checkbox-label" style={{ marginLeft: '7px' }}> Subscribed my me</label>
                 </div>
                 <div className="form-item">
                     <label>Additional subscribers</label>

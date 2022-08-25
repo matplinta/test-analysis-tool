@@ -223,7 +223,7 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.test_set_name = validated_data.pop('test_set_name')
-        _ = validated_data.pop('branch')
+        _ = validated_data.pop('branch', None)
         testline_type_data = validated_data.pop('testline_type')
         testline_type_instance = TestlineType.objects.get(**testline_type_data)
         instance.testline_type = testline_type_instance

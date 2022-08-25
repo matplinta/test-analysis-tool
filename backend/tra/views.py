@@ -332,10 +332,10 @@ class TestSetFilterView(viewsets.ModelViewSet):
             return Response(status=status.HTTP_304_NOT_MODIFIED)
 
 
-    def perform_create(self, serializer):
-        instance = serializer.save()
-        instance.owners.add(self.request.user)
-        instance.subscribers.add(self.request.user)
+    # def perform_create(self, serializer):
+    #     instance = serializer.save()
+    #     instance.owners.add(self.request.user)
+    #     instance.subscribers.add(self.request.user)
 
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]

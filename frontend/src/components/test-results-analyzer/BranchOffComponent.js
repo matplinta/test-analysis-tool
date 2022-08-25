@@ -93,6 +93,7 @@ const BranchOffComponent = () => {
     }
 
     const makeBranchOff = () => {
+        console.log("???????/", selectedBranch)
         handleFormShow();
     }
 
