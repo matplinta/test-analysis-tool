@@ -1,3 +1,9 @@
+// Description: File is responsible for managing form to add/edit fail message type regex
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
 import { useEffect, useState } from "react";
 
 import { InputText } from 'primereact/inputtext';
@@ -6,11 +12,12 @@ import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
 
-import { postFailMessageType, getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
+import { postFailMessageType, getEnvIssueTypes, putFailMessageType } from './../../services/test-results-analyzer/fail-message-type.service';
+import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
 
 import './FailMessageTypeAddModal.css';
 
-const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
+const FailMessageTypeAddModal = ({ failMessageToEdit, showForm, handleFormClose }) => {
 
     const [name, setName] = useState('');
     const [regex, setRegex] = useState('');
@@ -26,7 +33,7 @@ const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
                 setEnvIssueTypesList(data);
             },
             (error) => {
-                console.log("Error");
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_REGEX, AlertTypes.error);
             })
     }
 
@@ -46,18 +53,50 @@ const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
         }
         postFailMessageType(failMessgeRegexTypeToAdd).then(
             (success) => {
-                console.log("Success!")
+                Notify.sendNotification(Successes.ADD_FAIL_MESSAGE_REGEX, AlertTypes.success)
                 clearForm();
                 handleFormClose();
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.ADD_FAIL_MESSAGE_REGEX, AlertTypes.error)
             })
+    }
+
+    const handleFailMessageRegexTypeEdit = () => {
+        let failMessageRegexTypeToEdit = {
+            'name': name,
+            'regex': regex,
+            'description': description,
+            'env_issue_type': envIssueType
+        }
+        putFailMessageType(failMessageToEdit.id, failMessageRegexTypeToEdit).then(
+            (success) => {
+                Notify.sendNotification(Successes.EDIT_FAIL_MESSAGE_REGEX, AlertTypes.success)
+                clearForm();
+                handleFormClose();
+            },
+            (error) => {
+                Notify.sendNotification(Errors.EDIT_FAIL_MESSAGE_REGEX, AlertTypes.error)
+            })
+    }
+
+
+    let fetchFailMesageToEdit = () => {
+        setName(failMessageToEdit.name);
+        setRegex(failMessageToEdit.regex);
+        setEnvIssueType(failMessageToEdit.env_issue_type);
+        setDescription(failMessageToEdit.description);
+    }
+
+    let selectEnvIssueType = (type) => {
+        setEnvIssueType(type)
     }
 
     useEffect(() => {
         fetchEnvIssueTypes();
-    }, [])
+        if (failMessageToEdit !== null) fetchFailMesageToEdit();
+        else clearForm();
+    }, [failMessageToEdit])
 
     return (
         <div>
@@ -74,7 +113,7 @@ const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
                 </div>
                 <div className="form-item">
                     <label htmlFor="envIssueType" className="block">Env Issue Type</label>
-                    <SelectButton optionLabel="name" optionValue="name" className="issue-type-select-button" value={envIssueType} options={envIssueTypesList} onChange={(e) => setEnvIssueType(e.value)}></SelectButton>
+                    <SelectButton optionLabel="name" optionValue="name" className="issue-type-select-button" value={envIssueType} options={envIssueTypesList} onChange={(e) => selectEnvIssueType(e.value)}></SelectButton>
                 </div>
                 <div className="form-item">
                     <label htmlFor="regex" className="block">Description</label>
@@ -82,14 +121,22 @@ const FailMessageTypeAddModal = ({ showForm, handleFormClose }) => {
                     <InputTextarea value={description} rows={2} onChange={(e) => setDescription(e.target.value)} autoResize style={{ width: "100%" }} />
                 </div>
 
-                <div className="form-item">
-                    <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeAdd}>
-                        Add Filter
-                    </Button>
-                    <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
-                        Clear Form
-                    </Button>
-                </div>
+                {failMessageToEdit === null ?
+                    <div className="form-item">
+                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeAdd}>
+                            Add Regex
+                        </Button>
+                        <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                            Clear Form
+                        </Button>
+                    </div>
+                    :
+                    <div className="form-item">
+                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeEdit}>
+                            Save Regex
+                        </Button>
+                    </div>
+                }
             </Dialog >
 
         </div >
