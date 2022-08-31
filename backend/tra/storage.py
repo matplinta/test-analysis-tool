@@ -2,15 +2,24 @@ from django.core.files.storage import Storage
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 import subprocess
 import os
 import shutil
+import time
+
+
+def get_storage_instance():
+    if settings.DEBUG:
+        http_server = f"{settings.LOGS_STORAGE_HTTP_SERVER_DEBUG}:{settings.LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT}"
+        return UTECloudLogsStorage(storage_local_path=settings.LOGS_STORAGE_DOCKER_PATH_DEBUG, storage_http_server=http_server)
+    return UTECloudLogsStorage()
+
 
 class UTECloudLogsStorage(Storage):
     def __init__(self, storage_local_path=None, storage_http_server=None):
         if not storage_local_path:
-            storage_local_path = settings.LOGS_STORAGE_PATH
+            storage_local_path = settings.LOGS_STORAGE_DOCKER_PATH
         if not storage_http_server:
             storage_http_server = settings.LOGS_STORAGE_HTTP_SERVER
 
@@ -27,22 +36,18 @@ class UTECloudLogsStorage(Storage):
         if url_path.endswith('/'):
             url_path = url_path[:-1]
         cut_dirs = url_path.count('/')
-        wget_cmd = f"wget -r -np -nH --cut-dirs={cut_dirs} -R index.html -R index.html.tmp {url}"
+        wget_cmd = f"wget -q -r -np -nH --cut-dirs={cut_dirs} -R index.html -R index.html.tmp {url}"
         os.makedirs(path, exist_ok=True)
         proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
-        # try:
-        #     outs, errs = proc.communicate(timeout=300)
-        # except subprocess.TimeoutExpired:
-        #     proc.kill()
-        #     outs, errs = proc.communicate()
         proc.communicate(timeout=timeout)
-        return True if proc.returncode == 0 else False 
+        return proc.returncode 
 
     
-    def save(self, name, url, max_length=None, timeout=900):
+    def save(self, name, url, max_length=None, timeout=3600):
         name = self.get_available_name(name, max_length=max_length)
-        is_saved = self._save(name, url, timeout)
-        return is_saved
+        start_time = time.time()
+        rc = self._save(name, url, timeout)
+        return {"rc": rc, "time": str(time.time() - start_time)}
 
 
     def delete(self, name):
@@ -105,7 +110,7 @@ class UTECloudLogsStorage(Storage):
         Return an absolute URL where the file's contents can be accessed
         directly by a web browser.
         """
-        return f"{self._storage_http_server}/{name}"
+        return urljoin(self._storage_http_server, name)
 
     def _datetime_from_timestamp(self, ts):
         """
@@ -123,4 +128,3 @@ class UTECloudLogsStorage(Storage):
 
     def get_modified_time(self, name):
         return self._datetime_from_timestamp(os.path.getmtime(self.path(name)))
-    

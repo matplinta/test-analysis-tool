@@ -52,7 +52,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
     #     # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     #     # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -75,13 +75,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2'
 # SECRET_KEY = os.environ.get("SECRET_KEY")
 
-RP_USER = 'sc'
-RP_PASSWORD = 'Pico1234&'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.environ.get("DEBUG", default=''))
-LOGS_STORAGE_PATH = os.environ.get("LOGS_STORAGE_PATH", default='')
-LOGS_STORAGE_HTTP_SERVER = os.environ.get("LOGS_STORAGE_HTTP_SERVER", default='')
+DEBUG                               = bool(os.environ.get("DEBUG", default=''))
+RP_USER                             = os.environ.get("RP_USER", default='')
+RP_PASSWORD                         = os.environ.get("RP_PASSWORD", default='')
+LOGS_STORAGE_DOCKER_PATH            = os.environ.get("LOGS_STORAGE_DOCKER_PATH", default='')
+LOGS_STORAGE_DOCKER_PATH_DEBUG      = os.environ.get("LOGS_STORAGE_DOCKER_PATH_DEBUG", default='')
+LOGS_STORAGE_HTTP_SERVER            = os.environ.get("LOGS_STORAGE_HTTP_SERVER", default='')
+LOGS_STORAGE_HTTP_SERVER_DEBUG      = os.environ.get("LOGS_STORAGE_HTTP_SERVER_DEBUG", default='')
+LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT = os.environ.get("LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT", default='')
 
 ALLOWED_HOSTS = ['*']
 
