@@ -110,7 +110,7 @@ class UTECloudLogsStorage(Storage):
         Return an absolute URL where the file's contents can be accessed
         directly by a web browser.
         """
-        return urljoin(self._storage_http_server, name)
+        return "/".join(map(lambda x: str(x).rstrip('/'), [self._storage_http_server, name]))
 
     def _datetime_from_timestamp(self, ts):
         """
