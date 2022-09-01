@@ -151,4 +151,10 @@ testrun_analyze_schema = openapi.Schema(
 )
 
 
- 
+by_testset_filter_param = openapi.Parameter(
+    name="tsfid", 
+    in_=openapi.IN_QUERY,
+    description="TestSetFilter id",
+    type=openapi.TYPE_INTEGER,
+    required=True
+)

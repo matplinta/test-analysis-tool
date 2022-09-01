@@ -189,7 +189,7 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
 
         except TestRunWithSuchRPIDAlreadyExists as exc_rp_id:
             skipped_runs.append(str(exc_rp_id))
-            utils.log_exception_info(e)
+            utils.log_exception_info(exc_rp_id)
 
         except TestRunFBOlderThan3ConsecFBs as e:
             utils.log_exception_info(e)

@@ -507,24 +507,76 @@ class PullNotPassedTestrunsByAllTestSetFilters(APIView):
 
 
 class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
+    @swagger_auto_schema(
+        description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        operation_description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
     def get(self, request):
         celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.delay()
         return Response("OK")
 
 
 class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
+    @swagger_auto_schema(
+        description="Pull passed test runs from ReportingPortal to DB",
+        operation_description="Pull passed test runs from ReportingPortal to DB",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
     def get(self, request):
         celery_tasks.celery_pull_passed_testruns_by_all_testset_filters.delay()
         return Response("OK")
 
 
+class DownloadLatestPassedLogsToStorageByTestSetFilter(APIView):
+    @swagger_auto_schema(
+        description="Trigger download of latest passing logs for each test instance in particular TestSetFilter",
+        operation_description="Trigger download of latest passing logs for each test instance in particular TestSetFilter",
+        request_body=no_body,
+        manual_parameters=[by_testset_filter_param],
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request, tsfid):
+        celery_tasks.celery_download_latest_passed_logs_to_storage_by_testset_filter.delay(tsfid)
+        return Response("OK")
+
+
 class DownloadLatestPassedLogsToStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger download of latest passing logs for each test instance that is observed",
+        operation_description="Trigger download of latest passing logs for each test instance that is observed",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
     def get(self, request):
         celery_tasks.celery_download_latest_passed_logs_to_storage.delay()
         return Response("OK")
 
 
 class RemoveOldPassedLogsFromLogStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        operation_description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
     def get(self, request):
         celery_tasks.celery_remove_old_passed_logs_from_log_storage.delay()
         return Response("OK")

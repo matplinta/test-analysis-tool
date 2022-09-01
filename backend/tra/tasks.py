@@ -83,6 +83,11 @@ def celery_download_latest_passed_logs_to_storage():
     return test_runs_processing.download_latest_passed_logs_to_storage()
 
 
+@shared_task(name="celery_download_latest_passed_logs_to_storage_by_testset_filter")
+def celery_download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id):
+    return test_runs_processing.download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id)
+
+
 @shared_task(name="celery_pull_and_analyze_notanalyzed_testruns_by_testset_filter")
 def celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id, query_limit: int=None):
     return test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id=testset_filter_id, query_limit=query_limit)
