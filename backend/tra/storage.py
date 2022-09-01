@@ -47,7 +47,7 @@ class UTECloudLogsStorage(Storage):
         name = self.get_available_name(name, max_length=max_length)
         start_time = time.time()
         rc = self._save(name, url, timeout)
-        return {"rc": rc, "time": str(time.time() - start_time)}
+        return {"name": name, "rc": rc, "time": str(time.time() - start_time)}
 
 
     def delete(self, name):
