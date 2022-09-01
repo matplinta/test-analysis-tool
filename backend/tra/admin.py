@@ -68,7 +68,7 @@ class BranchAdmin(admin.ModelAdmin):
 
 @admin.register(TestInstance)
 class TestInstanceAdmin(admin.ModelAdmin):
-    list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
+    list_display = ['test_case_name', 'id', 'test_set', 'last_passing_logs', 'execution_suspended']
     list_filter = ['execution_suspended', 'test_set']
     search_fields = ['test_set__test_set_name', 'test_case_name']
 

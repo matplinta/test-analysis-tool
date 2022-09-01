@@ -227,10 +227,17 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
     test_instances = testset_filter.test_instances.all()
     log_inst_info_dict = {}
     for test_instance in test_instances:
-        latest_test_run = test_instance.test_runs.all().exclude(ute_exec_url='').exclude(ute_exec_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
-        if not latest_test_run:
-            return "Could not find latest passed run with ute_exec_url filled"
-        ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_test_run)
+        latest_passed_test_run = test_instance.test_runs.all().exclude(ute_exec_url='').exclude(ute_exec_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
+        if not latest_passed_test_run:
+            log_inst_info_dict.setdefault(None, {
+            "utecloud_run_id": "Could not find latest passed run with ute_exec_url filled", 
+            "ute_exec_url": None,
+            "test_instance_ids": []
+            })
+            log_inst_info_dict[None]["test_instance_ids"].append(test_instance.id)
+            continue 
+
+        ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_passed_test_run)
         
         if test_instance.has_last_passing_logs_set():
             if test_instance.last_passing_logs.utecloud_run_id == ute_cloud_sr_id:
@@ -238,13 +245,18 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
 
         logs_instance, created = LastPassingLogs.objects.get_or_create(
             utecloud_run_id=ute_cloud_sr_id,
-            build=latest_test_run.builds,
-            airphone=latest_test_run.airphone
+            build=latest_passed_test_run.builds,
+            airphone=latest_passed_test_run.airphone
         )
+
+        if not created and logs_instance.location and logs_instance.url:
+            test_instance.last_passing_logs = logs_instance
+            test_instance.save()
+            continue
 
         log_inst_info_dict.setdefault(logs_instance.id, {
             "utecloud_run_id": ute_cloud_sr_id, 
-            "ute_exec_url": latest_test_run.ute_exec_url,
+            "ute_exec_url": latest_passed_test_run.ute_exec_url,
             "test_instance_ids": []
             }
         )
@@ -255,6 +267,7 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
         # else:
         #     test_instance.last_passing_logs = logs_instance
         #     test_instance.save()
+
     for logs_instance_id, info in log_inst_info_dict.items():
         utecloud_run_id = info["utecloud_run_id"]
         celery_tasks.celery_download_resursively_contents_to_storage.delay(
