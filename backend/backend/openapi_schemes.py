@@ -131,3 +131,30 @@ fail_barchart_response_scheme = openapi.Schema(
         "info": openapi.Schema(type=openapi.TYPE_STRING, description="Data range")
     }
 )
+
+
+testrun_analyze_schema = openapi.Schema(
+    title="AnalyzeToRP",
+    type=openapi.TYPE_OBJECT,
+    properties ={
+        "rp_ids": openapi.Schema(
+            type=openapi.TYPE_ARRAY, 
+            description="List of ids of test_runs from reporting portal",
+            items=openapi.Schema(
+                type=openapi.TYPE_INTEGER, 
+                description="Id of test_run from reporting portal")
+        ),
+        "comment": openapi.Schema(type=openapi.TYPE_STRING, description="Comment"),
+        "result": openapi.Schema(type=openapi.TYPE_STRING, description="Result: passed or failed"),
+        "env_issue_type": openapi.Schema(type=openapi.TYPE_STRING, description="EnvIssueType name")
+    }
+)
+
+
+by_testset_filter_param = openapi.Parameter(
+    name="tsfid", 
+    in_=openapi.IN_QUERY,
+    description="TestSetFilter id",
+    type=openapi.TYPE_INTEGER,
+    required=True
+)

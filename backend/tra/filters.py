@@ -5,7 +5,6 @@ from django.db.models import Q
 from .models import (
     FailMessageTypeGroup,
     FeatureBuild,
-    get_fb_info_based_on_date,
     Organization, 
     TestRunResult, 
     TestlineType, 

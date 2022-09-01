@@ -1,18 +1,5 @@
 from django.contrib import admin
-from .models import (
-    TestInstance, 
-    TestlineType,
-    TestRun, 
-    TestSetFilter,
-    RepPortalUserToken,
-    Branch, 
-    Organization, 
-    EnvIssueType, 
-    TestRunResult,
-    FailMessageType,
-    FailMessageTypeGroup,
-    FeatureBuild
-)
+from .models import *
 
 
 @admin.register(FeatureBuild)
@@ -83,7 +70,7 @@ class BranchAdmin(admin.ModelAdmin):
 class TestInstanceAdmin(admin.ModelAdmin):
     list_display = ['test_case_name', 'id', 'test_set', 'execution_suspended']
     list_filter = ['execution_suspended', 'test_set']
-    search_fields = ['test_set__name', 'test_case_name']
+    search_fields = ['test_set__test_set_name', 'test_case_name']
 
 
 @admin.register(TestRun)
@@ -128,3 +115,16 @@ class TestSetFilterAdmin(admin.ModelAdmin):
     list_filter = ['test_set_name', 'testline_type', 'branch']
     search_fields = ['test_set_name', ]
 
+
+@admin.register(LastPassingLogs)
+class LastPassingLogsAdmin(admin.ModelAdmin):
+    list_display = ['utecloud_run_id', 'location', 'id', 'url', 'size', 'build', 'airphone',]
+    list_filter = ['build', 'airphone',]
+    search_fields = ['location', 'url', 'build', 'utecloud_run_id']
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['message', 'id', 'read', 'date']
+    list_filter = ['read', ]
+    search_fields = ['message', 'read', 'date']
