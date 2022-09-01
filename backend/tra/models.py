@@ -165,7 +165,7 @@ class TestRun(models.Model):
     def has_ute_logs_available(self):
         timezone = pytz.timezone(settings.TIME_ZONE)
         now =  timezone.localize(datetime.now())
-        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=10)) 
+        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=7)) 
 
 
 
