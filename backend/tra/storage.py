@@ -43,7 +43,7 @@ class UTECloudLogsStorage(Storage):
         return proc.returncode 
 
     
-    def save(self, name, url, max_length=None, timeout=3600):
+    def save(self, name, url, max_length=None, timeout=10800):
         name = self.get_available_name(name, max_length=max_length)
         start_time = time.time()
         rc = self._save(name, url, timeout)

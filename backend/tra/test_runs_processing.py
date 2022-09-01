@@ -227,11 +227,11 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
     test_instances = testset_filter.test_instances.all()
     log_inst_info_dict = {}
     for test_instance in test_instances:
-        latest_passed_test_run = test_instance.test_runs.all().exclude(ute_exec_url='').exclude(ute_exec_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
+        latest_passed_test_run = test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
         if not latest_passed_test_run:
             log_inst_info_dict.setdefault(None, {
-            "utecloud_run_id": "Could not find latest passed run with ute_exec_url filled", 
-            "ute_exec_url": None,
+            "utecloud_run_id": "Could not find latest passed run with log_file_url filled", 
+            "ute_exec_url_exact": None,
             "test_instance_ids": []
             })
             log_inst_info_dict[None]["test_instance_ids"].append(test_instance.id)
@@ -254,9 +254,11 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
             test_instance.save()
             continue
 
+        log_file_url = latest_passed_test_run.log_file_url
+        logs_url = log_file_url.split('test_results')[0]
         log_inst_info_dict.setdefault(logs_instance.id, {
             "utecloud_run_id": ute_cloud_sr_id, 
-            "ute_exec_url": latest_passed_test_run.ute_exec_url,
+            "ute_exec_url_exact": logs_url,
             "test_instance_ids": []
             }
         )
@@ -269,12 +271,14 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
         #     test_instance.save()
 
     for logs_instance_id, info in log_inst_info_dict.items():
+        if logs_instance_id is None:
+            continue
         utecloud_run_id = info["utecloud_run_id"]
         celery_tasks.celery_download_resursively_contents_to_storage.delay(
             lpl_id=logs_instance_id, 
             test_instance_ids=info["test_instance_ids"], 
             directory=os.path.join(settings.LOGS_STORAGE_PASSED_TESTRUNS_LOGS_RELATIVE_PATH, utecloud_run_id), 
-            url=info["ute_exec_url"]
+            url=info["ute_exec_url_exact"]
         )
     
     return log_inst_info_dict
