@@ -28,6 +28,11 @@
     color: #694382;
 }
 
+.result-badge.result-passed {
+    background-color: #cfffcf;
+    color: #694382;
+}
+
 .p-card .p-card-body {
     padding-left: 0.35rem;
     padding-right: 0.35rem;
