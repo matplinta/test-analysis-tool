@@ -7,6 +7,7 @@ from typing import List, Dict, Tuple
 from django.conf import settings
 from itertools import chain
 import re
+import os
 from django.contrib.auth.models import User
 from celery import shared_task
 from .models import (
@@ -257,7 +258,7 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
         celery_tasks.celery_download_resursively_contents_to_storage.delay(
             lpl_id=logs_instance_id, 
             test_instance_ids=info["test_instance_ids"], 
-            directory=f"tra/passed/{utecloud_run_id}", 
+            directory=os.path.join(settings.LOGS_STORAGE_PASSED_TESTRUNS_LOGS_RELATIVE_PATH, utecloud_run_id), 
             url=info["ute_exec_url"]
         )
     
