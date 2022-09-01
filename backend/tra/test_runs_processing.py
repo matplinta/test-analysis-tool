@@ -227,7 +227,9 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
     test_instances = testset_filter.test_instances.all()
     log_inst_info_dict = {}
     for test_instance in test_instances:
-        latest_test_run = test_instance.test_runs.all().filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
+        latest_test_run = test_instance.test_runs.all().exclude(ute_exec_url='').exclude(ute_exec_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
+        if not latest_test_run:
+            return "Could not find latest passed run with ute_exec_url filled"
         ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_test_run)
         
         if test_instance.has_last_passing_logs_set():

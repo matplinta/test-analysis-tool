@@ -98,7 +98,7 @@ class LastPassingLogs(models.Model):
     utecloud_run_id = models.BigIntegerField(unique=True)
     location        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
     url             = models.TextField(blank=True, null=True, help_text="Last passing logs url to TRA http storage")
-    size            = models.IntegerField(blank=True, null=True, help_text="Size of logs directory")
+    size            = models.BigIntegerField(blank=True, null=True, help_text="Size of logs directory")
     build           = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing build in TRA Storage")
     airphone        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
 
