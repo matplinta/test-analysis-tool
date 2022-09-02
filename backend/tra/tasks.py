@@ -112,9 +112,13 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
         logs_instance = LastPassingLogs.objects.get(id=lpl_id)
         logs_instance.location = name
         logs_instance.url = storage.url(name)
-        logs_instance.size = storage.size(name)
-        logs_instance.save()
-
-        TestInstance.objects.filter(id__in=test_instance_ids).update(last_passing_logs=logs_instance)
+        size = storage.size(name)
+        if size == 0:
+            return {"resp": resp, "test_instance_ids": test_instance_ids, 
+                    "location": name, "url": storage.url(name), "size": size}
+        else:
+            logs_instance.size = size
+            logs_instance.save()
+            TestInstance.objects.filter(id__in=test_instance_ids).update(last_passing_logs=logs_instance)
        
     return {"resp": resp, "test_instance_ids": test_instance_ids}
