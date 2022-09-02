@@ -194,7 +194,7 @@ class TestSetFilter(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return self.test_set_name
+        return f"{self.branch} - {self.testline_type} - {self.test_set_name}"
 
     def is_subscribed_by_anyone(self):
         subs_count = self.subscribers.all().count()
