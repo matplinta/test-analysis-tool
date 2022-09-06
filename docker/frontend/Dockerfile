@@ -14,6 +14,7 @@ WORKDIR /frontend
 
 COPY ./package.json /frontend/
 COPY ./package-lock.json /frontend/
+RUN npm config set proxy http://lab-proxy.krk-lab.nsn-rdnet.net:8080
 RUN npm install
 
 COPY . /frontend/

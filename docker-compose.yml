@@ -89,7 +89,8 @@ services:
       context: ./frontend
       dockerfile: ../docker/frontend/Dockerfile
     volumes:
-      - ./frontend:/frontend
+      - ./frontend/public:/frontend/public
+      - ./frontend/src:/frontend/src
     stdin_open: true
     command: npm start
     ports:
