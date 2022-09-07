@@ -211,8 +211,15 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
 
 
 def download_latest_passed_logs_to_storage():
+    def find_latest_passed_run_with_logs_available(test_instance):
+        for test_run in test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time'):
+            if test_run.has_ute_logs_available():
+                return test_run
+        return None
+
+
     def find_latest_passed_run_and_prepare_last_passing_logs_data(test_instance):
-        latest_passed_test_run = test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
+        latest_passed_test_run = find_latest_passed_run_with_logs_available(test_instance)
         if not latest_passed_test_run:
             log_inst_info_dict.setdefault(None, {
             "utecloud_run_id": "Could not find latest passed run with log_file_url filled", 

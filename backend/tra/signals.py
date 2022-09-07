@@ -6,5 +6,6 @@ from .storage import get_storage_instance
 @receiver(post_delete, sender=models.LastPassingLogs)
 def delete_logs_in_storage(sender, instance: models.LastPassingLogs, using, **kwargs):
     storage = get_storage_instance()
-    resp = storage.delete(name=instance.location)
+    if instance.location:
+        resp = storage.delete(name=instance.location)
     

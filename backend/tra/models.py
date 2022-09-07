@@ -103,6 +103,8 @@ class LastPassingLogs(models.Model):
     airphone        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
     downloaded      = models.BooleanField(blank=True, null=True, default=False, help_text="Indicates if logs has been downloaded")
 
+    class Meta:
+        verbose_name_plural = 'Last passing logs'
 
     def __str__(self):
         return f"{self.id} - {self.location}"
