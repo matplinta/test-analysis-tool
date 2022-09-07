@@ -52,8 +52,6 @@ urlpatterns = [
          name='pull_notpassed_testruns_by_all_testset_filters_celery'),
     path('celery/pull_passed_testruns_by_all_testset_filters_celery/', views.PullPassedTestrunsByAllTestSetFiltersCelery.as_view(), 
          name='pull_passed_testruns_by_all_testset_filters_celery'),
-    path('celery/download_latest_passed_logs_to_storage_by_testset_filter/<int:tsfid>/', views.DownloadLatestPassedLogsToStorageByTestSetFilter.as_view(), 
-         name='download_latest_passed_logs_to_storage_by_testset_filter'),
     path('celery/download_latest_passed_logs_to_storage/', views.DownloadLatestPassedLogsToStorage.as_view(), 
          name='download_latest_passed_logs_to_storage'),
     path('celery/remove_old_passed_logs_from_log_storage/', views.RemoveOldPassedLogsFromLogStorage.as_view(), 

@@ -211,22 +211,7 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
 
 
 def download_latest_passed_logs_to_storage():
-    testset_filters = TestSetFilter.objects.all()
-    tsf_dict = {}
-    for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone(): 
-            info = download_latest_passed_logs_to_storage_by_testset_filter(testset_filter.id)
-            tsf_dict[testset_filter.id] = info
-        else:
-            tsf_dict[testset_filter.id] = "Not subscribed by anyone"
-    return tsf_dict
-
-
-def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: int):
-    testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
-    test_instances = testset_filter.test_instances.all()
-    log_inst_info_dict = {}
-    for test_instance in test_instances:
+    def find_latest_passed_run_and_prepare_last_passing_logs_data(test_instance):
         latest_passed_test_run = test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time').first()
         if not latest_passed_test_run:
             log_inst_info_dict.setdefault(None, {
@@ -235,13 +220,13 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
             "test_instance_ids": []
             })
             log_inst_info_dict[None]["test_instance_ids"].append(test_instance.id)
-            continue 
+            return 
 
         ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_passed_test_run)
         
         if test_instance.has_last_passing_logs_set():
             if test_instance.last_passing_logs.utecloud_run_id == ute_cloud_sr_id:
-                continue
+                return
 
         logs_instance, created = LastPassingLogs.objects.get_or_create(
             utecloud_run_id=ute_cloud_sr_id,
@@ -249,10 +234,10 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
             airphone=latest_passed_test_run.airphone
         )
 
-        if not created and logs_instance.location and logs_instance.url:
+        if not created and logs_instance.downloaded is True:
             test_instance.last_passing_logs = logs_instance
             test_instance.save()
-            continue
+            return
 
         log_file_url = latest_passed_test_run.log_file_url
         logs_url = log_file_url.split('test_results')[0]
@@ -264,24 +249,34 @@ def download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id: 
         )
         log_inst_info_dict[logs_instance.id]["test_instance_ids"].append(test_instance.id)
 
-        # if created:
-        #     celery_tasks.celery_download_resursively_contents_to_storage.delay(logs_instance.id, test_instance.id, )
-        # else:
-        #     test_instance.last_passing_logs = logs_instance
-        #     test_instance.save()
 
-    for logs_instance_id, info in log_inst_info_dict.items():
-        if logs_instance_id is None:
-            continue
-        utecloud_run_id = info["utecloud_run_id"]
-        celery_tasks.celery_download_resursively_contents_to_storage.delay(
-            lpl_id=logs_instance_id, 
-            test_instance_ids=info["test_instance_ids"], 
-            directory=os.path.join(settings.LOGS_STORAGE_PASSED_TESTRUNS_LOGS_RELATIVE_PATH, utecloud_run_id), 
-            url=info["ute_exec_url_exact"]
-        )
+    def schedule_download_of_logs(log_inst_info_dict):
+        tasks = {}
+        for logs_instance_id, info in log_inst_info_dict.items():
+            if logs_instance_id is None:
+                continue
+            utecloud_run_id = info["utecloud_run_id"]
+            task = celery_tasks.celery_download_resursively_contents_to_storage.delay(
+                lpl_id=logs_instance_id, 
+                test_instance_ids=info["test_instance_ids"], 
+                directory=os.path.join(settings.LOGS_STORAGE_PASSED_TESTRUNS_LOGS_RELATIVE_PATH, utecloud_run_id), 
+                url=info["ute_exec_url_exact"]
+            )
+            tasks[logs_instance_id] = task.id
+        return tasks
+
+    log_inst_info_dict = {}
+    testset_filters = TestSetFilter.objects.all()
+    for testset_filter in testset_filters:
+        if testset_filter.is_subscribed_by_anyone(): 
+            test_instances = testset_filter.test_instances.all()
+            for test_instance in test_instances:
+                find_latest_passed_run_and_prepare_last_passing_logs_data(test_instance)
+            
     
-    return log_inst_info_dict
+    async_tasks = schedule_download_of_logs(log_inst_info_dict)
+    return {"celery_tasks": async_tasks, "log_inst_info_dict": log_inst_info_dict}
+
 
 
 ######################################################################

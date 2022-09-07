@@ -13,21 +13,21 @@ from .storage import get_storage_instance
 logger = get_task_logger(__name__)
 
 
-@app.on_after_finalize.connect
-def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(crontab(hour=18, day_of_week=3), celery_remove_old_feature_builds.s(), name='Delete older than last 3 FBs')
-    sender.add_periodic_task(crontab(minute=30, hour="*/6"), 
-                             celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
-                             name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
-    sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
-                             celery_remove_old_passed_logs_from_log_storage.s(), 
-                             name='celery_remove_old_passed_logs_from_log_storage')
-    sender.add_periodic_task(crontab(minute=0, hour="20"), 
-                             celery_pull_passed_testruns_by_all_testset_filters.s(), 
-                             name='celery_pull_passed_testruns_by_all_testset_filters')
-    sender.add_periodic_task(crontab(minute=0, hour="21"), 
-                             celery_download_latest_passed_logs_to_storage.s(), 
-                             name='celery_download_latest_passed_logs_to_storage')
+# @app.on_after_finalize.connect
+# def setup_periodic_tasks(sender, **kwargs):
+#     sender.add_periodic_task(crontab(hour=18, day_of_week=3), celery_remove_old_feature_builds.s(), name='Delete older than last 3 FBs')
+#     sender.add_periodic_task(crontab(minute=30, hour="*/6"), 
+#                              celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
+#                              name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
+#     sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
+#                              celery_remove_old_passed_logs_from_log_storage.s(), 
+#                              name='celery_remove_old_passed_logs_from_log_storage')
+#     sender.add_periodic_task(crontab(minute=0, hour="20"), 
+#                              celery_pull_passed_testruns_by_all_testset_filters.s(), 
+#                              name='celery_pull_passed_testruns_by_all_testset_filters')
+#     sender.add_periodic_task(crontab(minute=0, hour="21"), 
+#                              celery_download_latest_passed_logs_to_storage.s(), 
+#                              name='celery_download_latest_passed_logs_to_storage')
 
 
 @app.task()
@@ -44,11 +44,11 @@ def celery_remove_old_feature_builds(keep_fb_threshold=3):
 def celery_remove_old_passed_logs_from_log_storage():
     """Removes logs from passed executions when none test instances have last_passed_logs assigned to this instance"""
     last_passing_logs = LastPassingLogs.objects.all()
-    storage = get_storage_instance()
+    # storage = get_storage_instance()
     for lpl in last_passing_logs: 
         if not lpl.test_instances.all().exists():
-            if storage.exists(lpl.location):
-                storage.delete(lpl.location)
+            # if storage.exists(lpl.location):
+            #     storage.delete(lpl.location)
             lpl.delete()
 
 
@@ -83,11 +83,6 @@ def celery_download_latest_passed_logs_to_storage():
     return test_runs_processing.download_latest_passed_logs_to_storage()
 
 
-@shared_task(name="celery_download_latest_passed_logs_to_storage_by_testset_filter")
-def celery_download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id):
-    return test_runs_processing.download_latest_passed_logs_to_storage_by_testset_filter(testset_filter_id)
-
-
 @shared_task(name="celery_pull_and_analyze_notanalyzed_testruns_by_testset_filter")
 def celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id, query_limit: int=None):
     return test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id=testset_filter_id, query_limit=query_limit)
@@ -118,6 +113,7 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
                     "location": name, "url": storage.url(name), "size": size}
         else:
             logs_instance.size = size
+            logs_instance.downloaded = True
             logs_instance.save()
             TestInstance.objects.filter(id__in=test_instance_ids).update(last_passing_logs=logs_instance)
        

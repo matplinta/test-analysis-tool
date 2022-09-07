@@ -101,6 +101,7 @@ class LastPassingLogs(models.Model):
     size            = models.BigIntegerField(blank=True, null=True, help_text="Size of logs directory")
     build           = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing build in TRA Storage")
     airphone        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
+    downloaded      = models.BooleanField(blank=True, null=True, default=False, help_text="Indicates if logs has been downloaded")
 
 
     def __str__(self):
@@ -165,7 +166,7 @@ class TestRun(models.Model):
     def has_ute_logs_available(self):
         timezone = pytz.timezone(settings.TIME_ZONE)
         now =  timezone.localize(datetime.now())
-        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=7)) 
+        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=settings.UTE_LOGS_LIFESPAN)) 
 
 
 

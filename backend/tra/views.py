@@ -536,22 +536,6 @@ class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
         return Response("OK")
 
 
-class DownloadLatestPassedLogsToStorageByTestSetFilter(APIView):
-    @swagger_auto_schema(
-        description="Trigger download of latest passing logs for each test instance in particular TestSetFilter",
-        operation_description="Trigger download of latest passing logs for each test instance in particular TestSetFilter",
-        request_body=no_body,
-        manual_parameters=[by_testset_filter_param],
-        responses={
-            200: "",
-        },
-        tags=["celery"]
-    )
-    def get(self, request, tsfid):
-        celery_tasks.celery_download_latest_passed_logs_to_storage_by_testset_filter.delay(tsfid)
-        return Response("OK")
-
-
 class DownloadLatestPassedLogsToStorage(APIView):
     @swagger_auto_schema(
         description="Trigger download of latest passing logs for each test instance that is observed",

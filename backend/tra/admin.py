@@ -118,7 +118,7 @@ class TestSetFilterAdmin(admin.ModelAdmin):
 
 @admin.register(LastPassingLogs)
 class LastPassingLogsAdmin(admin.ModelAdmin):
-    list_display = ['utecloud_run_id', 'location', 'id', 'url', 'size', 'build', 'airphone',]
+    list_display = ['utecloud_run_id', 'location', 'id', 'url', 'size', 'build', 'airphone', 'downloaded']
     list_filter = ['build', 'airphone',]
     search_fields = ['location', 'url', 'build', 'utecloud_run_id']
 
