@@ -56,6 +56,10 @@ urlpatterns = [
          name='download_latest_passed_logs_to_storage'),
     path('celery/remove_old_passed_logs_from_log_storage/', views.RemoveOldPassedLogsFromLogStorage.as_view(), 
          name='remove_old_passed_logs_from_log_storage'),
+    path('celery/sync_suspension_status_of_test_instances_by_all_testset_filters/', views.SyncSuspensionStatusOfTestInstancesByAllTestSetFilters.as_view(), 
+         name='sync_suspension_status_of_test_instances_by_all_testset_filters'),
+    path('celery/fill_empty_test_instances_with_their_rp_ids/', views.FillEmptyTestInstancesWithTheirRPIds.as_view(), 
+         name='fill_empty_test_instances_with_their_rp_ids'),
     
     
     path('', include(router.urls)),

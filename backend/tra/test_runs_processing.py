@@ -100,6 +100,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", "")
     )
     test_instance, _ = TestInstance.objects.get_or_create(
+        rp_id=rp_test_run["qc_test_instance"]["id"],
         test_set=test_set_filter,
         test_case_name=rp_test_run["test_case"]["name"]
     )
@@ -285,6 +286,25 @@ def download_latest_passed_logs_to_storage():
     return {"celery_tasks": async_tasks, "log_inst_info_dict": log_inst_info_dict}
 
 
+def sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id: int, limit=None):
+    def get_ti_suspended_status_from_results(ti_id: int):
+        return next((item["suspended"] for item in results if item["id"] == ti_id), None)
+
+    not_found = []
+    testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
+    postfix = testset_filter.test_lab_path.split('\\')[-1]
+    if not limit:
+        limit = testset_filter.limit
+    results = RepPortal().get_data_from_testinstances(limit=limit, test_lab_path=testset_filter.test_lab_path)
+    for test_instance in testset_filter.test_instances.all():
+        suspended_status = get_ti_suspended_status_from_results(test_instance.rp_id)
+        if suspended_status is None:
+            not_found.append(test_instance.rp_id)
+        test_instance.execution_suspended = suspended_status
+        test_instance.save()
+    return {"not_updated": not_found}
+
+
 
 ######################################################################
 ###########            FOR DEV PURPOSES USES ONLY          ###########
@@ -299,3 +319,28 @@ def pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(query_limit: i
         tr_by_rf[testset_filter.id] = pull_stats["loaded_new_runs"]
         tr_by_rf_skipped[testset_filter.id] = pull_stats["skipped_runs"]
     return {'loaded_new_runs': tr_by_rf, 'skipped_runs': tr_by_rf_skipped}
+
+
+def fill_empty_test_instances_with_their_rp_ids():
+    def get_ti_id_from_results(tc_name, test_set_name, test_lab_path):
+        for elem in results:
+            if elem["name"].startswith('[1]') or elem["name"].startswith('[1.0]'):
+                name = elem["name"].split(']')[-1].strip()
+            else:
+                name = elem["name"]
+            if elem["test_set"]["name"] == test_set_name and name == tc_name and elem["m_path"] == test_lab_path:
+                return elem["id"]
+        return None
+
+    not_found = []
+    for testset_filter in TestSetFilter.objects.all():
+        results = RepPortal().get_data_from_testinstances(limit=1000, test_lab_path=testset_filter.test_lab_path)
+        for test_instance in testset_filter.test_instances.all():
+            rp_id = get_ti_id_from_results(test_instance.test_case_name, testset_filter.test_set_name,  testset_filter.test_lab_path)
+            if rp_id is None:
+                not_found.append(test_instance)
+            else:
+                test_instance.rp_id = rp_id
+                test_instance.save()
+                
+    return [str(e) for e in not_found]

@@ -566,6 +566,27 @@ class RemoveOldPassedLogsFromLogStorage(APIView):
         return Response("OK")
 
 
+class SyncSuspensionStatusOfTestInstancesByAllTestSetFilters(APIView):
+    @swagger_auto_schema(
+        description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        operation_description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_sync_suspension_status_of_test_instances_by_all_testset_filters.delay()
+        return Response("OK")
+
+
+class FillEmptyTestInstancesWithTheirRPIds(APIView):
+    def get(self, request):
+        resp = test_runs_processing.fill_empty_test_instances_with_their_rp_ids()
+        return Response(resp)
+
+
 class SummaryStatisticsView(APIView): #TODO
     pass
 

@@ -28,7 +28,10 @@ class RepPortal():
         self.user = settings.RP_USER
         self.passwd = settings.RP_PASSWORD
         self.token = token
-        self.basic_url = 'https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/'
+        self.test_run_url = 'https://rep-portal.wroclaw.nsn-rdnet.net/api/automatic-test/'
+        self.test_instance_url = ('https://rep-portal.wroclaw.nsn-rdnet.net/api/qc-beta/instances/batch/?ti_scope=true&limit={}&ordering=name&'
+                                  'fields=id%2Csuspended%2Cm_path%2Crelease%2Ctest_set__name%2Cname%2Curl%2Cstatus%2Cstatus_color%2Clast_passed__timestamp'
+                                  '%2Ctest_lvl_area%2Csw_build%2Cpronto_view_type')
         
         self._default_dict = {"common_build": None, "pronto": "", "default_blocked": "true", "runs": None,
                               "send_to_qc": "false", "result": None, "comment": None}
@@ -110,10 +113,20 @@ class RepPortal():
         if filters:
             url_components.append(filters)
         url_components.append(fields)
-        base_url = f"{self.basic_url}runs/report/?"
+        base_url = f"{self.test_run_url}runs/report/?"
         print(url_components)
         rest_url = '&'.join(url_components)
         return f"{base_url}{rest_url}"
+
+
+    def _build_get_url_for_testinstances(self, ids=None, test_lab_path=None, limit=100):
+        url = self.test_instance_url.format(limit) 
+        if ids:
+            url += '&id__in=' + ','.join([str(x) for x in ids])
+        if test_lab_path:
+            test_lab_path = test_lab_path.replace('\\', '%5C')
+            url += f"&m_path__pos_neg={test_lab_path}"
+        return url
     
 
     def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None):            
@@ -139,6 +152,36 @@ class RepPortal():
         if results is None:
             raise RepPortalError(f"Last response: {resp}, {resp.text}. No results for url: {url}")
         return results
+
+
+    def get_data_from_testinstances(self, ids: list=None, test_lab_path=None, limit=100):            
+        url = self._build_get_url_for_testinstances(ids=ids, test_lab_path=test_lab_path, limit=limit)
+        api = RepApi(username=self.user, password=self.passwd, config='rep-prod-one')
+        api.session.login(token=self.token)
+        retry = 5
+        try:
+            while retry > 0:
+                resp = api.get(url, params=None)
+                if resp.status_code == 200:
+                    break
+                elif resp.status_code == 429:
+                    wait_sec_until_new_minute_starts = 60 - int(time.time()) % 60
+                    time.sleep(wait_sec_until_new_minute_starts)
+                    retry -= 1
+                    continue
+                else:
+                    raise RepPortalError(f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}")
+        finally:
+            api.logout()
+        results = resp.json().get('results', None)
+        if results is None:
+            raise RepPortalError(f"Last response: {resp}, {resp.text}. No results for url: {url}")
+        return results
+
+
+    def set_suspension_status_for_test_instances(ti_ids: List[int], suspend_status: bool=False):
+        url = "https://rep-portal.wroclaw.nsn-rdnet.net/api/qc-edit-async/instance/"
+        payload = {"id":[15843495,15843496,20226154],"changes":[{"field":"suspended","newValue":"false"}],"quantity":3}
 
 
     def _generate_analyze_dict(self, runs: List[int], result: str, comment: str, env_issue_type=None, common_build="", suggested_prontos: List[str]=[], pronto="", 
