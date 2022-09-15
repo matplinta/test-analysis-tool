@@ -568,8 +568,8 @@ class RemoveOldPassedLogsFromLogStorage(APIView):
 
 class SyncSuspensionStatusOfTestInstancesByAllTestSetFilters(APIView):
     @swagger_auto_schema(
-        description="Trigger removal of last passing logs from test instances that are not observed by anyone",
-        operation_description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        description="Sync suspension status of all test instances by all test set filters",
+        operation_description="Sync suspension status of all test instances by all test set filters",
         request_body=no_body,
         responses={
             200: "",
