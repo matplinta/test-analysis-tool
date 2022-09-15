@@ -147,7 +147,7 @@ class TestInstanceView(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class TestSetFilterView(viewsets.ReadOnlyModelViewSet):
+class TestSetFilterView(viewsets.ModelViewSet):
     serializer_class = TestSetFilterSerializer
     queryset = TestSetFilter.objects.all()
     pagination_class = None
