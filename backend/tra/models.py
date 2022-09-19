@@ -1,32 +1,9 @@
-from xml.etree.ElementTree import Comment
-from django.db import models
-
 from django.db import models
 from django.contrib.auth.models import User
 import re
-import datetime
+from datetime import datetime, timedelta
 from django.conf import settings
-# import pytz
-from dateutil import tz
-
-
-def get_fb_info_based_on_date(test_datetime):
-    fb_start = datetime.datetime(2022, 1, 5, 0, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE))
-    if test_datetime.year < 2022:
-        return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
-    while fb_start.year != test_datetime.year:
-        fb_start = fb_start + datetime.timedelta(days=14)
-
-    fb_no = 1
-    while True:
-        fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
-        if fb_start < test_datetime < fb_end:
-            break
-        else:
-            fb_no += 1
-            fb_start = fb_start + datetime.timedelta(days=14)
-    name = f"FB{str(test_datetime.year)[-2:]}{fb_no:02d}"
-    return name, fb_start, fb_end
+import pytz
 
 
 class Organization(models.Model):
@@ -108,11 +85,38 @@ class FailMessageTypeGroup(models.Model):
         return self.name
 
 
+class Notification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    message = models.TextField(blank=False, null=False, help_text="Message contents")
+    read = models.BooleanField(blank=True, default=False,  help_text="Indication if the message was read by the user")
+    date = models.DateTimeField(help_text="Date of message")
+    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+
+
+class LastPassingLogs(models.Model):
+    id              = models.BigAutoField(primary_key=True)
+    utecloud_run_id = models.BigIntegerField(unique=True)
+    location        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
+    url             = models.TextField(blank=True, null=True, help_text="Last passing logs url to TRA http storage")
+    size            = models.BigIntegerField(blank=True, null=True, help_text="Size of logs directory")
+    build           = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing build in TRA Storage")
+    airphone        = models.CharField(max_length=200, blank=True, null=True, help_text="Last passing AirPhone build in TRA Storage")
+    downloaded      = models.BooleanField(blank=True, null=True, default=False, help_text="Indicates if logs has been downloaded")
+
+    class Meta:
+        verbose_name_plural = 'Last passing logs'
+
+    def __str__(self):
+        return f"{self.id} - {self.location}"
+
 class TestInstance(models.Model):
     id                  = models.BigAutoField(primary_key=True)
-    test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set")
+    rp_id               = models.BigIntegerField(blank=True, null=True, help_text="ReportingPortal TestInstance Id")
+    test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set", related_name="test_instances")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
+    last_passing_logs   = models.ForeignKey(LastPassingLogs, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
+    
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
@@ -121,11 +125,20 @@ class TestInstance(models.Model):
     def __str__(self):
         return f"{self.test_case_name[:40]}... on {self.test_set.branch}"
 
+    def has_last_passing_logs_set(self):
+        return True if self.last_passing_logs else False
+
+    def last_passing_logs_date_is_older_than(self, date):
+        if self.has_last_passing_logs_set():
+            return True if self.last_passing_logs.date < date else False
+        else:
+            return True
+
 
 class TestRun(models.Model):
     id               = models.BigAutoField(primary_key=True, help_text="Internal TRA TestRun id")
     rp_id            = models.BigIntegerField(blank=False, null=True, help_text="Reporting Portal TestRun id")
-    test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance")
+    test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance", related_name="test_runs")
     testline_type    = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline configuration")
     organization     = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, help_text="Organization")
     result           = models.ForeignKey(TestRunResult, on_delete=models.CASCADE, blank=False, help_text="Testrun result")
@@ -153,6 +166,13 @@ class TestRun(models.Model):
         return f"{self.test_instance.test_case_name[:40]} from {self.test_instance.test_set.branch}"
 
 
+    def has_ute_logs_available(self):
+        timezone = pytz.timezone(settings.TIME_ZONE)
+        now =  timezone.localize(datetime.now())
+        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=settings.UTE_LOGS_LIFESPAN)) 
+
+
+
 class RepPortalUserToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="rp_token")
     token = models.CharField(max_length=300, blank=False, null=True, help_text="RepPortal user specific token")
@@ -178,7 +198,11 @@ class TestSetFilter(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return self.test_set_name
+        return f"{self.branch} - {self.testline_type} - {self.test_set_name}"
+
+    def is_subscribed_by_anyone(self):
+        subs_count = self.subscribers.all().count()
+        return False if subs_count == 0 else True
 
     def save(self, *args, **kwargs):
         match = re.search(r'Root\\+Test_Sets\\+(\w+)\\+', self.test_lab_path)

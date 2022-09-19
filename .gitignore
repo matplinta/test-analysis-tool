@@ -10,3 +10,4 @@ postgres_db
 backend/static
 backend/celerybeat-schedule
 dump.rdb
+node_modules

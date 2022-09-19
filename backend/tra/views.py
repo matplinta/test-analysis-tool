@@ -38,7 +38,8 @@ from .serializers import (
     TestRunResultSerializer,
     FeatureBuildSerializer,
     UserSerializer,
-    BranchSerializer
+    BranchSerializer,
+    LastPassingLogsSerializer
 )
 
 from .models import (
@@ -54,19 +55,16 @@ from .models import (
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
+    LastPassingLogs
 )
 
 from .filters import TestRunFilter
 from .pagination import StandardResultsSetPagination
-from rep_portal.api import RepPortal
 import json
-from datetime import datetime
-import pytz
-import logging
 import copy
 
-from .test_runs_processing import *
-from .tasks import celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters
+from . import test_runs_processing
+from . import tasks as celery_tasks
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -134,6 +132,18 @@ class TestRunResultView(viewsets.ModelViewSet):
 class EnvIssueTypeView(viewsets.ModelViewSet):
     serializer_class = EnvIssueTypeSerializer
     queryset = EnvIssueType.objects.all()
+    pagination_class = None
+
+
+class LastPassingLogsView(viewsets.ModelViewSet):
+    serializer_class = LastPassingLogsSerializer
+    queryset = LastPassingLogs.objects.all()
+    pagination_class = None
+
+
+class TestInstanceView(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TestInstanceSerializer
+    queryset = TestInstance.objects.all()
     pagination_class = None
 
 
@@ -443,6 +453,13 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
 
 
 class TestRunsAnalyzeToRP(APIView):
+    @swagger_auto_schema(
+        description="Method to trigger analysis of TestRun to ReportingPortal",
+        operation_description="Method to trigger analysis of TestRun to ReportingPortal",
+        request_body=testrun_analyze_schema,
+        responses={200: ""},
+        tags=["api"]
+    )
     def post(self, request):
         data = self.request.data
         rp_ids = data["rp_ids"] 
@@ -460,7 +477,7 @@ class TestRunsAnalyzeToRP(APIView):
         else:
             token = None
 
-        celery_analyze_testruns.delay(
+        celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
             comment=comment, 
             common_build="", 
@@ -474,27 +491,102 @@ class TestRunsAnalyzeToRP(APIView):
         return Response(status=200)
 
 
-class LoadTestRunsToDBBasedOnRegressionFilter(APIView):
-    def get(self, request, rfid):
-        regression_filter = TestSetFilter.objects.get(pk=rfid)
+class PullNotPassedTestrunsByTestSetFilter(APIView):
+    def get(self, request, tsfid):
+        testset_filter = TestSetFilter.objects.get(pk=tsfid)
         limit = self.request.query_params.get('limit', None)
-        content = pull_and_analyze_notanalyzed_testruns_by_regfilter(regression_filter.id, limit)
+        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter.id, limit)
         return Response(content)
 
 
-class LoadTestRunsToDBBasedOnAllRegressionFilters(APIView):
+class PullNotPassedTestrunsByAllTestSetFilters(APIView):
     def get(self, request):
         limit = self.request.query_params.get('limit', None)
-        content = pull_and_analyze_notanalyzed_testruns_by_all_regfilters(limit)
+        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(limit)
         return Response(content)
 
 
-class LoadTestRunsToDBBasedOnAllRegressionFiltersCelery(APIView):
+class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
+    @swagger_auto_schema(
+        description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        operation_description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
     def get(self, request):
-        celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters.delay()
+        celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.delay()
         return Response("OK")
 
 
-class SummaryStatisticsView(APIView):
+class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
+    @swagger_auto_schema(
+        description="Pull passed test runs from ReportingPortal to DB",
+        operation_description="Pull passed test runs from ReportingPortal to DB",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_pull_passed_testruns_by_all_testset_filters.delay()
+        return Response("OK")
+
+
+class DownloadLatestPassedLogsToStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger download of latest passing logs for each test instance that is observed",
+        operation_description="Trigger download of latest passing logs for each test instance that is observed",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_download_latest_passed_logs_to_storage.delay()
+        return Response("OK")
+
+
+class RemoveOldPassedLogsFromLogStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        operation_description="Trigger removal of last passing logs from test instances that are not observed by anyone",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_remove_old_passed_logs_from_log_storage.delay()
+        return Response("OK")
+
+
+class SyncSuspensionStatusOfTestInstancesByAllTestSetFilters(APIView):
+    @swagger_auto_schema(
+        description="Sync suspension status of all test instances by all test set filters",
+        operation_description="Sync suspension status of all test instances by all test set filters",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_sync_suspension_status_of_test_instances_by_all_testset_filters.delay()
+        return Response("OK")
+
+
+class FillEmptyTestInstancesWithTheirRPIds(APIView):
+    def get(self, request):
+        resp = test_runs_processing.fill_empty_test_instances_with_their_rp_ids()
+        return Response(resp)
+
+
+class SummaryStatisticsView(APIView): #TODO
     pass
 

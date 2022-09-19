@@ -1,4 +1,3 @@
-from unittest import TestResult
 from .models import (
     FailMessageTypeGroup,
     Organization, 
@@ -10,7 +9,8 @@ from .models import (
     Branch,
     EnvIssueType, 
     FailMessageType,
-    FeatureBuild
+    FeatureBuild,
+    LastPassingLogs
 )
 from rest_framework import serializers
 from django.contrib.auth.models import User
@@ -53,6 +53,10 @@ class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
             fail_message_type_group_instance.fail_message_types.add(fail_message_type_instance)
         return fail_message_type_group_instance
 
+class LastPassingLogsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LastPassingLogs
+        fields = ('id', 'utecloud_run_id', 'location', 'url', 'size', 'build', 'airphone', )
 
 class FeatureBuildSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,10 +103,12 @@ class TestSetSerializer(serializers.ModelSerializer):
 
 class TestInstanceSerializer(serializers.ModelSerializer):
     test_set = TestSetSerializer()
+    last_passing_logs = LastPassingLogsSerializer(read_only=True)
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'test_set', 'test_case_name')
+        fields = ('id', 'test_set', 'test_case_name', 'last_passing_logs')
+        read_only_fields = ('last_passing_logs',)
         extra_kwargs = {
             'test_set': {'validators': []},
             'test_case_name': {'validators': []},
@@ -128,7 +134,7 @@ class TestRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestRun
         fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
-                  'result', 'env_issue_type', 'comment', 'builds', 'fail_message', 'ute_exec_url', 'log_file_url', 
+                  'result', 'env_issue_type', 'comment', 'builds', 'airphone', 'fail_message', 'ute_exec_url', 'log_file_url', 
                   'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by')
         read_only_fields = ('analyzed', )
 

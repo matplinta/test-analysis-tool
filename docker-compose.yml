@@ -15,6 +15,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./backend:/app
+      - logs_storage_debug:${LOGS_STORAGE_DOCKER_PATH_DEBUG}
     ports:
       - "8000:8000"
       - "8888:8888"
@@ -34,6 +35,8 @@ services:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.dev
     command: celery -A backend worker -l info
+    volumes:
+      - logs_storage_debug:${LOGS_STORAGE_DOCKER_PATH_DEBUG}
     env_file:
       - ./.env
     environment:
@@ -86,7 +89,8 @@ services:
       context: ./frontend
       dockerfile: ../docker/frontend/Dockerfile
     volumes:
-      - ./frontend:/frontend
+      - ./frontend/public:/frontend/public
+      - ./frontend/src:/frontend/src
     stdin_open: true
     command: npm start
     ports:
@@ -96,12 +100,17 @@ services:
       - db
       - web
 
-# volumes:
-#   logs_storage:
-#     driver: vieux/sshfs:latest
-#     driver_opts:
-#       sshcmd: ute@plinta-auto.sc5g.krk-lab.nsn-rdnet.net:/home/ute/logs/
-#       password: ute
+  logs_http_server:
+    image: python:3.8-alpine
+    working_dir: ${LOGS_STORAGE_DOCKER_PATH_DEBUG}
+    command:  python -m http.server ${LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT}
+    ports:
+      - "${LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT}:${LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT}"
+    volumes:
+      - logs_storage_debug:${LOGS_STORAGE_DOCKER_PATH_DEBUG}
+
+volumes:
+  logs_storage_debug:
 #   postgres_db:
 #     driver: local
 #     driver_opts:

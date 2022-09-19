@@ -3,6 +3,7 @@ from rest_framework import routers
 from tra import views
 
 router = routers.DefaultRouter()
+
 # API to handle RegressionFilters model
 # special actions: /owned            to display RegressionFilters that the user is the owner of
 # special actions: /subscribed       to display RegressionFilters that the user is subscribed to
@@ -16,22 +17,13 @@ router.register(r'fail_message_types', views.FailMessageTypeView, 'failmessagety
 # API to handle FailMessageTypeGroup model
 # special actions: /my         to display FailMessageTypeGroup objects that the user is the author of
 router.register(r'fail_message_type_groups', views.FailMessageTypeGroupView, 'failmessagetypegroups')
-# router.register(r'fail_message_type_groups_ro', views.FailMessageTypeGroupROView, 'failmessagetypegroupsro')
-
-# API to handle TestlineType model
 router.register(r'testline_types', views.TestlineTypeView, 'testline_types')
-
-# API to handle EnvIssueType model
 router.register(r'env_issue_types', views.EnvIssueTypeView, 'env_issue_types')
-
-# API to handle TestRunResult model
 router.register(r'test_run_results', views.TestRunResultView, 'testrunresults')
-
-# API to handle TestRun model
 router.register(r'test_runs', views.TestRunView, 'testruns')
-
-# API to handle TestRun model
 router.register(r'branches', views.BranchView, 'branches')
+router.register(r'last_passing_logs', views.LastPassingLogsView, 'last_passing_logs')
+router.register(r'test_instances', views.TestInstanceView, 'test_instances')
 
 urlpatterns = [
     # Filtering TestRuns queryset by the following fields:
@@ -47,12 +39,28 @@ urlpatterns = [
     #            env_issue_type     env issue type string
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
-    # path('test_runs/by_reg_filter/<int:rfid>/', views.TestRunsBasedOnRegressionFiltersView.as_view(), name='by_reg_filter_pk'),
 
-    path('test_runs/load_by_reg_filter/<int:rfid>/', views.LoadTestRunsToDBBasedOnRegressionFilter.as_view(), name='load_filtered_trs'),
+    path('test_runs/pull_notpassed_testruns_by_testset_filter/<int:tsfid>/', views.PullNotPassedTestrunsByTestSetFilter.as_view(), 
+         name='pull_notpassed_testruns_by_testset_filter'),
     # additional parameter limit=<int> can be provided to override default limit specified by regression filter
 
-    path('test_runs/load_by_all_reg_filter/', views.LoadTestRunsToDBBasedOnAllRegressionFilters.as_view(), name='load_filtered_trs_by_all_rf'),
-    path('test_runs/load_by_all_reg_filter_celery/', views.LoadTestRunsToDBBasedOnAllRegressionFiltersCelery.as_view(), name='load_filtered_trs_by_all_rf_celery'),
+    path('test_runs/pull_notpassed_testruns_by_all_testset_filters/', views.PullNotPassedTestrunsByAllTestSetFilters.as_view(), 
+         name='pull_notpassed_testruns_by_all_testset_filters'),
+
+
+    path('celery/pull_notpassed_testruns_by_all_testset_filters_celery/', views.PullNotPassedTestrunsByAllTestSetFiltersCelery.as_view(), 
+         name='pull_notpassed_testruns_by_all_testset_filters_celery'),
+    path('celery/pull_passed_testruns_by_all_testset_filters_celery/', views.PullPassedTestrunsByAllTestSetFiltersCelery.as_view(), 
+         name='pull_passed_testruns_by_all_testset_filters_celery'),
+    path('celery/download_latest_passed_logs_to_storage/', views.DownloadLatestPassedLogsToStorage.as_view(), 
+         name='download_latest_passed_logs_to_storage'),
+    path('celery/remove_old_passed_logs_from_log_storage/', views.RemoveOldPassedLogsFromLogStorage.as_view(), 
+         name='remove_old_passed_logs_from_log_storage'),
+    path('celery/sync_suspension_status_of_test_instances_by_all_testset_filters/', views.SyncSuspensionStatusOfTestInstancesByAllTestSetFilters.as_view(), 
+         name='sync_suspension_status_of_test_instances_by_all_testset_filters'),
+    path('celery/fill_empty_test_instances_with_their_rp_ids/', views.FillEmptyTestInstancesWithTheirRPIds.as_view(), 
+         name='fill_empty_test_instances_with_their_rp_ids'),
+    
+    
     path('', include(router.urls)),
 ]
