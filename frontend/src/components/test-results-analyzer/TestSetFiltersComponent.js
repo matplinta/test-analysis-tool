@@ -15,6 +15,9 @@ import { VscExpandAll } from 'react-icons/vsc';
 import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
 import { GrAddCircle } from 'react-icons/gr';
 import { FiSettings } from 'react-icons/fi';
+import { MdAddCircle } from 'react-icons/md';
+import { FaEdit } from 'react-icons/fa';
+import { BiEdit } from 'react-icons/bi';
 
 import UserFilterAddModal from './TestSetFilterAddModal';
 import {
@@ -117,8 +120,8 @@ let TestSetFiltersComponent = ({ type }) => {
 
     let editButton = (rowData) => {
         return (
-            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFilter(rowData.id)} >
-                <FiSettings size='20' />
+            <Button className="p-button-warning p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFilter(rowData.id)} >
+                <BiEdit size='20' />
             </Button>
         );
     }
@@ -169,13 +172,13 @@ let TestSetFiltersComponent = ({ type }) => {
     let subscribeOrUnsubscribedButton = (rowData) => {
         if (rowData.subscribers.includes(currentUser)) {
             return (
-                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
+                <Button className="p-button-secondary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
                     <div><BiBellOff size='20' /></div>
                 </Button>
             );
         } else {
             return (
-                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => subscribeFilter(rowData)} >
+                <Button className="p-button-info p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => subscribeFilter(rowData)} >
                     <div><BiBell size='20' /></div>
                 </Button>
             );
@@ -249,21 +252,25 @@ let TestSetFiltersComponent = ({ type }) => {
 
     return (
         <>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={addFilter}>
-                Add Regression Filter
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={addFilter}>
+                <MdAddCircle size='20' />
+                <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
             </Button>
             {type !== "subscribed" ?
-                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={sunscribeSelectedTestFilters}>
-                    <BiBell size='20' /> Subscribe selected
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={sunscribeSelectedTestFilters}>
+                    <BiBell size='20' />
+                    <span style={{ marginLeft: '5px' }}>Subscribe selected</span>
                 </Button>
                 : null
             }
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={unsunscribeSelectedTestFilters}>
-                <BiBellOff size='20' /> Unsubscribe selected
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm" onClick={unsunscribeSelectedTestFilters}>
+                <BiBellOff size='20' />
+                <span style={{ marginLeft: '5px' }}>Unsubscribe selected</span>
             </Button>
             {type === "owned" ?
-                < Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={confirmRemove}>
-                    <BiTrash size='20' /> Remove selected
+                < Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-danger p-button-sm" onClick={confirmRemove}>
+                    <BiTrash size='20' />
+                    <span style={{ marginLeft: '5px' }}>Remove selected</span>
                 </Button>
                 : null
             }

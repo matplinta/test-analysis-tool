@@ -65,7 +65,8 @@ export const Successes = {
     'BRANCH_OFF': 'Branch Off performed succesfully!',
     'EDIT_FAIL_MESSAGE_REGEX': 'Fail Message Regex edited succesfully!',
     'ADD_FAIL_MESSAGE_REGEX': 'Fail Message Regex added succesfully!',
-    'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!'
+    'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!',
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!'
 
 }
 
@@ -91,7 +92,8 @@ export const Errors = {
     'EDIT_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex editing!',
     'ADD_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex adding!',
     'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',
-    'FETCH_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex fetching!'
+    'FETCH_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex fetching!',
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group removing!',
 
 
 }

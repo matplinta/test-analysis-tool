@@ -10,8 +10,9 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { FiSettings } from 'react-icons/fi';
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegTrashAlt, FaEdit } from 'react-icons/fa';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { MdAddCircle } from 'react-icons/md';
 
 import FailMessageTypeAddModal from './FailMessageTypeAddModal';
 
@@ -90,8 +91,8 @@ const FailRegexTypesComponent = () => {
 
     let editButton = (rowData) => {
         return (
-            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFailMessage(rowData)} disabled={!rowData.author.includes(currentUser)}>
-                <FiSettings size='20' />
+            <Button className="p-button-warning p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFailMessage(rowData)} disabled={!rowData.author.includes(currentUser)}>
+                <FaEdit size='20' />
             </Button>
 
         );
@@ -99,10 +100,9 @@ const FailRegexTypesComponent = () => {
 
     let removeButton = (rowData) => {
         return (
-            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)} disabled={!rowData.author.includes(currentUser)}>
+            <Button className="p-button-danger p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)} disabled={!rowData.author.includes(currentUser)}>
                 <FaRegTrashAlt size='20' />
             </Button>
-
         );
     }
 
@@ -114,7 +114,10 @@ const FailRegexTypesComponent = () => {
 
     return (
         <>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleFormShow}>Add Fail Message Regex</Button>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={handleFormShow}>
+                <MdAddCircle size='20' />
+                <span style={{ marginLeft: '5px' }}>Add Fail Message Regex</span>
+            </Button>
             <DataTable value={failRegexTypes} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
                 size="small" className="table-style"
                 filters={filters} filterDisplay="row" loading={loading}

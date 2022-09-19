@@ -22,7 +22,7 @@ let MenuComponent = () => {
         {
             label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Test Set Filters</span>,
             items: [{
-                label: "All Test Set Filters",
+                label: "All",
                 command: () => { navigate('test-set-filters') },
             }, {
                 label: "Subscribed",
@@ -31,12 +31,12 @@ let MenuComponent = () => {
                 label: "Owned",
                 command: () => { navigate('owned-test-set-filters') },
             }, {
-                label: "Prapare to Branch off",
+                label: "Prapare to branch off",
                 command: () => { navigate('test-set-filters-branch-off') },
             }]
         },
         {
-            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages Definitions</span>,
+            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages</span>,
             items: [{
                 label: <span>Fail Message Regex</span>,
                 command: () => { navigate('fail-regex') }

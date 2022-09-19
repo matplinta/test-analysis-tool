@@ -31,3 +31,7 @@ export const postFailMessageTypeGroup = async (failMessageTypeGroup) => {
 export const deleteFailMessageTypeRegex = async (id) => {
     return (await axios.delete('api/tra/fail_message_types/' + id, { headers: authHeader() }));
 }
+
+export const deleteFailMessageTypeRegexGroup = async (id) => {
+    return (await axios.delete('api/tra/fail_message_type_groups/' + id, { headers: authHeader() }));
+}
