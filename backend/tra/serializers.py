@@ -53,6 +53,16 @@ class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
             fail_message_type_group_instance.fail_message_types.add(fail_message_type_instance)
         return fail_message_type_group_instance
 
+    def update(self, instance, validated_data):
+        fail_message_types_data = validated_data.pop('fail_message_types')
+        fmts = [FailMessageType.objects.get(**fmt) for fmt in fail_message_types_data]
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        instance.fail_message_type_groups.set(fmts)
+        return instance
+
 class LastPassingLogsSerializer(serializers.ModelSerializer):
     class Meta:
         model = LastPassingLogs
@@ -242,11 +252,14 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
         owners = [User.objects.get(**owner) for owner in owners_data]
         subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
 
-        instance.fail_message_type_groups.set(fmtgs)
-        instance.owners.set(owners)
-        instance.subscribers.set(subscribers)
+        
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
+
+        instance.fail_message_type_groups.set(fmtgs)
+        instance.owners.set(owners)
+        instance.subscribers.set(subscribers)
+
         return instance
