@@ -5,7 +5,6 @@
 //  --------------------------------------------------------------------------
 
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom'
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -13,16 +12,12 @@ import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { VscExpandAll } from 'react-icons/vsc';
 import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
-import { GrAddCircle } from 'react-icons/gr';
-import { FiSettings } from 'react-icons/fi';
 import { MdAddCircle } from 'react-icons/md';
-import { FaEdit } from 'react-icons/fa';
 import { BiEdit } from 'react-icons/bi';
 
 import UserFilterAddModal from './TestSetFilterAddModal';
 import {
-    getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe,
-    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter, getTestSetFilter, putTestSetFilter,
+    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter,
     postTestSetFilterSubscribe, postTestSetFilterUnsubscribe, deleteTestSetFilterBatch
 } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -33,8 +28,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './TestSetFiltersComponent.css';
 
 let TestSetFiltersComponent = ({ type }) => {
-
-    const navigate = useNavigate();
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 

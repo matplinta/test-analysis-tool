@@ -28,6 +28,10 @@ export const postFailMessageTypeGroup = async (failMessageTypeGroup) => {
     return (await axios.post('api/tra/fail_message_type_groups/', failMessageTypeGroup, { headers: authHeader() }));
 }
 
+export const putFailMessageTypeGroup = async (id, failMessageTypeGroup) => {
+    return (await axios.put('api/tra/fail_message_type_groups/' + id + '/', failMessageTypeGroup, { headers: authHeader() }));
+}
+
 export const deleteFailMessageTypeRegex = async (id) => {
     return (await axios.delete('api/tra/fail_message_types/' + id, { headers: authHeader() }));
 }

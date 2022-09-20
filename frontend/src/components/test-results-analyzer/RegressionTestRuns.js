@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card } from 'primereact/card';
 import { Tree } from 'primereact/tree';
-import { Tooltip } from 'primereact/tooltip';
-import { ScrollPanel } from 'primereact/scrollpanel';
+import { Button } from 'primereact/button';
 
 import TestRunTableComponent from './TestRunTableComponent';
 
@@ -11,7 +9,6 @@ import { getTestRunsFilters } from '../../services/test-results-analyzer/test-ru
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import './RegressionTestRuns.css'
-import { Button } from 'primereact/button';
 
 let RegressionTestRuns = () => {
 
@@ -509,7 +506,7 @@ let RegressionTestRuns = () => {
                     {statusCheckboxList}
                     {fbCheckboxList}
                     {analyzerCheckboxList}
-                    <Button onClick={searchTestRuns} className="p-button-primary" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
+                    <Button onClick={searchTestRuns} className="p-button-info" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
                     {/* </ScrollPanel> */}
                 </div>
                 :

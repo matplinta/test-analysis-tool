@@ -1,26 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
-import { Button } from 'primereact/button';
 import { ToggleButton } from 'primereact/togglebutton';
-import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
-import { MdAddCircle } from 'react-icons/md';
-import { confirmDialog } from 'primereact/confirmdialog';
 
-import { useCurrentUser } from '../../services/CurrentUserContext';
-import { getFailMessageTypeGroups, deleteFailMessageTypeRegexGroup } from '../../services/test-results-analyzer/fail-message-type.service';
+import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 
 import "./FailMessageTypeGroupComponent.css";
-import FailMessageGroupAddModal from './FailMessageGroupAddModal';
-import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify';
 
 let FailMessageTypeGroupComponent = () => {
 
     const [failMessageTypeGroups, setFailMessageTypeGroups] = useState();
     const [expandedKeys, setExpandedKeys] = useState({});
-    const [failMessageGroupIdToEdit, setFailMessageGroupIdToEdit] = useState(null);
     const [selectedGroups, setSelectedGroups] = useState(null);
 
     const [isToggled, setIsToggled] = useState(false);
@@ -30,8 +22,6 @@ let FailMessageTypeGroupComponent = () => {
     const [showForm, setShowForm] = useState(false);
     const handleFormClose = () => setShowForm(false);
     const handleFormShow = () => setShowForm(true);
-
-    const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     let { group } = useParams();
 
@@ -125,33 +115,7 @@ let FailMessageTypeGroupComponent = () => {
         }
     }
 
-    let editFailMessageGroup = (rowData) => {
-        setFailMessageGroupIdToEdit(rowData.data.id);
-        handleFormShow();
-    }
-
-    const confirmRemove = (rowData) => {
-        confirmDialog({
-            message: '\nAre you sure you want to remove Fail Message Regex Group?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => removeFailMessageGroup(rowData.id)
-        });
-    };
-
-    let removeFailMessageGroup = (id) => {
-        deleteFailMessageTypeRegexGroup(id).then(
-            (result) => {
-                Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.success);
-            },
-            (error) => {
-                Notify.sendNotification(Errors.REMOVE_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.error);
-            }
-        )
-    }
-
     useEffect(() => {
-        fetchCurrentUser();
         fetchFailMessageGroups(group);
     }, [])
 
@@ -160,30 +124,13 @@ let FailMessageTypeGroupComponent = () => {
             <ToggleButton checked={isToggled} onChange={(e) => onToggle(e.value)} onLabel="Collapse List" offLabel="Expand All"
                 onIcon="pi pi-chevron-up" offIcon="pi pi-chevron-down" aria-label="Confirmation"
                 className="p-button-info p-button-sm"
-                style={{ marginLeft: '5px', fontWeight: 'bold' }} />
-
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={handleFormShow}>
-                <MdAddCircle size='20' />
-                <span style={{ marginLeft: '5px' }}>Add Regex Group</span>
-            </Button>
-
-            <Button onClick={() => confirmRemove()} style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-danger p-button-sm">
-                <FaRegTrashAlt size='20' />
-                <span style={{ marginLeft: '3px' }}>Remove selected</span>
-            </Button >
-
-            <Button className="p-button-warning p-button-sm" onClick={() => editFailMessageGroup()} style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }}>
-                <FaEdit size='20' />
-                <span style={{ marginLeft: '3px' }}>Edit selected</span>
-            </Button>
+                style={{ marginLeft: '6px', marginTop: '3px', fontWeight: 'bold' }} />
 
             <TreeTable value={failMessageTypeGroups} scrollable size="small" loading={loading}
                 scrollHeight="calc(100vh - 300px)" showGridlines className="tree-table-style"
                 resizableColumns columnResizeMode="fit" rowClassName={rowClassName}
                 expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}
                 selectionKeys={selectedGroups} onSelectionChange={e => setSelectedGroups(e.value)}>
-
-                <Column selectionMode="multiple"></Column>
 
                 <Column field="group_name" header="Group Name" expander sortable filter filterPlaceholder="Filter by name"></Column>
                 <Column field="group_author" header="Group Author" sortable filter filterPlaceholder="Filter by author"></Column>
@@ -194,8 +141,6 @@ let FailMessageTypeGroupComponent = () => {
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Filter by description"></Column>
 
             </TreeTable>
-
-            <FailMessageGroupAddModal failMessageGroupIdToEdit={failMessageGroupIdToEdit} showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
         </>
     )
 }

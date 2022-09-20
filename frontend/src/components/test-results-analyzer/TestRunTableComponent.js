@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Button } from 'react-bootstrap';
+import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
@@ -213,8 +213,13 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
             <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyze Test Runs As Env Issue</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={handleGenerateRPUrl}>
+                Generate RP URL
+            </Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-help p-button-sm" onClick={handleAnalizeTestRuns}>
+                Analyze Test Runs As Env Issue
+            </Button>
+
         </div>
 
     );

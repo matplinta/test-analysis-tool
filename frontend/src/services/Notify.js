@@ -66,8 +66,9 @@ export const Successes = {
     'EDIT_FAIL_MESSAGE_REGEX': 'Fail Message Regex edited succesfully!',
     'ADD_FAIL_MESSAGE_REGEX': 'Fail Message Regex added succesfully!',
     'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!',
-    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!'
-
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!',
+    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created succesfully!',
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited succesfully!'
 }
 
 export const Errors = {
@@ -94,8 +95,8 @@ export const Errors = {
     'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',
     'FETCH_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex fetching!',
     'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group removing!',
-
-
+    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group creating!',
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group editing!'
 }
 
 export const Warnings = {
