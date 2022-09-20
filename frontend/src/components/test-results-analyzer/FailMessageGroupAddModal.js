@@ -15,10 +15,9 @@ import FailMessagesTableComponent from "./FailMessagesTableComponent";
 import { postFailMessageTypeGroup, putFailMessageTypeGroup } from './../../services/test-results-analyzer/fail-message-type.service';
 import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify';
 
-const FailMessageGroupAddModal = ({ failMessageGroupToEdit, setFailMessageGroupToEdit, showForm, handleFormClose }) => {
+const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCopy, showForm, handleFormClose }) => {
 
     const [name, setName] = useState("");
-
     const [selectedFailMessageTypes, setSelectedFailMessageTypes] = useState([]);
 
     const handleFailMessageRegexGroupAdd = () => {
@@ -68,15 +67,57 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, setFailMessageGroupT
         setSelectedFailMessageTypes(failMessageGroupToEdit.fail_message_types)
     }
 
+    const fetchFailMessageGroupToCopy = () => {
+        setName(failMessageGroupToCopy.name);
+        setSelectedFailMessageTypes(failMessageGroupToCopy.fail_message_types)
+    }
+
+    const setDialogTitle = () => {
+        if (failMessageGroupToCopy !== null) {
+            return "Copy Fail Message Regex Group";
+        }
+        else if (failMessageGroupToEdit !== null) {
+            return "Edit Fail Message Regex Group";
+        } else {
+            return "Create Fail Message Regex Group";
+        }
+    }
+
+    const setFormButtons = () => {
+        if (failMessageGroupToCopy !== null) {
+            return <div className="form-item">
+                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
+                    Copy Fail Message Group
+                </Button>
+            </div>
+        }
+        else if (failMessageGroupToEdit !== null) {
+            return <div className="form-item">
+                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
+                    Add Fail Message Group
+                </Button>
+                <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                    Clear Form
+                </Button>
+            </div>
+        } else {
+            return <div className="form-item">
+                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupEdit}>
+                    Save
+                </Button>
+            </div>
+        }
+    }
+
     useEffect(() => {
         if (failMessageGroupToEdit !== null) fetchFailMessageGroupToEdit();
+        else if (failMessageGroupToCopy !== null) fetchFailMessageGroupToCopy();
         else clearForm();
-    }, [failMessageGroupToEdit])
+    }, [failMessageGroupToEdit, failMessageGroupToCopy])
 
     return (
         <div>
-            <Dialog header={failMessageGroupToEdit === null ? "Create fail message regex group" : "Edit fail message regex group"}
-                visible={showForm} className="dialog-style" onHide={handleFormCloseAndClear}>
+            <Dialog header={setDialogTitle} visible={showForm} className="dialog-style" onHide={handleFormCloseAndClear}>
                 <div className="form-item">
                     <label htmlFor="name" className="block">Fail Message Group Name</label>
                     <InputText id="name" value={name} onChange={(e) => setName(e.target.value)} style={{ width: "100%" }}
@@ -95,9 +136,12 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, setFailMessageGroupT
                         <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
                             Add Fail Message Group
                         </Button>
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
-                            Clear Form
-                        </Button>
+                        {failMessageGroupToCopy === null ?
+                            <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                                Clear Form
+                            </Button>
+                            : null
+                        }
                     </div>
                     :
                     <div className="form-item">

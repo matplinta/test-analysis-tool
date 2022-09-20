@@ -60,7 +60,7 @@ class FailMessageTypeGroupSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
 
         instance.save()
-        instance.fail_message_type_groups.set(fmts)
+        instance.fail_message_types.set(fmts)
         return instance
 
 class LastPassingLogsSerializer(serializers.ModelSerializer):

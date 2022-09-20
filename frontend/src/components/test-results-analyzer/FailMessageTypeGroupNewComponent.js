@@ -16,6 +16,7 @@ import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import { DataTable } from 'primereact/datatable';
 import { AiOutlineLink } from 'react-icons/ai';
+import { MdContentCopy } from 'react-icons/md';
 
 import { useCurrentUser } from '../../services/CurrentUserContext';
 import { getFailMessageTypeGroups, deleteFailMessageTypeRegexGroup } from '../../services/test-results-analyzer/fail-message-type.service';
@@ -31,6 +32,7 @@ let FailMessageTypeGroupComponent = () => {
     const [selectedRegexList, setSelectedRegexList] = useState([]);
 
     const [failMessageGroupToEdit, setFailMessageGroupToEdit] = useState(null);
+    const [failMessageGroupToCopy, setFailMessageGroupToCopy] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -48,8 +50,16 @@ let FailMessageTypeGroupComponent = () => {
         getFailMessageTypeGroups(group).then(
             (response) => {
                 setFailMessageTypeGroups(response.data);
-                if (selectedFailMessageTypeGroup !== null)
-                    setSelectedFailMessageTypeGroup(response.data.filter(group => group.id === selectedFailMessageTypeGroup.id)[0]);
+                if (response.data.length > 0 && failMessageGroupToEdit !== null) {
+                    let selectedGroup = response.data.filter(group => group.id === failMessageGroupToEdit.id)[0];
+                    setSelectedFailMessageTypeGroup(selectedGroup);
+                    setSelectedRegexList(selectedGroup.fail_message_types);
+                }
+                if (response.data.length > 0 && failMessageGroupToCopy !== null) {
+                    let selectedGroup = response.data.filter(group => group.id === failMessageGroupToCopy.id)[0];
+                    setSelectedFailMessageTypeGroup(selectedGroup);
+                    setSelectedRegexList(selectedGroup.fail_message_types);
+                }
                 setLoading(false);
             },
             (error) => {
@@ -62,13 +72,18 @@ let FailMessageTypeGroupComponent = () => {
     const handleFormCloseAndRefresh = () => {
         handleFormClose();
         fetchFailMessageGroups();
+        setFailMessageGroupToEdit(null);
+        setFailMessageGroupToCopy(null);
     }
 
     let editFailMessageGroup = (rowData) => {
         setFailMessageGroupToEdit(rowData);
         handleFormShow();
-        fetchFailMessageGroups();
-        setSelectedFailMessageTypeGroup(failMessageGroupToEdit);
+    }
+
+    let copyFailMessageGroup = (rowData) => {
+        handleFormShow();
+        setFailMessageGroupToCopy(rowData);
     }
 
     const confirmRemove = (rowData) => {
@@ -105,8 +120,18 @@ let FailMessageTypeGroupComponent = () => {
 
     let editButton = (rowData) => {
         return (
-            <Button className="p-button-warning p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFailMessageGroup(rowData)} disabled={!rowData.author.includes(currentUser)}>
+            <Button className="p-button-warning p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFailMessageGroup(rowData)}
+                disabled={!rowData.author.includes(currentUser)}>
                 <FaEdit size='20' />
+            </Button>
+
+        );
+    }
+
+    let copyButton = (rowData) => {
+        return (
+            <Button className="p-button-info p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => copyFailMessageGroup(rowData)}>
+                <MdContentCopy size='20' />
             </Button>
 
         );
@@ -114,7 +139,8 @@ let FailMessageTypeGroupComponent = () => {
 
     let removeButton = (rowData) => {
         return (
-            <Button className="p-button-danger p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)} disabled={!rowData.author.includes(currentUser)}>
+            <Button className="p-button-danger p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)}
+                disabled={!rowData.author.includes(currentUser)}>
                 <FaRegTrashAlt size='20' />
             </Button>
         );
@@ -144,13 +170,14 @@ let FailMessageTypeGroupComponent = () => {
                         filterDisplay="row" loading={loading}
                         globalFilterFields={['name', 'regex', 'author', 'description']}
                         emptyMessage="No rergex groups found."
-                        scrollHeight="calc(100vh - 270px)"
+                        scrollHeight="calc(100vh - 290px)"
                         resizableColumns columnResizeMode="fit"
                         selectionMode="single" selection={selectedFailMessageTypeGroup}
                         onSelectionChange={e => selectFailMessageTypeGroup(e.value)}>
 
                         <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
                         <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
+                        <Column body={copyButton} header="Copy" style={{ textAlign: "center", minWidth: "60px" }} />
                         <Column body={editButton} header="Edit" style={{ textAlign: "center", minWidth: "60px" }} />
                         <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
                     </DataTable >
@@ -163,7 +190,7 @@ let FailMessageTypeGroupComponent = () => {
                         filterDisplay="row" loading={loading}
                         globalFilterFields={['name', 'regex', 'author', 'description']}
                         emptyMessage="Any regex selected."
-                        scrollHeight="calc(100vh - 270px)"
+                        scrollHeight="calc(100vh - 290px)"
                         resizableColumns columnResizeMode="fit">
 
                         <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" ></Column >
@@ -176,7 +203,7 @@ let FailMessageTypeGroupComponent = () => {
                 </Card>
             </div >
 
-            <FailMessageGroupAddModal failMessageGroupToEdit={failMessageGroupToEdit} setFailMessageGroupToEdit={setFailMessageGroupToEdit}
+            <FailMessageGroupAddModal failMessageGroupToEdit={failMessageGroupToEdit} failMessageGroupToCopy={failMessageGroupToCopy}
                 showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
         </>
     )
