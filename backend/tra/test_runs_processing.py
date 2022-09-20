@@ -52,18 +52,18 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
     return None, None
 
 
-def send_testrun_analysis_to_rp(test_run, token):
+def send_testrun_analysis_to_rp(test_run, auth_params):
     celery_tasks.celery_analyze_testruns.delay(
         runs=[test_run.rp_id], 
         comment=f"Analyzed by user {test_run.analyzed_by.username}: {test_run.comment}", 
         common_build=test_run.builds, 
         result=test_run.result.name, 
         env_issue_type=test_run.env_issue_type.name,
-        token=token
+        auth_params=auth_params
     )
 
 
-def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType], first_lines_to_match: int=3, token: str=None):
+def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMessageType], first_lines_to_match: int=3, auth_params: dict=None):
     fail_message_type, line_no = match_fail_message_type(fail_message=test_run.fail_message, fail_message_types=fail_message_types)
     if fail_message_type and line_no <= first_lines_to_match:
         test_run.result = utils.get_env_issue_result_instance()
@@ -71,7 +71,7 @@ def try_to_analyze_test_run(test_run: TestRun, fail_message_types: List[FailMess
         test_run.comment = fail_message_type.name
         test_run.analyzed = True
         test_run.analyzed_by = utils.get_autoanalyzer_user()
-        send_testrun_analysis_to_rp(test_run, token)
+        send_testrun_analysis_to_rp(test_run, auth_params)
     return test_run
 
 
@@ -150,7 +150,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
             tr = create_testrun_obj_based_on_rp_data(test_run, ignore_old_testruns=True)
             not_analyzed = utils.get_not_analyzed_result_instance()
             if try_to_analyze and testset_filter and (tr.result == not_analyzed):
-                tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types, token=token)
+                tr = try_to_analyze_test_run(test_run=tr, fail_message_types=fail_message_types, auth_params=auth_params)
 
             tr.save()
             new_runs.append(tr.rp_id)
@@ -169,12 +169,12 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
         query_limit = testset_filter.limit
 
     new_runs, skipped_runs = [], []
-    token = utils.try_to_get_rp_api_token_from_testset_filter_owners(testset_filter)
 
     if try_to_analyze and testset_filter:
         fail_message_types = get_fail_message_types_from_testset_filter(testset_filter)
 
-    test_runs_data = RepPortal(token=token).get_data_from_testruns(limit=query_limit, filters=filters)
+    auth_params = utils.get_rp_api_auth_params(testset_filter)
+    test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
     return {'new_runs': new_runs, 'skipped_runs': skipped_runs}
@@ -204,9 +204,9 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
         query_limit = testset_filter.limit
 
     new_runs, skipped_runs = [], []
-    token = utils.try_to_get_rp_api_token_from_testset_filter_owners(testset_filter)
 
-    test_runs_data = RepPortal(token=token).get_data_from_testruns(limit=query_limit, filters=filters)
+    auth_params = utils.get_rp_api_auth_params(testset_filter)
+    test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
     return {'new_runs': new_runs, 'skipped_runs': skipped_runs}
@@ -296,7 +296,9 @@ def sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id
     postfix = testset_filter.test_lab_path.split('\\')[-1]
     if not limit:
         limit = testset_filter.limit
-    results = RepPortal().get_data_from_testinstances(limit=limit, test_lab_path=testset_filter.test_lab_path)
+        
+    auth_params = utils.get_rp_api_auth_params(testset_filter)
+    results, _ = RepPortal(**auth_params).get_data_from_testinstances(limit=limit, test_lab_path=testset_filter.test_lab_path)
     for test_instance in testset_filter.test_instances.all():
         suspended_status = get_ti_suspended_status_from_results(test_instance.rp_id)
         if suspended_status is None:
@@ -335,7 +337,8 @@ def fill_empty_test_instances_with_their_rp_ids():
 
     not_found = []
     for testset_filter in TestSetFilter.objects.all():
-        results = RepPortal().get_data_from_testinstances(limit=1000, test_lab_path=testset_filter.test_lab_path)
+        auth_params = utils.get_rp_api_auth_params(testset_filter)
+        results, _ = RepPortal(**auth_params).get_data_from_testinstances(limit=1000, test_lab_path=testset_filter.test_lab_path)
         for test_instance in testset_filter.test_instances.all():
             rp_id = get_ti_id_from_results(test_instance.test_case_name, testset_filter.test_set_name,  testset_filter.test_lab_path)
             if rp_id is None:

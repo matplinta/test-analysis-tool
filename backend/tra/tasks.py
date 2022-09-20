@@ -7,6 +7,7 @@ from .models import *
 from rep_portal.api import RepPortal, RepPortalError
 from . import test_runs_processing
 from .storage import get_storage_instance
+from . import utils
 
 
 
@@ -113,8 +114,11 @@ def celery_sync_suspension_status_of_test_instances_by_testset_filter(self, test
 
 
 @shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
-def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, token=None):
-    return RepPortal(token=token).analyze_testruns(runs, comment, common_build, result, env_issue_type)
+def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, auth_params=None):
+    if not auth_params:
+        auth_params = utils.get_rp_api_auth_params()
+    resp, url, data =  RepPortal(**auth_params).analyze_testruns(runs, comment, common_build, result, env_issue_type)
+    return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
 
 
 @shared_task(name="download_resursively_contents_to_storage")

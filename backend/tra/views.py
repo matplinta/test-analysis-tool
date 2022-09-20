@@ -65,6 +65,7 @@ import copy
 
 from . import test_runs_processing
 from . import tasks as celery_tasks
+from . import utils
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -477,13 +478,15 @@ class TestRunsAnalyzeToRP(APIView):
         else:
             token = None
 
+        auth_params = utils.get_rp_api_auth_params(token=token)
+
         celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
             comment=comment, 
             common_build="", 
             result=result_obj.name, 
             env_issue_type=env_issue_type,
-            token=token
+            auth_params=auth_params
         )
 
         test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)

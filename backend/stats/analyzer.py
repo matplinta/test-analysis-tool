@@ -18,11 +18,14 @@ import re
 from rep_portal.api import RepPortal
 from datetime import date
 from typing import Dict
+from tra.utils import get_rp_api_auth_params
 
 
 class Analyzer():
-    def __init__(self, fail_message_dict=None, filters=None, rp_token=None):
-        self.rp_token = rp_token
+    def __init__(self, fail_message_dict=None, filters=None, rp_auth_params=None):
+        if not rp_auth_params:
+            rp_auth_params = get_rp_api_auth_params()
+        self.rp_auth_params = rp_auth_params
         self.fail_message_dict = fail_message_dict if fail_message_dict else {}
         self.filters = filters if filters else {}
         self.limit = self.filters.pop('limit', 100)
@@ -32,7 +35,7 @@ class Analyzer():
         if url:
             df = self._get_normalized_json_from_url(url)
         else:
-            datajson = RepPortal(self.rp_token).get_data_from_testruns(limit=self.limit, filters=self.filters)
+            datajson, _ = RepPortal(**self.rp_auth_params).get_data_from_testruns(limit=self.limit, filters=self.filters)
             df = json_normalize(datajson)
         df = self._drop_empty_fail_msg_rows(df)
         df = self._convert_datetime_columns_to_datetime(df)
