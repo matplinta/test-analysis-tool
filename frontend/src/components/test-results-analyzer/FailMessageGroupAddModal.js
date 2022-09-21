@@ -86,23 +86,23 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCo
     const setFormButtons = () => {
         if (failMessageGroupToCopy !== null) {
             return <div className="form-item">
-                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
+                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupAdd}>
                     Copy Fail Message Group
                 </Button>
             </div>
         }
         else if (failMessageGroupToEdit !== null) {
             return <div className="form-item">
-                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
+                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupAdd}>
                     Add Fail Message Group
                 </Button>
-                <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                <Button className="p-button-primary " type="submit" onClick={clearForm}>
                     Clear Form
                 </Button>
             </div>
         } else {
             return <div className="form-item">
-                <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupEdit}>
+                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupEdit}>
                     Save
                 </Button>
             </div>
@@ -133,11 +133,11 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCo
 
                 {failMessageGroupToEdit === null ?
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupAdd}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupAdd}>
                             Add Fail Message Group
                         </Button>
                         {failMessageGroupToCopy === null ?
-                            <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                            <Button className="p-button-primary " type="submit" onClick={clearForm}>
                                 Clear Form
                             </Button>
                             : null
@@ -145,7 +145,7 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCo
                     </div>
                     :
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexGroupEdit}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupEdit}>
                             Save
                         </Button>
                     </div>

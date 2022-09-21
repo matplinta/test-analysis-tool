@@ -113,12 +113,12 @@ const BranchOffComponent = () => {
 
             {(selectedBranch !== null && selectedTestFilters.length !== 0) ?
                 < Button style={{ marginLeft: '5px', fontWeight: 'bold', height: '46px', marginBottom: '3px' }}
-                    className="p-button-success p-button-color p-button-sm" onClick={makeBranchOff}>
+                    className="p-button-success  p-button-sm" onClick={makeBranchOff}>
                     <RiGitBranchFill size='20' />  Perform Branch Off
                 </Button>
                 :
                 < Button style={{ marginLeft: '5px', fontWeight: 'bold', height: '46px', marginBottom: '3px' }}
-                    className="p-button-success p-button-color p-button-sm" onClick={makeBranchOff} disabled>
+                    className="p-button-success  p-button-sm" onClick={makeBranchOff} disabled>
                     <RiGitBranchFill size='20' />  Perform Branch Off
                 </Button>
             }

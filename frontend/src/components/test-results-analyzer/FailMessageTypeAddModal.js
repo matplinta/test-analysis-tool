@@ -123,16 +123,16 @@ const FailMessageTypeAddModal = ({ failMessageToEdit, showForm, handleFormClose 
 
                 {failMessageToEdit === null ?
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeAdd}>
+                        <Button className="p-button-primary" type="submit" onClick={handleFailMessageRegexTypeAdd}>
                             Add Regex
                         </Button>
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                        <Button className="p-button-primary" type="submit" onClick={clearForm}>
                             Clear Form
                         </Button>
                     </div>
                     :
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFailMessageRegexTypeEdit}>
+                        <Button className="p-button-primary" type="submit" onClick={handleFailMessageRegexTypeEdit}>
                             Save Regex
                         </Button>
                     </div>

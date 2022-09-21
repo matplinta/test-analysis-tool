@@ -34,7 +34,9 @@ let LogoutComponent = ({ setIsUserLoggedIn }) => {
 
     return (
         <div>
-            <Button size="sm" style={{ "marginLeft": '20px', height: '35px' }} className="p-button-primary p-button-color" onClick={handleShow}>Logout</Button>
+            <Button style={{ height: '35px' }} className="p-button-primary" onClick={handleShow}>
+                Logout
+            </Button>
 
             <Modal show={show} onHide={handleClose} size="sm" centered >
                 <Modal.Header closeButton>

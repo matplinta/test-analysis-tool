@@ -218,9 +218,9 @@ let ChartsComponent = () => {
 
                         <Row style={{ paddingLeft: '8px' }}>
                             <Col style={{ padding: '2px' }}>
-                                <Button className="p-button-primary p-button-color" type="submit" onClick={saveFilterSet}>Save Filter Set</Button>
-                                <Button className="p-button-primary p-button-color" type="submit" onClick={generateChart}>Generate Chart</Button>
-                                <Button className="p-button-primary p-button-color" type="submit" onClick={clearFilterSet}>Clear Filter Set</Button>
+                                <Button className="p-button-primary " type="submit" onClick={saveFilterSet}>Save Filter Set</Button>
+                                <Button className="p-button-primary " type="submit" onClick={generateChart}>Generate Chart</Button>
+                                <Button className="p-button-primary " type="submit" onClick={clearFilterSet}>Clear Filter Set</Button>
                             </Col>
                         </Row>
                     </Container>

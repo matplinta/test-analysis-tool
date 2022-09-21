@@ -271,15 +271,15 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 </div>
                 {filterIdToEdit === null ?
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterAdd}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFilterAdd}>
                             Add Filter
                         </Button>
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                        <Button className="p-button-primary " type="submit" onClick={clearForm}>
                             Clear Form
                         </Button>
                     </div>
                     : <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterEdit}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFilterEdit}>
                             Save Filter
                         </Button>
                     </div>

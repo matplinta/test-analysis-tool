@@ -99,10 +99,10 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, old
                 </div>
 
                 <div className="form-item">
-                    <Button className="p-button-primary p-button-color" type="submit" onClick={handlePerformBranchOff}>
+                    <Button className="p-button-primary " type="submit" onClick={handlePerformBranchOff}>
                         Perform Branch Off
                     </Button>
-                    <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                    <Button className="p-button-primary " type="submit" onClick={clearForm}>
                         Clear Form
                     </Button>
                 </div>
