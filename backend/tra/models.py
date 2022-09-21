@@ -117,7 +117,8 @@ class TestInstance(models.Model):
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     last_passing_logs   = models.ForeignKey(LastPassingLogs, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
-    # no_run_in_rp        = models.BooleanField(blank=True, default=False, null=True,  help_text="No run status in ReportingPortal for the current Feature Build")
+    organization        = models.ForeignKey(Organization, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
+    no_run_in_rp        = models.BooleanField(blank=True, default=False, null=True, help_text="No run status in ReportingPortal for the current Feature Build")
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]

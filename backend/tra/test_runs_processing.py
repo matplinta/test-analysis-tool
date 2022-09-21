@@ -100,16 +100,17 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", ""),
         testline_type=rp_test_run['test_col']["testline_type"]
     )
+    organization, _ = Organization.objects.get_or_create(
+        name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
+    )
     test_instance, _ = TestInstance.objects.get_or_create(
         rp_id=rp_test_run["qc_test_instance"]["id"],
         test_set=test_set_filter,
-        test_case_name=rp_test_run["test_case"]["name"]
+        test_case_name=rp_test_run["test_case"]["name"],
+        organization=organization
     )
     testline_type, _ = TestlineType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
-    )
-    organization, _ = Organization.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
     )
     env_issue_type, _ = EnvIssueType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["env_issue_type"])

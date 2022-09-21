@@ -158,10 +158,6 @@ class RepPortal():
             data["suspension_end"] = suspension_end
         return data
 
-    def _get_results_or_raise_error(self, resp):
-        results = resp.json().get('results', None)
-        if results is None:
-            raise RepPortalError(f"Last response: {resp}, {resp.text}. No results for url: {url}")
 
     def _get_logged_in_repapi_instance(self):
         api = RepApi(username=self.user, password=self.passwd, config=RepPortal.CONFIG)

@@ -1,3 +1,4 @@
+from typing import List, Set
 from celery.utils.log import get_task_logger
 from celery import shared_task
 from celery.schedules import crontab
@@ -33,6 +34,9 @@ if settings.DEBUG is False:
         sender.add_periodic_task(crontab(minute=5, hour="*/8"), 
                                  celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
                                  name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
+        sender.add_periodic_task(crontab(minute=35, hour="*/8"), 
+                                 celery_sync_norun_data_of_all_test_instances.s(), 
+                                 name='celery_sync_norun_data_of_all_test_instances')
 
 
 @app.task()
@@ -94,6 +98,25 @@ def celery_sync_suspension_status_of_test_instances_by_all_testset_filters(query
 
 
 @app.task()
+def celery_sync_norun_data_of_all_test_instances():
+    testset_filters = TestSetFilter.objects.exclude(subscribers=None)
+    branches = set([tsf.branch for tsf in testset_filters])
+    ti_eligible_to_sync_all = TestInstance.objects.none()
+    for testset_filter in testset_filters:
+        ti_eligible_to_sync_all = ti_eligible_to_sync_all | testset_filter.test_instances.all() 
+    organizations = set([ti.organization for ti in ti_eligible_to_sync_all])
+
+    for organization in organizations:
+        for branch in branches:
+            ti_eligible_to_sync = ti_eligible_to_sync_all.filter(organization=organization, test_set__branch=branch)
+            ti_eligible_ids = list(set([ti.rp_id for ti in ti_eligible_to_sync]))
+
+            celery_sync_norun_data_per_organization_and_branch.delay(organization.name, branch.name)
+
+    return {"organizations": [org.name for org in organizations], "branches": [bra.name for bra in branches], "ti_eligible_len": ti_eligible_to_sync_all.count()}
+
+
+@app.task()
 def celery_download_latest_passed_logs_to_storage():
     return test_runs_processing.download_latest_passed_logs_to_storage()
 
@@ -143,6 +166,17 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
     return {"resp": resp, "test_instance_ids": test_instance_ids}
 
 
-# @shared_task(name="celery_fill_empty_test_instances_with_their_rp_ids")
-# def celery_fill_empty_test_instances_with_their_rp_ids():
-#     return test_runs_processing.fill_empty_test_instances_with_their_rp_ids()
+@shared_task(name="sync_norun_data_per_organization_and_branch")
+def celery_sync_norun_data_per_organization_and_branch(organization_name: int, branch_name: int):
+    auth_params = utils.get_rp_api_auth_params()
+    organization = Organization.objects.get(name=organization_name)
+    branch = Branch.objects.get(name=branch_name)
+    ti_eligible_to_sync = TestInstance.objects.exclude(test_set__subscribers=None).filter(organization=organization, test_set__branch=branch)
+    ti_eligible_ids = set([ti.rp_id for ti in ti_eligible_to_sync])
+
+    ti_noruns =  RepPortal(**auth_params).get_test_instances_for_present_feature_build_with_specified_status(
+        organization.name, status="no_run", release=branch.name)
+    ti_noruns_ids = set([ti["id"] for ti in ti_noruns])
+    ti_intersection = ti_eligible_ids.intersection(ti_noruns_ids)
+    TestInstance.objects.filter(rp_id__in=list(ti_intersection)).update(no_run_in_rp=True)
+    return {"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "branch": branch.name, "organization": organization.name}

@@ -60,6 +60,8 @@ urlpatterns = [
          name='sync_suspension_status_of_test_instances_by_all_testset_filters'),
     path('celery/fill_empty_test_instances_with_their_rp_ids/', views.FillEmptyTestInstancesWithTheirRPIds.as_view(), 
          name='fill_empty_test_instances_with_their_rp_ids'),
+    path('celery/sync_norun_data_of_all_test_instances/', views.SyncNorunDataOfAllTestInstances.as_view(), 
+         name='sync_norun_data_of_all_test_instances'),
     
     
     path('', include(router.urls)),
