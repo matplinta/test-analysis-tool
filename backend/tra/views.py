@@ -65,6 +65,7 @@ import copy
 
 from . import test_runs_processing
 from . import tasks as celery_tasks
+from . import utils
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -144,7 +145,6 @@ class LastPassingLogsView(viewsets.ModelViewSet):
 class TestInstanceView(viewsets.ReadOnlyModelViewSet):
     serializer_class = TestInstanceSerializer
     queryset = TestInstance.objects.all()
-    pagination_class = None
 
 
 class TestSetFilterView(viewsets.ModelViewSet):
@@ -477,13 +477,15 @@ class TestRunsAnalyzeToRP(APIView):
         else:
             token = None
 
+        auth_params = utils.get_rp_api_auth_params(token=token)
+
         celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
             comment=comment, 
             common_build="", 
             result=result_obj.name, 
             env_issue_type=env_issue_type,
-            token=token
+            auth_params=auth_params
         )
 
         test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
@@ -585,6 +587,23 @@ class FillEmptyTestInstancesWithTheirRPIds(APIView):
     def get(self, request):
         resp = test_runs_processing.fill_empty_test_instances_with_their_rp_ids()
         return Response(resp)
+
+
+
+class SyncNorunDataOfAllTestInstances(APIView):
+    @swagger_auto_schema(
+        description="Sync no_run info from all test instances that are being subscribed by test sets (with subscribers)",
+        operation_description="Sync no_run info from all test instances that are being subscribed by test sets (with subscribers)",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_sync_norun_data_of_all_test_instances.delay()
+        return Response("OK")
+
 
 
 class SummaryStatisticsView(APIView): #TODO
