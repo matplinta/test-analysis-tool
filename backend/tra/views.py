@@ -58,7 +58,7 @@ from .models import (
     LastPassingLogs
 )
 
-from .filters import TestRunFilter
+from .filters import TestRunFilter, TestInstanceFilter
 from .pagination import StandardResultsSetPagination
 import json
 import copy
@@ -259,6 +259,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
         pks = [tsdata['id'] for tsdata in request.data["testsetfilters"]]
         should_delete = request.data.get("delete", False)
         should_unsubscribe = request.data.get("unsubscribe", False)
+        should_unsubscribe_all = request.data.get("unsubscribe", True)
         new_branch_name = request.data["new_branch"]
         try:
             new_branch = Branch.objects.get(name=new_branch_name)
@@ -294,8 +295,11 @@ class TestSetFilterView(viewsets.ModelViewSet):
         else:
             if should_unsubscribe:
                 for tsfilter in tsfilters:
-                    if self.request.user in tsfilter.subscribers.all():
-                        tsfilter.subscribers.remove(self.request.user)
+                    if should_unsubscribe_all:
+                         tsfilter.subscribers.clear()
+                    else:
+                        if self.request.user in tsfilter.subscribers.all():
+                            tsfilter.subscribers.remove(self.request.user)
 
         return self._serialize_response(new_tsfilters, status=status.HTTP_201_CREATED)
 
@@ -450,6 +454,27 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
                                                test_instance__test_set=reg_filter), tsfilters, Q())
         )
         return queryset
+
+
+class TestInstancesBasedOnQuery(generics.ListAPIView):
+    serializer_class = TestInstanceSerializer
+    filterset_class = TestInstanceFilter
+    pagination_class = StandardResultsSetPagination
+    ordering_fields = (
+        'rp_id',
+        'test_set__test_set_name',
+        'test_set__test_lab_path',
+        'test_set__branch__name',
+        'test_set__testline_type__name',
+        'last_passing_logs__utecloud_run_id',
+        'test_case_name',
+        'organization__name',
+        'execution_suspended',
+        'no_run_in_rp',
+    )
+
+    def get_queryset(self):
+        return TestInstance.objects.filter(test_set__subscribers=self.request.user)
 
 
 class TestRunsAnalyzeToRP(APIView):

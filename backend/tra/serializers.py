@@ -101,9 +101,10 @@ class EnvIssueTypeSerializer(serializers.ModelSerializer):
 
 class TestSetSerializer(serializers.ModelSerializer):
     branch = serializers.CharField(source="branch.name", read_only=True)
+    testline_type = serializers.CharField(source="testline_type.name", read_only=True)
     class Meta:
         model = TestSetFilter
-        fields = ('id', 'branch', 'test_set_name', 'test_lab_path')
+        fields = ('id', 'branch', 'test_set_name', 'test_lab_path', 'testline_type')
         read_only_fields = ('branch',)
         extra_kwargs = {
             'test_set_name': {'validators': []},
@@ -114,10 +115,11 @@ class TestSetSerializer(serializers.ModelSerializer):
 class TestInstanceSerializer(serializers.ModelSerializer):
     test_set = TestSetSerializer()
     last_passing_logs = LastPassingLogsSerializer(read_only=True)
+    organization = serializers.CharField(source='organization.name')
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'test_set', 'test_case_name', 'last_passing_logs')
+        fields = ('id', 'rp_id', 'test_set', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended')
         read_only_fields = ('last_passing_logs',)
         extra_kwargs = {
             'test_set': {'validators': []},
