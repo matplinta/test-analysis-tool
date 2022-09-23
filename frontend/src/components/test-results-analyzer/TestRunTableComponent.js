@@ -136,7 +136,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     let logLinkBodyTemplate = (rowData) => {
         return (
-            <Button variant="link" href={rowData.log_file_url} style={{ fontSize: '11px' }}>Logs</Button>
+            <a href={rowData.log_file_url} style={{ fontSize: '11px' }}>Logs</a>
         )
     }
 
@@ -144,7 +144,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
         const rpLink = rpUrl + rowData.rp_id;
         return (
-            <Button variant="link" href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </Button >
+            <a href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
         )
     }
 
