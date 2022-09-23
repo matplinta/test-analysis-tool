@@ -8,6 +8,7 @@ from django.conf import settings
 from itertools import chain
 import re
 import os
+from django.db import IntegrityError
 from django.contrib.auth.models import User
 from celery import shared_task
 from .models import (
@@ -163,13 +164,17 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
         except TestRunFBOlderThan3ConsecFBs as e:
             utils.log_exception_info(e)
 
+        except IntegrityError as e:
+            errored.append(str(exc_rp_id))
+            utils.log_exception_info(e)
+
 
     testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
     filters = utils.get_filters_for_rp_api(testrun_result="not analyzed,environment issue", testset_filter=testset_filter)
     if not query_limit:
         query_limit = testset_filter.limit
 
-    new_runs, skipped_runs = [], []
+    new_runs, skipped_runs, errored = [], [], []
 
     if try_to_analyze and testset_filter:
         fail_message_types = get_fail_message_types_from_testset_filter(testset_filter)
@@ -178,7 +183,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
     test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
-    return {'new_runs': new_runs, 'skipped_runs': skipped_runs}
+    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "errored": errored}
 
 
 def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: int=None):
@@ -198,19 +203,24 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
         except TestRunFBOlderThan3ConsecFBs as e:
             utils.log_exception_info(e)
 
+        except IntegrityError as e:
+            errored.append(str(exc_rp_id))
+            utils.log_exception_info(e)
+
+
 
     testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
     filters = utils.get_filters_for_rp_api(testrun_result="passed", testset_filter=testset_filter)
     if not query_limit:
         query_limit = testset_filter.limit
 
-    new_runs, skipped_runs = [], []
+    new_runs, skipped_runs, errored = [], [], []
 
     auth_params = utils.get_rp_api_auth_params(testset_filter)
     test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
-    return {'new_runs': new_runs, 'skipped_runs': skipped_runs}
+    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "errored": errored}
 
 
 def download_latest_passed_logs_to_storage():
