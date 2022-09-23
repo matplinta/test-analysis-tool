@@ -58,13 +58,14 @@ from .models import (
     LastPassingLogs
 )
 
-from .filters import TestRunFilter
+from .filters import TestRunFilter, TestInstanceFilter
 from .pagination import StandardResultsSetPagination
 import json
 import copy
 
 from . import test_runs_processing
 from . import tasks as celery_tasks
+from . import utils
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -144,7 +145,6 @@ class LastPassingLogsView(viewsets.ModelViewSet):
 class TestInstanceView(viewsets.ReadOnlyModelViewSet):
     serializer_class = TestInstanceSerializer
     queryset = TestInstance.objects.all()
-    pagination_class = None
 
 
 class TestSetFilterView(viewsets.ModelViewSet):
@@ -259,6 +259,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
         pks = [tsdata['id'] for tsdata in request.data["testsetfilters"]]
         should_delete = request.data.get("delete", False)
         should_unsubscribe = request.data.get("unsubscribe", False)
+        should_unsubscribe_all = request.data.get("unsubscribe", True)
         new_branch_name = request.data["new_branch"]
         try:
             new_branch = Branch.objects.get(name=new_branch_name)
@@ -294,8 +295,11 @@ class TestSetFilterView(viewsets.ModelViewSet):
         else:
             if should_unsubscribe:
                 for tsfilter in tsfilters:
-                    if self.request.user in tsfilter.subscribers.all():
-                        tsfilter.subscribers.remove(self.request.user)
+                    if should_unsubscribe_all:
+                         tsfilter.subscribers.clear()
+                    else:
+                        if self.request.user in tsfilter.subscribers.all():
+                            tsfilter.subscribers.remove(self.request.user)
 
         return self._serialize_response(new_tsfilters, status=status.HTTP_201_CREATED)
 
@@ -452,6 +456,27 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         return queryset
 
 
+class TestInstancesBasedOnQuery(generics.ListAPIView):
+    serializer_class = TestInstanceSerializer
+    filterset_class = TestInstanceFilter
+    pagination_class = StandardResultsSetPagination
+    ordering_fields = (
+        'rp_id',
+        'test_set__test_set_name',
+        'test_set__test_lab_path',
+        'test_set__branch__name',
+        'test_set__testline_type__name',
+        'last_passing_logs__utecloud_run_id',
+        'test_case_name',
+        'organization__name',
+        'execution_suspended',
+        'no_run_in_rp',
+    )
+
+    def get_queryset(self):
+        return TestInstance.objects.filter(test_set__subscribers=self.request.user)
+
+
 class TestRunsAnalyzeToRP(APIView):
     @swagger_auto_schema(
         description="Method to trigger analysis of TestRun to ReportingPortal",
@@ -477,13 +502,15 @@ class TestRunsAnalyzeToRP(APIView):
         else:
             token = None
 
+        auth_params = utils.get_rp_api_auth_params(token=token)
+
         celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
             comment=comment, 
             common_build="", 
             result=result_obj.name, 
             env_issue_type=env_issue_type,
-            token=token
+            auth_params=auth_params
         )
 
         test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
@@ -585,6 +612,23 @@ class FillEmptyTestInstancesWithTheirRPIds(APIView):
     def get(self, request):
         resp = test_runs_processing.fill_empty_test_instances_with_their_rp_ids()
         return Response(resp)
+
+
+
+class SyncNorunDataOfAllTestInstances(APIView):
+    @swagger_auto_schema(
+        description="Sync no_run info from all test instances that are being subscribed by test sets (with subscribers)",
+        operation_description="Sync no_run info from all test instances that are being subscribed by test sets (with subscribers)",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_sync_norun_data_of_all_test_instances.delay()
+        return Response("OK")
+
 
 
 class SummaryStatisticsView(APIView): #TODO

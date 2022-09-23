@@ -26,17 +26,8 @@ router.register(r'last_passing_logs', views.LastPassingLogsView, 'last_passing_l
 router.register(r'test_instances', views.TestInstanceView, 'test_instances')
 
 urlpatterns = [
-    # Filtering TestRuns queryset by the following fields:
-    #     - reg_filters, fb, test_instance, result, env_issue_type, analyzed_by, analyzed, testline_type,
-    # All fields should be referenced by their primary keys
-    path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='byquery'),
-
-    # test_runs/analyze_to_rp   
-    #       send POST with the following keys:
-    #            rp_ids             list of rp ids to analyze
-    #            comment            comment
-    #            result             result string
-    #            env_issue_type     env issue type string
+    path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='tr_byquery'),
+    path('test_instances/by_query/', views.TestInstancesBasedOnQuery.as_view(), name='ti_byquery'),
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
 
@@ -60,6 +51,8 @@ urlpatterns = [
          name='sync_suspension_status_of_test_instances_by_all_testset_filters'),
     path('celery/fill_empty_test_instances_with_their_rp_ids/', views.FillEmptyTestInstancesWithTheirRPIds.as_view(), 
          name='fill_empty_test_instances_with_their_rp_ids'),
+    path('celery/sync_norun_data_of_all_test_instances/', views.SyncNorunDataOfAllTestInstances.as_view(), 
+         name='sync_norun_data_of_all_test_instances'),
     
     
     path('', include(router.urls)),

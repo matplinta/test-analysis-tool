@@ -47,3 +47,21 @@ class TestRunFilter(filters.FilterSet):
         fields = ["test_instance", "fb", "result", "testline_type", "env_issue_type", "analyzed", "analyzed_by",
             'test_set_name', 'branch', 
         ] 
+
+
+class TestInstanceFilter(filters.FilterSet):
+
+    class Meta:
+        model = TestInstance
+        fields = {
+            'rp_id': ['exact'],
+            'test_set__test_set_name': ['icontains'],
+            'test_set__test_lab_path': ['icontains'],
+            'test_set__branch__name': ['icontains'],
+            'test_set__testline_type__name': ['icontains'],
+            'last_passing_logs__utecloud_run_id': ['exact'],
+            'test_case_name': ['icontains'],
+            'organization__name': ['icontains'],
+            'execution_suspended': ['exact'],
+            'no_run_in_rp': ['exact'],
+        }

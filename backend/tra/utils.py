@@ -87,6 +87,13 @@ def try_to_get_rp_api_token_from_testset_filter_owners(testset_filter: TestSetFi
     return token
 
 
+def get_rp_api_auth_params(testset_filter: TestSetFilter=None, token=None):
+    if not token:
+        token = try_to_get_rp_api_token_from_testset_filter_owners(testset_filter=testset_filter)
+    return {"token": token, "user": settings.RP_USER, "passwd": settings.RP_PASSWORD, "debug": settings.DEBUG}
+
+
+
 def log_exception_info(exception: Exception):
     logging.info(f"{type(exception).__name__} was raised for rp_id={exception}")
 

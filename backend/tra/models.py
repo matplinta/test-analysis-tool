@@ -109,14 +109,16 @@ class LastPassingLogs(models.Model):
     def __str__(self):
         return f"{self.id} - {self.location}"
 
+
 class TestInstance(models.Model):
     id                  = models.BigAutoField(primary_key=True)
-    rp_id               = models.BigIntegerField(blank=True, null=True, help_text="ReportingPortal TestInstance Id")
+    rp_id               = models.BigIntegerField(unique=True, blank=True, null=True, help_text="ReportingPortal TestInstance Id")
     test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set", related_name="test_instances")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     last_passing_logs   = models.ForeignKey(LastPassingLogs, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
-    
+    organization        = models.ForeignKey(Organization, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
+    no_run_in_rp        = models.BooleanField(blank=True, default=False, null=True, help_text="No run status in ReportingPortal for the current Feature Build")
     
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
@@ -137,7 +139,7 @@ class TestInstance(models.Model):
 
 class TestRun(models.Model):
     id               = models.BigAutoField(primary_key=True, help_text="Internal TRA TestRun id")
-    rp_id            = models.BigIntegerField(blank=False, null=True, help_text="Reporting Portal TestRun id")
+    rp_id            = models.BigIntegerField(unique=True, blank=False, null=True, help_text="Reporting Portal TestRun id")
     test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance", related_name="test_runs")
     testline_type    = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline configuration")
     organization     = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, help_text="Organization")

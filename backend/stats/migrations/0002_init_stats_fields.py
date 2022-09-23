@@ -7,7 +7,7 @@ def init_stats_fields(apps, schema_editor):
     # We can't import the Person model directly as it may be a newer
     # version than this migration expects. We use the historical version.
     FilterField = apps.get_model('stats', 'FilterField')
-    for elem in RepPortal().filter_dict.keys():
+    for elem in RepPortal.TEST_RUN_FILTER_DICT.keys():
         ff = FilterField(name=elem)
         ff.save()
 
