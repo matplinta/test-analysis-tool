@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Button from 'react-bootstrap/Button';
+import { Button } from 'primereact/button';
 import Modal from 'react-bootstrap/Modal';
 
 import ConfirmationComponent from './ConfirmationComponent';
@@ -33,7 +33,7 @@ let LogoutComponent = ({ setIsUserLoggedIn }) => {
     }
 
     return (
-        <div>
+        <div style={{ display: 'inline' }}>
             <Button style={{ height: '35px' }} className="p-button-primary" onClick={handleShow}>
                 Logout
             </Button>
@@ -49,7 +49,6 @@ let LogoutComponent = ({ setIsUserLoggedIn }) => {
 
             <ConfirmationComponent confirmationType='logout' show={showConfirmation} handleClose={handleConfirmationClose} />
         </div>
-
     )
 }
 

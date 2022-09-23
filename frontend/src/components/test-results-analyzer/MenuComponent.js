@@ -4,13 +4,18 @@ import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
+import { PanelMenu } from 'primereact/panelmenu';
 
 import logo_TRA from './../../assets/logo_TRA.png';
+
+import GoToAdminComponent from './../home/GoToAdminComponent';
+import LogoutComponent from './../home/authorization/LogoutComponent';
+import LoginComponent from './../home/authorization/LoginComponent';
 
 import './MenuComponent.css';
 
 
-let MenuComponent = () => {
+let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     const navigate = useNavigate();
 
@@ -53,10 +58,19 @@ let MenuComponent = () => {
 
     const start = <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>;
 
+    const end = (
+        <>
+            <GoToAdminComponent />
+
+            {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
+            {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
+        </>
+    )
+
     return (
         <>
 
-            <Menubar model={items} start={start} className="menu" style={{ height: '55px' }} />
+            <Menubar model={items} start={start} end={end} className="menu" style={{ height: '55px' }} />
             <Outlet />
 
         </>

@@ -89,7 +89,7 @@ export const Errors = {
     'BRANCH_OFF': 'Error during pewrforming Branch Off!',
     'FETCH_USERS_LIST': 'Error during users fetching!',
     'FETCH_FAIL_MESSAGE_GROUPS_LIST': 'Error during Fail Messages Type Groups fetching!',
-    'FETCH_TEST_LINES_LIST': 'Error during Test Lines Types fetching!',
+    'FETCH_TEST_LINES_LIST': 'Error during Testlines Types fetching!',
     'EDIT_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex editing!',
     'ADD_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex adding!',
     'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',

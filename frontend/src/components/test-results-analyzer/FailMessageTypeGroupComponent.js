@@ -127,7 +127,7 @@ let FailMessageTypeGroupComponent = () => {
                 style={{ marginLeft: '6px', marginTop: '3px', fontWeight: 'bold' }} />
 
             <TreeTable value={failMessageTypeGroups} scrollable size="small" loading={loading}
-                scrollHeight="calc(100vh - 300px)" showGridlines className="tree-table-style"
+                scrollHeight="calc(100vh - 150px)" showGridlines className="tree-table-style"
                 resizableColumns columnResizeMode="fit" rowClassName={rowClassName}
                 expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}
                 selectionKeys={selectedGroups} onSelectionChange={e => setSelectedGroups(e.value)}>

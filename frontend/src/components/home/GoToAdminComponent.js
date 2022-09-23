@@ -6,12 +6,10 @@ let GoToAdminComponent = () => {
 
     const adminApiUrl = axios.defaults.baseURL + "/admin/";
     return (
-        <Button className="p-button-text p-button-sm p-button-secondary" style={{ borderColor: 'lightgrey', height: '35px' }}>
-            <a href={adminApiUrl} style={{ textDecoration: 'none' }}>
-                <i className="pi pi-cog"></i>
-                <span> Admin </span>
-            </a>
-        </Button>
+        <a href={adminApiUrl} target="_blank" style={{ textDecoration: 'none', color: 'white', textAlign: 'center' }}>
+            <i className="pi pi-cog" style={{ marginBottom: '9px' }}></i>
+            <span style={{ marginBottom: '9px' }}> Admin </span>
+        </a>
     )
 }
 

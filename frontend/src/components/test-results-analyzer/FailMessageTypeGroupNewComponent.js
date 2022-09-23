@@ -170,7 +170,7 @@ let FailMessageTypeGroupComponent = () => {
                         filterDisplay="row" loading={loading}
                         globalFilterFields={['name', 'regex', 'author', 'description']}
                         emptyMessage="No rergex groups found."
-                        scrollHeight="calc(100vh - 290px)"
+                        scrollHeight="calc(100vh - 200px)"
                         resizableColumns columnResizeMode="fit"
                         selectionMode="single" selection={selectedFailMessageTypeGroup}
                         onSelectionChange={e => selectFailMessageTypeGroup(e.value)}>
@@ -190,7 +190,7 @@ let FailMessageTypeGroupComponent = () => {
                         filterDisplay="row" loading={loading}
                         globalFilterFields={['name', 'regex', 'author', 'description']}
                         emptyMessage="Any regex selected."
-                        scrollHeight="calc(100vh - 290px)"
+                        scrollHeight="calc(100vh - 180px)"
                         resizableColumns columnResizeMode="fit">
 
                         <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" ></Column >

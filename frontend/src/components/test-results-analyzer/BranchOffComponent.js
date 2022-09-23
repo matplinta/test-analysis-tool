@@ -132,14 +132,14 @@ const BranchOffComponent = () => {
                         showGridlines dataKey="id"
                         filters={filters} filterDisplay="row" loading={loading}
                         emptyMessage="No fail message types found."
-                        scrollHeight="calc(100vh - 220px)"
+                        scrollHeight="calc(100vh - 190px)"
                         resizableColumns columnResizeMode="fit"
                         selectionMode="checkbox" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
                         <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
                         <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
                         <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
                         <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
-                        <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
+                        <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by testline type" ></Column>
                         <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
                         <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
                         <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>

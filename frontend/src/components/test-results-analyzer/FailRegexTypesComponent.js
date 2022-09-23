@@ -123,7 +123,7 @@ const FailRegexTypesComponent = () => {
                 filters={filters} filterDisplay="row" loading={loading}
                 globalFilterFields={['name', 'regex', 'author', 'description']}
                 emptyMessage="No fail message types found."
-                scrollHeight="calc(100vh - 230px)"
+                scrollHeight="calc(100vh - 150px)"
                 resizableColumns columnResizeMode="fit">
                 < Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '20%' }} ></Column >
                 <Column field="regex" header="Regex" sortable filter filterPlaceholder="Search by regex" style={{ width: '35%' }} ></Column>

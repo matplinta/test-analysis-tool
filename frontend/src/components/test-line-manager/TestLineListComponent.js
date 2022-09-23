@@ -8,7 +8,7 @@ let TestLineListComponent = () => {
     useEffect(() => {
         const fetchTestLineList = async () => {
             try {
-                const {testLineList: response} = await axios.get('../../../data/TestLinesList.json');
+                const { testLineList: response } = await axios.get('../../../data/TestLinesList.json');
                 setTestLineList(response);
             } catch (error) {
                 console.log(error.message);
@@ -19,7 +19,7 @@ let TestLineListComponent = () => {
 
     return (
         <>
-            <h1>Test Lines</h1>
+            <h1>Testlines</h1>
         </>
     )
 }

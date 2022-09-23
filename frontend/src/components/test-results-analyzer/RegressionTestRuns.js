@@ -144,8 +144,8 @@ let RegressionTestRuns = () => {
         if (testSetFiltersNodes.length === 0) {
             let filters = {
                 key: 'testline_type',
-                label: 'Test Line Type',
-                data: 'Test Line Type',
+                label: 'Testline Type',
+                data: 'Testline Type',
                 children: []
             }
 
@@ -499,7 +499,6 @@ let RegressionTestRuns = () => {
             {showFilters ?
                 <div className="p-col-fixed" style={{ width: '16%' }}>
                     <Button label="Hide" onClick={() => setShowFilters(false)} icon="pi pi-angle-double-left" className="p-button-text p-button-sm p-button-plain" />
-                    {/* <ScrollPanel style={{ width: '100%', height: 'calc(100vh - 310px)' }}> */}
                     {testSetCheckboxList}
                     {testLineTypeCheckboxList}
                     {branchCheckboxList}
@@ -507,7 +506,6 @@ let RegressionTestRuns = () => {
                     {fbCheckboxList}
                     {analyzerCheckboxList}
                     <Button onClick={searchTestRuns} className="p-button-info" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
-                    {/* </ScrollPanel> */}
                 </div>
                 :
                 <div className="p-col-fixed" style={{ width: '55px' }}>
