@@ -9,6 +9,10 @@ export const postFailMessageType = async (failMessageType) => {
     return (await axios.post('api/tra/fail_message_types/', failMessageType, { headers: authHeader() }));
 }
 
+export const putFailMessageType = async (id, failMessageType) => {
+    return (await axios.put('api/tra/fail_message_types/' + id + '/', failMessageType, { headers: authHeader() }));
+}
+
 export const getEnvIssueTypes = async () => {
     return (await axios.get('api/tra/env_issue_types/', { headers: authHeader() }));
 }
@@ -22,4 +26,16 @@ export const getFailMessageTypeGroups = async (group) => {
 
 export const postFailMessageTypeGroup = async (failMessageTypeGroup) => {
     return (await axios.post('api/tra/fail_message_type_groups/', failMessageTypeGroup, { headers: authHeader() }));
+}
+
+export const putFailMessageTypeGroup = async (id, failMessageTypeGroup) => {
+    return (await axios.put('api/tra/fail_message_type_groups/' + id + '/', failMessageTypeGroup, { headers: authHeader() }));
+}
+
+export const deleteFailMessageTypeRegex = async (id) => {
+    return (await axios.delete('api/tra/fail_message_types/' + id, { headers: authHeader() }));
+}
+
+export const deleteFailMessageTypeRegexGroup = async (id) => {
+    return (await axios.delete('api/tra/fail_message_type_groups/' + id, { headers: authHeader() }));
 }

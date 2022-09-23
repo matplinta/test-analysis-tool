@@ -45,8 +45,8 @@ let LoginComponent = ({ setIsUserLoggedIn }) => {
     }
 
     return (
-        <div>
-            <Button size="sm" style={{ "marginLeft": '20px', height: '35px' }} className="p-button-primary p-button-color" onClick={handleShow}>Login</Button>
+        <div style={{ display: 'inline' }}>
+            <Button style={{ height: '35px' }} className="p-button-primary" onClick={handleShow}>Login</Button>
 
 
             <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered dialogClassName="modal-90w" >

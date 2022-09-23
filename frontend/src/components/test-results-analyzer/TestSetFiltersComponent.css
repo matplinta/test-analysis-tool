@@ -10,3 +10,13 @@
     height: 30px;
     font-size: 13px;
 }
+
+.table-style .p-checkbox {
+    width: 25px;
+    height: 25px;
+}
+
+.table-style .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #004c9a;
+    background-color: #004c9a;
+}

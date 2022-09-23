@@ -1,20 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { Column } from 'primereact/column';
 import { TreeTable } from 'primereact/treetable';
-import { Button } from 'primereact/button';
 import { ToggleButton } from 'primereact/togglebutton';
 
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 
 import "./FailMessageTypeGroupComponent.css";
-import FailMessageGroupAddModal from './FailMessageGroupAddModal';
 
 let FailMessageTypeGroupComponent = () => {
 
     const [failMessageTypeGroups, setFailMessageTypeGroups] = useState();
     const [expandedKeys, setExpandedKeys] = useState({});
+    const [selectedGroups, setSelectedGroups] = useState(null);
 
     const [isToggled, setIsToggled] = useState(false);
 
@@ -124,15 +123,14 @@ let FailMessageTypeGroupComponent = () => {
         <>
             <ToggleButton checked={isToggled} onChange={(e) => onToggle(e.value)} onLabel="Collapse List" offLabel="Expand All"
                 onIcon="pi pi-chevron-up" offIcon="pi pi-chevron-down" aria-label="Confirmation"
-                className="p-button-primary p-button-color p-button-sm toggle-button-expand"
-                style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} />
-
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleFormShow}>Add Regex Group</Button>
+                className="p-button-info p-button-sm"
+                style={{ marginLeft: '6px', marginTop: '3px', fontWeight: 'bold' }} />
 
             <TreeTable value={failMessageTypeGroups} scrollable size="small" loading={loading}
-                scrollHeight="calc(100vh - 300px)" showGridlines className="tree-table-style"
+                scrollHeight="calc(100vh - 150px)" showGridlines className="tree-table-style"
                 resizableColumns columnResizeMode="fit" rowClassName={rowClassName}
-                expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}>
+                expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}
+                selectionKeys={selectedGroups} onSelectionChange={e => setSelectedGroups(e.value)}>
 
                 <Column field="group_name" header="Group Name" expander sortable filter filterPlaceholder="Filter by name"></Column>
                 <Column field="group_author" header="Group Author" sortable filter filterPlaceholder="Filter by author"></Column>
@@ -141,9 +139,8 @@ let FailMessageTypeGroupComponent = () => {
                 <Column field="type_author" header="Regex Author" sortable filter filterPlaceholder="Filter by author"></Column>
                 <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Filter by env issue type"></Column>
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Filter by description"></Column>
-            </TreeTable>
 
-            <FailMessageGroupAddModal showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
+            </TreeTable>
         </>
     )
 }

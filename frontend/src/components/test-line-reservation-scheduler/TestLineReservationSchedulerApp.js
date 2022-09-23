@@ -1,8 +1,8 @@
 import ApplictionTitleComponent from '../home/ApplictionTitleComponent';
 
 let TestLineReservationSchedulerApp = () => {
-    return(
-        <ApplictionTitleComponent appName="Test Line Reservation Scheduler" />
+    return (
+        <ApplictionTitleComponent appName="Testline Reservation Scheduler" />
     )
 }
 

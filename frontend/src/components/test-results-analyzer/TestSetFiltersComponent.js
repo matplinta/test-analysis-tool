@@ -5,7 +5,6 @@
 //  --------------------------------------------------------------------------
 
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom'
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -13,13 +12,12 @@ import { Button } from 'primereact/button';
 import { confirmDialog } from 'primereact/confirmdialog';
 import { VscExpandAll } from 'react-icons/vsc';
 import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
-import { GrAddCircle } from 'react-icons/gr';
-import { FiSettings } from 'react-icons/fi';
+import { MdAddCircle } from 'react-icons/md';
+import { BiEdit } from 'react-icons/bi';
 
 import UserFilterAddModal from './TestSetFilterAddModal';
 import {
-    getTestFilters, deleteTestFilter, getTestFilter, putTestFilter, postTestFilterSubscribe, postTestFilterUnsubscribe,
-    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter, getTestSetFilter, putTestSetFilter,
+    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter,
     postTestSetFilterSubscribe, postTestSetFilterUnsubscribe, deleteTestSetFilterBatch
 } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -30,8 +28,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './TestSetFiltersComponent.css';
 
 let TestSetFiltersComponent = ({ type }) => {
-
-    const navigate = useNavigate();
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
@@ -117,8 +113,8 @@ let TestSetFiltersComponent = ({ type }) => {
 
     let editButton = (rowData) => {
         return (
-            <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFilter(rowData.id)} >
-                <FiSettings size='20' />
+            <Button className="p-button-warning p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => editFilter(rowData.id)} >
+                <BiEdit size='20' />
             </Button>
         );
     }
@@ -169,13 +165,13 @@ let TestSetFiltersComponent = ({ type }) => {
     let subscribeOrUnsubscribedButton = (rowData) => {
         if (rowData.subscribers.includes(currentUser)) {
             return (
-                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
+                <Button className="p-button-secondary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => unsubscribeFilter(rowData)} >
                     <div><BiBellOff size='20' /></div>
                 </Button>
             );
         } else {
             return (
-                <Button className="p-button-primary p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => subscribeFilter(rowData)} >
+                <Button className="p-button-info p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => subscribeFilter(rowData)} >
                     <div><BiBell size='20' /></div>
                 </Button>
             );
@@ -249,21 +245,25 @@ let TestSetFiltersComponent = ({ type }) => {
 
     return (
         <>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={addFilter}>
-                Add Regression Filter
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={addFilter}>
+                <MdAddCircle size='20' />
+                <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
             </Button>
             {type !== "subscribed" ?
-                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={sunscribeSelectedTestFilters}>
-                    <BiBell size='20' /> Subscribe selected
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={sunscribeSelectedTestFilters}>
+                    <BiBell size='20' />
+                    <span style={{ marginLeft: '5px' }}>Subscribe selected</span>
                 </Button>
                 : null
             }
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={unsunscribeSelectedTestFilters}>
-                <BiBellOff size='20' /> Unsubscribe selected
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm" onClick={unsunscribeSelectedTestFilters}>
+                <BiBellOff size='20' />
+                <span style={{ marginLeft: '5px' }}>Unsubscribe selected</span>
             </Button>
             {type === "owned" ?
-                < Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={confirmRemove}>
-                    <BiTrash size='20' /> Remove selected
+                < Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-danger p-button-sm" onClick={confirmRemove}>
+                    <BiTrash size='20' />
+                    <span style={{ marginLeft: '5px' }}>Remove selected</span>
                 </Button>
                 : null
             }
@@ -272,14 +272,14 @@ let TestSetFiltersComponent = ({ type }) => {
                 showGridlines dataKey="id"
                 filters={filters} filterDisplay="row" loading={loading}
                 emptyMessage="No fail message types found."
-                scrollHeight="calc(100vh - 220px)"
+                scrollHeight="calc(100vh - 150px)"
                 resizableColumns columnResizeMode="fit"
                 selectionMode="checkbox" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
                 <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
                 <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
-                <Column field="testline_type" header="Test Line Type" sortable filter filterPlaceholder="Search by test line type" ></Column>
+                <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by testline type" ></Column>
                 <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
                 <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>

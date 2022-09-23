@@ -62,7 +62,13 @@ export const Successes = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter were unsubscribed successfully!',
     'TEST_SET_FILTER_DELETED': 'Test set filter was removed successfully!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was edited successfully!',
-    'BRANCH_OFF': 'Branch Off performed succesfully!'
+    'BRANCH_OFF': 'Branch Off performed succesfully!',
+    'EDIT_FAIL_MESSAGE_REGEX': 'Fail Message Regex edited succesfully!',
+    'ADD_FAIL_MESSAGE_REGEX': 'Fail Message Regex added succesfully!',
+    'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!',
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!',
+    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created succesfully!',
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited succesfully!'
 }
 
 export const Errors = {
@@ -83,7 +89,14 @@ export const Errors = {
     'BRANCH_OFF': 'Error during pewrforming Branch Off!',
     'FETCH_USERS_LIST': 'Error during users fetching!',
     'FETCH_FAIL_MESSAGE_GROUPS_LIST': 'Error during Fail Messages Type Groups fetching!',
-    'FETCH_TEST_LINES_LIST': 'Error during Test Lines Types fetching!'
+    'FETCH_TEST_LINES_LIST': 'Error during Testlines Types fetching!',
+    'EDIT_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex editing!',
+    'ADD_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex adding!',
+    'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',
+    'FETCH_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex fetching!',
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group removing!',
+    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group creating!',
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group editing!'
 }
 
 export const Warnings = {

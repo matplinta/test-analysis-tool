@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Button } from 'react-bootstrap';
+import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { MultiSelect } from 'primereact/multiselect';
 import { Dropdown } from 'primereact/dropdown';
@@ -26,39 +26,20 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const [pagesCount, setPagesCount] = useState(null);
 
     const columns = [
-        // { field: 'id', header: 'ID' },
-        // { field: 'rp_id', header: 'RP ID' },
-        // { field: 'fb', header: 'FB' },
-        // { field: 'test_instance.test_case_name', header: 'Test Case' },
-        // { field: 'test_instance.test_set.branch', header: 'Branch' },
         { field: 'test_instance.test_set.name', header: 'Test Set Name' },
         { field: 'test_instance.test_set.test_lab_path', header: 'Test Lab Path' },
-        // { field: 'testline_type', header: 'Test Line Type' },
-        { field: 'test_line', header: 'Test Line' },
+        { field: 'test_line', header: 'Testline' },
         { field: 'test_suite', header: 'Test Suite' },
         { field: 'organization', header: 'Organization' },
-        // { field: 'result', header: 'Result' },
-        // { field: 'env_issue_type', header: 'Env Issue Type' },
-        // { field: 'comment', header: 'Comment' },
-        // { field: 'builds', header: 'Builds' },
-        // { field: 'log_file_url', header: 'Logs' },
         { field: 'start_time', header: 'Start time' },
         { field: 'end_time', header: 'End time' },
         { field: 'analyzed_by', header: 'Analyzed by' },
-        { field: 'fail_message', header: 'Fail Message' }
+        { field: 'fb', header: 'FB' }
     ];
 
     const [selectedColumns, setSelectedColumns] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    // const [lazyParams, setLazyParams] = useState({
-    //     first: 0,
-    //     rows: 10,
-    //     page: 1,
-    //     sortField: null,
-    //     sortOrder: null,
-    //     filters: {}
-    // });
 
     const [rowsPerPage, setRowsPerPage] = useState(30);
 
@@ -213,8 +194,13 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
             <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleGenerateRPUrl}>Generate RP URL</Button>
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-primary p-button-color p-button-sm" onClick={handleAnalizeTestRuns}>Analyze Test Runs As Env Issue</Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={handleGenerateRPUrl}>
+                Generate RP URL
+            </Button>
+            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-help p-button-sm" onClick={handleAnalizeTestRuns}>
+                Analyze Test Runs As Env Issue
+            </Button>
+
         </div>
 
     );
@@ -270,14 +256,14 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 className="test-runs-table">
 
                 <Column selectionMode="multiple" headerStyle={{ textAlign: 'center' }}></Column>
-                <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '100px' }} />
+                <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '80px' }} />
                 <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
                 <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
                 <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
                 <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
                 <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
                 <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
-                <Column field="fb" header="FB" sortable style={{ fontSize: '11px', minWidth: "60px" }} />
+                <Column field="fail_message" header="Fail message" style={{ fontSize: '11px', minWidth: "120px" }} />
                 <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
                 <Column field="comment" header="Comment" sortable style={{ fontSize: '11px', minWidth: '150px' }} />
                 {columnComponents}

@@ -234,7 +234,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                     <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} />
                 </div>
                 <div className="form-item">
-                    <label>Test Line Type (from UTE Cloud)</label>
+                    <label>Testline Type (from UTE Cloud)</label>
                     <br />
                     <Dropdown value={testLineType} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
                         optionLabel="label" filter showClear filterBy="label" />
@@ -271,15 +271,15 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
                 </div>
                 {filterIdToEdit === null ?
                     <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterAdd}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFilterAdd}>
                             Add Filter
                         </Button>
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={clearForm}>
+                        <Button className="p-button-primary " type="submit" onClick={clearForm}>
                             Clear Form
                         </Button>
                     </div>
                     : <div className="form-item">
-                        <Button className="p-button-primary p-button-color" type="submit" onClick={handleFilterEdit}>
+                        <Button className="p-button-primary " type="submit" onClick={handleFilterEdit}>
                             Save Filter
                         </Button>
                     </div>

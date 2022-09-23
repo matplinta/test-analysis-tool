@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import { Button } from 'primereact/button';
 
 import AuthService from "../../../services/auth.service.js";
 
@@ -52,10 +52,10 @@ let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
                 <Form.Check type="checkbox" label="Remember my login on this" />
             </Form.Group> */}
 
-            <Button variant="primary" type="submit">
+            <Button className="p-button-primary" type="submit">
                 Log in
             </Button>
-            <Button variant="primary" type="submit" onClick={handleClose}>
+            <Button className="p-button-primary" type="submit" onClick={handleClose}>
                 Cancel
             </Button>
         </Form>
