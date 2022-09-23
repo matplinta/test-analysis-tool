@@ -1,10 +1,10 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
-import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
+import { VscRegex } from 'react-icons/vsc';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
-import { PanelMenu } from 'primereact/panelmenu';
+import { BiLayer } from 'react-icons/bi';
 
 import logo_TRA from './../../assets/logo_TRA.png';
 
@@ -23,6 +23,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         {
             label: <span><HiOutlineDatabase size='20' style={{ marginBottom: '3px' }} /> Regression Test Runs</span>,
             command: () => { navigate('regression-test-runs') }
+        },
+        {
+            label: <span><BiLayer size='20' style={{ marginBottom: '3px' }} /> Test Instances</span>,
+            command: () => { navigate('test-instances') }
         },
         {
             label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Test Set Filters</span>,

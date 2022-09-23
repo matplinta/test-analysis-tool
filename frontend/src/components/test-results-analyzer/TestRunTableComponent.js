@@ -182,7 +182,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const handleAnalizeTestRuns = () => {
-        console.log(selectedTestRuns)
         if (selectedTestRuns.length > 0) {
             handleFormShow();
         } else {
