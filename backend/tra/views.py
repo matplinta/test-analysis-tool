@@ -649,8 +649,8 @@ class SummaryStatisticsView(APIView):
 
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
         testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
-        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance)
-        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance)
+        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
+        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
         suspended_tis = observed_test_insatnces.filter(execution_suspended=True)
         norun_tis = observed_test_insatnces.filter(no_run_in_rp=True)
 

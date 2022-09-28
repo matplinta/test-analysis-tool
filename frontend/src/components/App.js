@@ -15,9 +15,11 @@ import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTy
 import ChartsComponent from './test-results-analyzer/ChartsComponent';
 import BranchOffComponent from './test-results-analyzer/BranchOffComponent';
 import MenuComponent from './test-results-analyzer/MenuComponent';
+import SummaryComponent from './test-results-analyzer/SummaryComponent';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 
+import "primeflex/primeflex.css";
 import './App.css';
 
 
@@ -43,6 +45,7 @@ const App = () => {
         <section>
           <Routes>
             <Route path="" element={<MenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />} >
+              <Route path="" element={<SummaryComponent />} />
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
               <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
               <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
