@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { Menubar } from 'primereact/menubar';
 import { VscRegex, VscGroupByRefType } from 'react-icons/vsc';
 import { AiOutlineBarChart } from 'react-icons/ai';
@@ -56,7 +56,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         }
     ]
 
-    const start = <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>;
+    const start = 
+        <Link to='/'>
+            <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>
+        </Link>;
 
     const end = (
         <>
