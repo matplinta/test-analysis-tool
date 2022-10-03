@@ -655,8 +655,14 @@ class SummaryStatisticsView(APIView):
         suspended_tis = observed_test_insatnces.filter(execution_suspended=True)
         norun_tis = observed_test_insatnces.filter(no_run_in_rp=True)
 
-        top_na, top_na_count = na_testruns.values_list('fail_message').annotate(fm_count=Count('fail_message')).order_by('-fm_count').first()
-        top_envissue, top_envissue_count = envissue_testruns.values_list('comment').annotate(comment_count=Count('comment')).order_by('-comment_count').first()
+        if na_testruns:
+            top_na, top_na_count = na_testruns.values_list('fail_message').annotate(fm_count=Count('fail_message')).order_by('-fm_count').first()
+        else:
+            top_na, top_na_count = "No not_analyzed runs to display", 0
+        if envissue_testruns:
+            top_envissue, top_envissue_count = envissue_testruns.values_list('comment').annotate(comment_count=Count('comment')).order_by('-comment_count').first()
+        else:
+            top_envissue, top_envissue_count = "No env_issue runs to display", 0
 
         response = {
             "env_issues": {
