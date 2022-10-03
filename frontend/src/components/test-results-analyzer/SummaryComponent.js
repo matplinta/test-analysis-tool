@@ -41,7 +41,11 @@ const SummaryComponent = () => {
     )}
 
     let countPercent = (numeral, denominator) => {
-        return Math.round(numeral*100/denominator)
+        if (denominator == 0) {
+            return 0
+        }
+        else
+            return Math.round(numeral*100/denominator)
     }
 
     useEffect(() => {
@@ -59,8 +63,8 @@ const SummaryComponent = () => {
                     {generateCard('Latest Feature Build', summary.current_fb, '', 3, "pi-bolt", "green")}
                     {generateCard('All test runs', summary.all_in_fb_count, '', 3, "pi-database", "blue")}
                     {generateCard('Test runs (passed / not analyzed / environment issue)', `${countPercent(summary.passed.count, summary.all_in_fb_count)}% / ${countPercent(summary.not_analyzed.count, summary.all_in_fb_count)}% / ${countPercent(summary.env_issues.count, summary.all_in_fb_count)}%`, '', 6, "pi-percentage", "indigo")}
-                    {generateCard('Suspended Test Instances',  summary.test_instances.suspended, '', 6, "pi-ban", "red")}
-                    {generateCard('No Run Test Instances',  summary.test_instances.no_run, '', 6, "pi-times-circle", "pink")}
+                    {generateCard('Suspended Test Instances',  `${summary.test_instances.suspended} (${countPercent(summary.test_instances.suspended, summary.test_instances.all)}%)`, '', 6, "pi-ban", "red")}
+                    {generateCard('No Run Test Instances',  `${summary.test_instances.no_run} (${countPercent(summary.test_instances.no_run, summary.test_instances.all)}%)`, '', 6, "pi-times-circle", "pink")}
                     {generateCard('Not Analyzed',  summary.not_analyzed.count, summary.not_analyzed.top, 6, "pi-question-circle", "yellow", `Top (${summary.not_analyzed.top_count_percent}%): `)}
                     {generateCard('Environment Issues', summary.env_issues.count, summary.env_issues.top, 6, "pi-undo", "purple", `Top (${summary.env_issues.top_count_percent}%): `)}
                 </div>

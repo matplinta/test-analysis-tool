@@ -644,7 +644,7 @@ class SummaryStatisticsView(APIView):
     )
     def get(self, request):
         
-        observed_test_insatnces = TestInstance.objects.filter(test_set__subscribers=self.request.user)
+        observed_test_instances = TestInstance.objects.filter(test_set__subscribers=self.request.user)
         observed_test_runs = TestRun.objects.filter(test_instance__test_set__subscribers=self.request.user)
 
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
@@ -652,8 +652,8 @@ class SummaryStatisticsView(APIView):
         na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
         passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
         envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
-        suspended_tis = observed_test_insatnces.filter(execution_suspended=True)
-        norun_tis = observed_test_insatnces.filter(no_run_in_rp=True)
+        suspended_tis = observed_test_instances.filter(execution_suspended=True)
+        norun_tis = observed_test_instances.filter(no_run_in_rp=True)
 
         if na_testruns:
             top_na, top_na_count = na_testruns.values_list('fail_message').annotate(fm_count=Count('fail_message')).order_by('-fm_count').first()
@@ -686,7 +686,8 @@ class SummaryStatisticsView(APIView):
             "test_instances":
             {
                 "suspended": suspended_tis.count(),
-                "no_run": norun_tis.count()
+                "no_run": norun_tis.count(),
+                "all": observed_test_instances.count()
             },
             "current_fb": current_fb.name
         }
