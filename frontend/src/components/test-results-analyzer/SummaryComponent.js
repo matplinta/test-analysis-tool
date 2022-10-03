@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 
 import { getUserSummary } from '../../services/test-results-analyzer/statistics.service';
-
+import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify';
 import './SummaryComponent.css';
 
 const SummaryComponent = () => {
@@ -13,11 +13,10 @@ const SummaryComponent = () => {
     let fetchUserSummary = () => {
         getUserSummary().then(
             (response) => {
-                console.log(response.data);
                 setSummary(response.data);
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.FETCH_SUMMARY, AlertTypes.error);
             }
         )
     }
@@ -41,6 +40,10 @@ const SummaryComponent = () => {
         </div>
     )}
 
+    let countPercent = (numeral, denominator) => {
+        return Math.round(numeral*100/denominator)
+    }
+
     useEffect(() => {
         fetchUserSummary();
     }, [])
@@ -55,11 +58,11 @@ const SummaryComponent = () => {
                     </div>
                     {generateCard('Latest Feature Build', summary.current_fb, '', 3, "pi-bolt", "green")}
                     {generateCard('All test runs', summary.all_in_fb_count, '', 3, "pi-database", "blue")}
-                    {generateCard('Test runs (passed / not analyzed / environment issue)', `${Math.round(summary.passed.count*100/summary.all_in_fb_count)}% / ${Math.round(summary.not_analyzed.count*100/summary.all_in_fb_count)}% / ${Math.round(summary.env_issues.count*100/summary.all_in_fb_count)}%`, '', 6, "pi-percentage", "indigo")}
+                    {generateCard('Test runs (passed / not analyzed / environment issue)', `${countPercent(summary.passed.count, summary.all_in_fb_count)}% / ${countPercent(summary.not_analyzed.count, summary.all_in_fb_count)}% / ${countPercent(summary.env_issues.count, summary.all_in_fb_count)}%`, '', 6, "pi-percentage", "indigo")}
                     {generateCard('Suspended Test Instances',  summary.test_instances.suspended, '', 6, "pi-ban", "red")}
                     {generateCard('No Run Test Instances',  summary.test_instances.no_run, '', 6, "pi-times-circle", "pink")}
-                    {generateCard('Not Analyzed',  summary.not_analyzed.count, `${summary.not_analyzed.top}`, 6, "pi-question-circle", "yellow", `Top (${summary.not_analyzed.top_count_percent}%): `)}
-                    {generateCard('Environment Issues', summary.env_issues.count, `${summary.env_issues.top}`, 6, "pi-undo", "purple", `Top (${summary.env_issues.top_count_percent}%): `)}
+                    {generateCard('Not Analyzed',  summary.not_analyzed.count, summary.not_analyzed.top, 6, "pi-question-circle", "yellow", `Top (${summary.not_analyzed.top_count_percent}%): `)}
+                    {generateCard('Environment Issues', summary.env_issues.count, summary.env_issues.top, 6, "pi-undo", "purple", `Top (${summary.env_issues.top_count_percent}%): `)}
                 </div>
             </div> : null}
         </>
