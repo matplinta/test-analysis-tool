@@ -657,8 +657,10 @@ class SummaryStatisticsView(APIView):
 
         if na_testruns:
             top_na, top_na_count = na_testruns.values_list('fail_message').annotate(fm_count=Count('fail_message')).order_by('-fm_count').first()
+            na_testruns.count()
         else:
             top_na, top_na_count = "No not_analyzed runs to display", 0
+
         if envissue_testruns:
             top_envissue, top_envissue_count = envissue_testruns.values_list('comment').annotate(comment_count=Count('comment')).order_by('-comment_count').first()
         else:
@@ -669,13 +671,13 @@ class SummaryStatisticsView(APIView):
                 "count": envissue_testruns.count(),
                 "top": top_envissue,
                 "top_count": top_envissue_count,
-                "top_count_percent": int((top_envissue_count/envissue_testruns.count())*100)
+                "top_count_percent": int((top_envissue_count/envissue_testruns.count())*100) if envissue_testruns else 0
             },
             "not_analyzed": {
                 "count": na_testruns.count(),
                 "top": top_na,
                 "top_count": top_na_count,
-                "top_count_percent": int((top_na_count/na_testruns.count())*100)
+                "top_count_percent": int((top_na_count/na_testruns.count())*100) if na_testruns else 0
             },
             "passed": {
                 "count": passed_testruns.count()
