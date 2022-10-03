@@ -650,6 +650,7 @@ class SummaryStatisticsView(APIView):
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
         testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
         na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
+        passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
         envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
         suspended_tis = observed_test_insatnces.filter(execution_suspended=True)
         norun_tis = observed_test_insatnces.filter(no_run_in_rp=True)
@@ -670,11 +671,16 @@ class SummaryStatisticsView(APIView):
                 "top_count": top_na_count,
                 "top_count_percent": int((top_na_count/na_testruns.count())*100)
             },
+            "passed": {
+                "count": passed_testruns.count()
+            },
+            "all_in_fb_count": testruns_in_current_fb.count(),
             "test_instances":
             {
                 "suspended": suspended_tis.count(),
                 "no_run": norun_tis.count()
-            }
+            },
+            "current_fb": current_fb.name
         }
         return Response(response)
 
