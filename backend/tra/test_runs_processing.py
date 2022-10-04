@@ -204,7 +204,7 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
             utils.log_exception_info(e)
 
         except IntegrityError as e:
-            errored.append(str(exc_rp_id))
+            errored.append(str(e))
             utils.log_exception_info(e)
 
 

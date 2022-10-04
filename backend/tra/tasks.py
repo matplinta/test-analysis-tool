@@ -178,5 +178,7 @@ def celery_sync_norun_data_per_organization_and_branch(organization_name: int, b
         organization.name, status="no_run", release=branch.name)
     ti_noruns_ids = set([ti["id"] for ti in ti_noruns])
     ti_intersection = ti_eligible_ids.intersection(ti_noruns_ids)
+    ti_difference = ti_eligible_ids.difference(ti_noruns_ids)
+    TestInstance.objects.filter(rp_id__in=list(ti_difference)).update(no_run_in_rp=False)
     TestInstance.objects.filter(rp_id__in=list(ti_intersection)).update(no_run_in_rp=True)
-    return {"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "branch": branch.name, "organization": organization.name}
+    return {"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}
