@@ -7,5 +7,5 @@ export const getTestInstances = async () => {
 }
 
 export const getTestInstancesByQuery = async (filter, page, pageSize) => {
-    return (await axios.get('/api/tra/test_instances/?page=' + page + "&page_size=" + pageSize, { headers: authHeader() }));
+    return (await axios.get('/api/tra/test_instances/by_query/?page=' + page + "&page_size=" + pageSize, { headers: authHeader() }));
 }

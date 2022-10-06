@@ -1,3 +1,22 @@
 .test-instances-table {
-    margin: 5px
+    margin: 5px;
+    max-width: 99%;
+}
+
+.p-datatable.test-instances-table .p-datatable-header {
+    padding: 1rem;
+    text-align: left;
+    font-size: 1.5rem;
+}
+
+.p-datatable.test-instances-table .p-paginator {
+    padding: 1rem;
+}
+
+.p-datatable.test-instances-table .p-datatable-thead>tr>th {
+    text-align: left;
+}
+
+.p-datatable.test-instances-table .p-dropdown-label:not(.p-placeholder) {
+    text-transform: uppercase;
 }
