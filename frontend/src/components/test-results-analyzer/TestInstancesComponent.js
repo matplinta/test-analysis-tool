@@ -45,41 +45,29 @@ let TestInstancesComponent = () => {
 
     const [pageInputTooltip, setPageInputTooltip] = useState('Press \'Enter\' key to go to this page.');
 
-    let [filters, setFilters] = useState({
-        "rp_id": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "test_set__test_set_name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "test_set__test_lab_path": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "test_set__branch__name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "test_set__testline_type__name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        'test_case_name': { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "organization__name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
-        "execution_suspended": { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
-        "no_run_in_rp": { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
-    })
-
     // let [filters, setFilters] = useState({
-    //     "rp_id": { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     "test_set__test_set_name": { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     "test_set__test_lab_path": { value: null, matchMode: FilterMatchMode.CONTAINS },
+    //     "rp_id": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    //     "test_set__test_set_name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    //     "test_set__test_lab_path": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
     //     "test_set__branch__name": { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     "test_set__testline_type__name": { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     'test_case_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     "organization__name": { value: null, matchMode: FilterMatchMode.CONTAINS },
-    //     "execution_suspended": { value: null, matchMode: FilterMatchMode.EQUALS },
-    //     "no_run_in_rp": { value: null, matchMode: FilterMatchMode.EQUALS }
+    //     "test_set__testline_type__name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    //     'test_case_name': { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    //     "organization__name": { constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }] },
+    //     "execution_suspended": { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+    //     "no_run_in_rp": { constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
     // })
 
-    let filtersDict = {
-        "rp_id": null,
-        "test_set__test_set_name": null,
-        "test_set__test_lab_path": null,
-        "test_set__branch__name": null,
-        "test_set__testline_type__name": null,
-        "test_case_name": null,
-        "organization__name": null,
-        "execution_suspended": null,
-        "no_run_in_rp": null,
-    }
+    let [filters, setFilters] = useState({
+        "rp_id": { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set__test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set__test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set.branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_set__testline_type__name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'test_case_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'organization__name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'execution_suspended': { value: null, matchMode: FilterMatchMode.EQUALS },
+        'no_run_in_rp': { value: null, matchMode: FilterMatchMode.EQUALS }
+    })
 
     let trueFalseStatuses = [
         { label: 'True', value: true },
@@ -113,10 +101,8 @@ let TestInstancesComponent = () => {
         getBranches().then(
             (response) => {
                 if (response.data.length > 0) {
-                    let branches = response.data.filter(branch => branch.name !== '')
-                    let branchesParsed = branches.map(item => {
-                        return { label: item.name, value: item.name }
-                    })
+                    let branches = response.data.filter(branch => branch.name !== '');
+                    let branchesParsed = branches.map(item => item.name);
                     setBranches(branchesParsed);
                 }
             },
@@ -130,9 +116,7 @@ let TestInstancesComponent = () => {
         getTestLineTypes().then(
             (response) => {
                 if (response.data.length > 0) {
-                    const testLinesTypesValue = response.data.map(item => {
-                        return { label: item.name, value: item.name }
-                    })
+                    const testLinesTypesValue = response.data.map(item => item.name);
                     setTestLinesTypes(testLinesTypesValue);
                 }
             },
@@ -235,39 +219,40 @@ let TestInstancesComponent = () => {
     }
 
     const onStatusChange = (e, options) => {
-        options.filterApplyCallback(e.value);
-        console.log(filters)
+        options.value = e.value;
+        console.log("zmiana", e, options)
+        // options.filterApplyCallback(e.value);
+        // console.log(filters)
         // customFunction(e);
     }
 
     const customFunction = (value, filter) => {
         console.log("!!!!!!!!!!!!11")
+        console.log(value, filter)
+        console.log(filters)
     }
 
-
-    let tmp = (e, options) => {
-        options.filterApplyCallback(e)
-    }
 
     const suspendedFilter = (options) => {
         return <Dropdown className="p-column-filter" placeholder="Any"
-            value={options.value} options={trueFalseStatuses} onChange={(e) => options.filterCallback(e.value, options.index)} />
+            value={options.value} options={trueFalseStatuses} onChange={(e) => onStatusChange(e, options)} />
     }
 
     const noRunInRpFilter = (options) => {
         return <Dropdown className="p-column-filter" placeholder="Any"
-            value={options.value} options={trueFalseStatuses} onChange={(e) => options.filterCallback(e.value, options.index)} />
+            value={options.value} options={trueFalseStatuses} onChange={(e) => onStatusChange(e, options)} />
     }
 
     const testLineTypeFilter = (options) => {
         return <Dropdown className="p-column-filter" placeholder="Any"
-            value={options.value} options={testLinesTypes} onChange={(e) => options.filterCallback(e.value, options.index)} />
+            value={options.value} options={testLinesTypes} onChange={(e) => onStatusChange(e, options)} />
 
     }
 
     const branchTypeFilter = (options) => {
+        console.log(options)
         return <Dropdown className="p-column-filter" placeholder="Any"
-            value={options.value} options={branches} onChange={(e) => options.filterCallback(e.value, options.index)} showClear />
+            value={filters[options.field].value} options={branches} onChange={(e) => onStatusChange(e, options)} showClear />
     }
 
     useEffect(() => {
@@ -278,8 +263,10 @@ let TestInstancesComponent = () => {
 
     return (
         <>
-            <DataTable value={testInstances} paginator size="small" showGridlines stripedRows rowHover responsiveLayout="scroll"
-                pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testInstancesCount} onPage={(e) => onPageChange(e)}
+            <DataTable value={testInstances} paginator size="small"
+                showGridlines stripedRows rowHover responsiveLayout="scroll"
+                pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testInstancesCount}
+                onPage={(e) => onPageChange(e)}
                 paginatorTemplate={templateCurrentPageReport}
                 dataKey="id" loading={loading}
                 rowsPerPageOptions={[10, 30, 50, 100]}
@@ -288,12 +275,13 @@ let TestInstancesComponent = () => {
                 className="test-instances-table"
                 // columnResizeMode="expand"
                 columnResizeMode="fit" resizableColumns
-                filters={filters} filterDisplay="row"
+                filters={filters} filterDisplay="menu"
             >
 
                 <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id"
                     filterField="rp_id"
-                    showFilterMenu={true} filter showFilterMenuOptions={false} onFilterApplyClick={customFunction}
+                    showFilterMenu={true} filter showFilterMenuOptions={false}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px' }} />
 
                 <Column field="test_case_name" columnKey="test_case_name" header="Test Case"
@@ -307,42 +295,45 @@ let TestInstancesComponent = () => {
                     sortField='test_set.test_set_name' sortable
                     filterField="test_set__test_set_name"
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px' }} />
 
                 <Column field="test_set.testline_type" columnKey="test_set.testline_type" header="Testline Type"
                     sortField="test_set.testline_type" sortable
                     filterField="test_set__testline_type__name"
                     showFilterMenu={true} filter showFilterMenuOptions={false} filterElement={testLineTypeFilter}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px', minWidth: '200px' }} />
 
-                <Column field="test_set.branch" columnKey="test_set.branch" header="Branch"
-                    sortField="test_set.branch" sortable
-                    filterField="test_set__branch__name"
-                    showFilterMenu={true} filter showFilterMenuOptions={false} filterElement={branchTypeFilter}
-                    onFilterApplyClick={customFunction}
+                <Column field="test_set.branch" header="Branch"
+                    // sortField="test_set.branch" sortable
+                    // filterField="test_set__branch__name"
+                    // showFilterMenu={true} 
+                    filter
+                    // showFilterMenuOptions={false} 
+                    filterElement={branchTypeFilter}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px', textAlign: 'center' }} />
 
                 <Column field="test_set.test_lab_path" columnKey="test_set.test_lab_path" header="Test Lab Path"
                     sortField='test_set.test_lab_path' sortable
                     filterField="test_set__test_lab_path"
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px' }} />
 
                 <Column field="last_passing_logs.build" columnKey="last_passing_logs.build" header="Passed gNB"
                     sortField='last_passing_logs.build' sortable
                     filterField="last_passing_logs__build"
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px' }} />
 
                 <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Passed AP"
                     sortField='last_passing_logs.airphone' sortable
                     filterField="last_passing_logs__airphone"
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px' }} />
 
                 <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed"
@@ -352,13 +343,13 @@ let TestInstancesComponent = () => {
                     filterField="no_run_in_rp" filterElement={noRunInRpFilter}
                     filterType="boolian"
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     style={{ fontSize: '11px', textAlign: 'center' }} />
 
                 <Column body={suspendedBodyTemplate} columnKey="execution_suspended" header="Suspended"
                     filterField="execution_suspended" filterElement={suspendedFilter}
                     showFilterMenu={true} filter showFilterMenuOptions={false}
-                    onFilterApplyClick={customFunction}
+                    // onFilterApplyClick={customFunction}
                     filterType="boolian"
                     style={{ fontSize: '11px', textAlign: 'center' }} />
             </DataTable >
