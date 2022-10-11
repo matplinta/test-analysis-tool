@@ -9,6 +9,12 @@
     font-size: 1.5rem;
 }
 
+.p-datatable.test-instances-table .p-inputtext {
+    font-size: 11px;
+    padding: 6px;
+}
+
+
 .p-datatable.test-instances-table .p-paginator {
     padding: 1rem;
 }
@@ -19,4 +25,19 @@
 
 .p-datatable.test-instances-table .p-dropdown-label:not(.p-placeholder) {
     text-transform: uppercase;
+}
+
+.panel-style {
+    font-size: 11px;
+}
+
+.p-datatable.test-instances-table .p-dropdown .p-dropdown-clear-icon {
+    right: 2rem;
+    font-size: 13px;
+    padding: 2px;
+}
+
+.p-datatable.test-instances-table .p-dropdown .p-dropdown-trigger-icon {
+    font-size: 13px;
+    padding: 9px;
 }
