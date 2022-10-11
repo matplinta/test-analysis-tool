@@ -60,6 +60,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         // setLazyParams(event);
         setCurrentPage(event.page);
         fetchTestRunsByFilter(filterUrl, event.page + 1, rowsPerPage);
+        window.scrollTo(0, 0);
     }
 
     const onPageInputKeyDown = (event, options) => {
@@ -182,7 +183,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const handleAnalizeTestRuns = () => {
-        console.log(selectedTestRuns)
         if (selectedTestRuns.length > 0) {
             handleFormShow();
         } else {
@@ -249,7 +249,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 rowsPerPageOptions={[10, 30, 50, 100]}
                 reorderableColumns={true}
                 resizableColumns columnResizeMode="expand"
-                scrollHeight="calc(100vh - 290px)"
                 emptyMessage="No test runs found! Please change your selected filters."
                 sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}
                 selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}

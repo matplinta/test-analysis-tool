@@ -6,7 +6,6 @@ import axios from "axios";
 import Notify from './../services/Notify';
 import AuthService from './../services/auth.service.js';
 
-import TestResultsAnalyzerApp from './test-results-analyzer/TestResultsAnalyzerApp';
 import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
 import TestSetFiltersComponent from './test-results-analyzer/TestSetFiltersComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
@@ -15,14 +14,13 @@ import FailMessageTypeGroupComponent from './test-results-analyzer/FailMessageTy
 import ChartsComponent from './test-results-analyzer/ChartsComponent';
 import BranchOffComponent from './test-results-analyzer/BranchOffComponent';
 import MenuComponent from './test-results-analyzer/MenuComponent';
+import TestInstancesComponent from './test-results-analyzer/TestInstancesComponent';
 import SummaryComponent from './test-results-analyzer/SummaryComponent';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 
 import "primeflex/primeflex.css";
 import './App.css';
-
-
 
 const App = () => {
 
@@ -47,6 +45,7 @@ const App = () => {
             <Route path="" element={<MenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />} >
               <Route path="" element={<SummaryComponent />} />
               <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
+              <Route index path="test-instances" element={<TestInstancesComponent />} />
               <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
               <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
               <Route path="owned-test-set-filters" element={<TestSetFiltersComponent type={'owned'} />} />
