@@ -133,6 +133,12 @@ fail_barchart_response_scheme = openapi.Schema(
 )
 
 
+excel_response_scheme = openapi.Schema(
+    title="Excel",
+    type=openapi.FORMAT_BINARY,
+)
+
+
 testrun_analyze_schema = openapi.Schema(
     title="AnalyzeToRP",
     type=openapi.TYPE_OBJECT,

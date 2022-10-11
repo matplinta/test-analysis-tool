@@ -5,9 +5,14 @@ import datetime
 import logging
 import os
 import pytz
+import json
 from django.conf import settings
+from django.core.serializers import serialize
+from functools import reduce
+from django.db.models import Q
 
 from .models import (
+    Branch,
     FeatureBuild,
     Organization, 
     TestRunResult, 
@@ -18,6 +23,21 @@ from .models import (
     EnvIssueType, 
     FailMessageType,
     FailMessageTypeGroup,
+)
+
+from .serializers import (
+    TestInstanceSerializer,
+    TestRunSerializer, 
+    TestlineTypeSerializer, 
+    TestSetFilterSerializer,
+    FailMessageTypeSerializer,
+    FailMessageTypeGroupSerializer,
+    EnvIssueTypeSerializer,
+    TestRunResultSerializer,
+    FeatureBuildSerializer,
+    UserSerializer,
+    BranchSerializer,
+    LastPassingLogsSerializer
 )
 
 
@@ -100,3 +120,35 @@ def log_exception_info(exception: Exception):
 
 def get_testrun_ute_cloud_sr_execution_id(test_run: TestRun):
     return os.path.basename(os.path.normpath(urlparse(test_run.ute_exec_url).path))
+
+
+def get_distinct_values_based_on_subscribed_regfilters(user: User):
+        fields_dict = {}
+        def get_distinct_values_and_serialize(field, model, serializer=None, order_by_param=None, key_override=None):
+            order_by_param = order_by_param if order_by_param else field
+            distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
+            objects = model.objects.filter(pk__in=distinct_values)
+            data = serialize("json", objects)
+            key = field if not key_override else key_override
+            fields_dict[key] = json.loads(data)
+
+        queryset = TestRun.objects.all()
+        tsfilters = TestSetFilter.objects.filter(subscribers=user)
+        queryset = queryset.filter(
+            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
+                                               test_instance__test_set=reg_filter), tsfilters, Q())
+        )
+
+        fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
+        fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
+        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer)
+        get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
+        get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
+        get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
+        get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
+        get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
+        get_distinct_values_and_serialize('test_instance__test_set__branch', Branch, key_override="branch",
+                                          order_by_param="test_instance__test_set__branch__name")
+        test_set_distinct_values = tsfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
+        fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
+        return fields_dict
