@@ -50,11 +50,10 @@ class TestRunFilter(filters.FilterSet):
 
 
 class TestInstanceFilter(filters.FilterSet):
-
     class Meta:
         model = TestInstance
         fields = {
-            'rp_id': ['exact'],
+            'rp_id': ['exact', 'in'],
             'test_set__test_set_name': ['icontains'],
             'test_set__test_lab_path': ['icontains'],
             'test_set__branch__name': ['icontains'],

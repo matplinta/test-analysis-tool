@@ -25,6 +25,7 @@ from drf_yasg.utils import swagger_auto_schema, no_body
 
 from backend.permissions import IsAuthorOfObject
 from backend.openapi_schemes import *
+from django.db.models import Count
 from .permissions import IsOwnerOfObject, IsSubscribedToObject
 
 from .serializers import (
@@ -259,7 +260,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
         pks = [tsdata['id'] for tsdata in request.data["testsetfilters"]]
         should_delete = request.data.get("delete", False)
         should_unsubscribe = request.data.get("unsubscribe", False)
-        should_unsubscribe_all = request.data.get("unsubscribe", True)
+        should_unsubscribe_all = request.data.get("unsubscribe_all", True)
         new_branch_name = request.data["new_branch"]
         try:
             new_branch = Branch.objects.get(name=new_branch_name)
@@ -631,6 +632,64 @@ class SyncNorunDataOfAllTestInstances(APIView):
 
 
 
-class SummaryStatisticsView(APIView): #TODO
-    pass
+class SummaryStatisticsView(APIView):
+    @swagger_auto_schema(
+        description="Return summary information of the subscribed test sets",
+        operation_description="Return summary information of the subscribed test sets",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["summary", 'api']
+    )
+    def get(self, request):
+        
+        observed_test_instances = TestInstance.objects.filter(test_set__subscribers=self.request.user)
+        observed_test_runs = TestRun.objects.filter(test_instance__test_set__subscribers=self.request.user)
+
+        current_fb = FeatureBuild.objects.all().order_by("-name").first()
+        testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
+        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
+        passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
+        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
+        suspended_tis = observed_test_instances.filter(execution_suspended=True)
+        norun_tis = observed_test_instances.filter(no_run_in_rp=True)
+
+        if na_testruns:
+            top_na, top_na_count = na_testruns.values_list('fail_message').annotate(fm_count=Count('fail_message')).order_by('-fm_count').first()
+            na_testruns.count()
+        else:
+            top_na, top_na_count = "No not_analyzed runs to display", 0
+
+        if envissue_testruns:
+            top_envissue, top_envissue_count = envissue_testruns.values_list('comment').annotate(comment_count=Count('comment')).order_by('-comment_count').first()
+        else:
+            top_envissue, top_envissue_count = "No env_issue runs to display", 0
+
+        response = {
+            "env_issues": {
+                "count": envissue_testruns.count(),
+                "top": top_envissue,
+                "top_count": top_envissue_count,
+                "top_count_percent": int((top_envissue_count/envissue_testruns.count())*100) if envissue_testruns else 0
+            },
+            "not_analyzed": {
+                "count": na_testruns.count(),
+                "top": top_na,
+                "top_count": top_na_count,
+                "top_count_percent": int((top_na_count/na_testruns.count())*100) if na_testruns else 0
+            },
+            "passed": {
+                "count": passed_testruns.count()
+            },
+            "all_in_fb_count": testruns_in_current_fb.count(),
+            "test_instances":
+            {
+                "suspended": suspended_tis.count(),
+                "no_run": norun_tis.count(),
+                "all": observed_test_instances.count()
+            },
+            "current_fb": current_fb.name
+        }
+        return Response(response)
 

@@ -30,6 +30,7 @@ urlpatterns = [
     path('test_instances/by_query/', views.TestInstancesBasedOnQuery.as_view(), name='ti_byquery'),
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
+    path('summary/', views.SummaryStatisticsView.as_view(), name='summary_view'),
 
     path('test_runs/pull_notpassed_testruns_by_testset_filter/<int:tsfid>/', views.PullNotPassedTestrunsByTestSetFilter.as_view(), 
          name='pull_notpassed_testruns_by_testset_filter'),
