@@ -104,12 +104,22 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     organization, _ = Organization.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
     )
-    test_instance, _ = TestInstance.objects.get_or_create(
-        rp_id=rp_test_run["qc_test_instance"]["id"],
-        test_set=test_set_filter,
-        test_case_name=rp_test_run["test_case"]["name"],
-        organization=organization
-    )
+    if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
+        test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
+        if test_instance.test_set != test_set_filter: 
+            test_instance.test_set = test_set_filter
+        if test_instance.test_case_name != rp_test_run["test_case"]["name"]:
+            test_instance.test_case_name = rp_test_run["test_case"]["name"]
+        # if test_instance.organization != organization:
+        #     test_instance.organization = organization
+        test_instance.save()
+    else:
+        test_instance = TestInstance.objects.create(
+            rp_id=rp_test_run["qc_test_instance"]["id"],
+            test_set=test_set_filter,
+            test_case_name=rp_test_run["test_case"]["name"],
+            organization=organization
+        )
     testline_type, _ = TestlineType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
