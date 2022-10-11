@@ -68,3 +68,15 @@
   border-color: #004c90;
   color: white;
 }
+
+body {
+  background-color: #f2f2f2;
+  min-height: 100vh;
+  margin: 0;
+  position: relative;
+}
+
+footer {
+  background: rgb(239, 239, 239);
+  height: 25px;
+}

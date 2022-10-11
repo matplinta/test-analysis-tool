@@ -354,6 +354,7 @@ let RegressionTestRuns = () => {
         });
         setSortField(null);
         setSortOrder(null);
+        window.scrollTo(0, 0);
     }
 
     // const showTooltifIfLabelTooLong = () => {
