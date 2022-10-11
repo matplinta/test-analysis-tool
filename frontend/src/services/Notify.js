@@ -97,7 +97,8 @@ export const Errors = {
     'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group removing!',
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group creating!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group editing!',
-    'FETCH_SUMMARY': 'Error during fetching summary for the latest feature build!'
+    'FETCH_SUMMARY': 'Error during fetching summary for the latest feature build!',
+    'FETCH_TEST_INSTANCES': 'Error during fetching test instances!'
 }
 
 export const Warnings = {

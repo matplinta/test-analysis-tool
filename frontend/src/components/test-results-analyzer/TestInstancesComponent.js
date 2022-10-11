@@ -6,9 +6,9 @@
 
 
 import React, { useEffect, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -32,6 +32,11 @@ let TestInstancesComponent = () => {
     const [totalRecords, setTotalRecords] = useState(0);
 
     const [loading, setLoading] = useState(true);
+
+    const location = useLocation();
+    const state = location.state;
+
+    let [stateLoading, setStateLoading] = useState(false);
 
     const [lazyParams, setLazyParams] = useState({
         first: 1,
@@ -61,13 +66,14 @@ let TestInstancesComponent = () => {
                     setTotalRecords(response.data.count);
                     setTestInstances(response.data.results);
                     setLoading(false);
+                    setStateLoading(false);
                 } else {
                     setTestInstances([]);
                     setLoading(false);
                 }
             },
             (error) => {
-                console.log("Error during fetching test instances")
+                Notify.sendNotification(Errors.FETCH_TEST_INSTANCES, AlertTypes.error);
             }
         )
     }
@@ -181,10 +187,19 @@ let TestInstancesComponent = () => {
             value={options.value} options={branches} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
+    let saveFiltersFromState = () => {
+        if (state !== null) {
+            setStateLoading(true);
+            for (const [key, value] of Object.entries(state)) {
+                lazyParams.filters[key].value = value;
+            }
+        }
+    }
+
     useEffect(() => {
         fetchBranches();
         fetchTestLines();
-        fetchTestInstancesByFilter(lazyParams);
+        saveFiltersFromState();
     }, [])
 
     useEffect(() => {
@@ -193,91 +208,92 @@ let TestInstancesComponent = () => {
 
     return (
         <>
-            <DataTable value={testInstances} paginator size="small"
-                lazy first={lazyParams.first} rows={lazyParams.rows} totalRecords={totalRecords} onPage={onPage}
-                onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder} removableSort
-                onFilter={onFilter} filters={lazyParams.filters} filterDelay={800} loading={loading}
-                showGridlines stripedRows rowHover
-                paginatorTemplate={templateCurrentPageReport}
-                dataKey="id"
-                rowsPerPageOptions={[10, 30, 50, 100]}
-                responsiveLayout="scroll" scrollHeight="calc(100vh - 175px)"
-                emptyMessage="No test instances found!"
-                className="test-instances-table"
-                filterDisplay="row"
-                resizableColumns
-            >
+            {stateLoading === false ?
+                <DataTable value={testInstances} paginator size="small"
+                    lazy first={lazyParams.first} rows={lazyParams.rows} totalRecords={totalRecords} onPage={onPage}
+                    onSort={onSort} sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder} removableSort
+                    onFilter={onFilter} filters={lazyParams.filters} filterDelay={800} loading={loading}
+                    showGridlines stripedRows rowHover
+                    paginatorTemplate={templateCurrentPageReport}
+                    dataKey="id"
+                    rowsPerPageOptions={[10, 30, 50, 100]}
+                    responsiveLayout="scroll" scrollHeight="calc(100vh - 175px)"
+                    emptyMessage="No test instances found!"
+                    className="test-instances-table"
+                    filterDisplay="row"
+                    resizableColumns
+                >
 
-                <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id"
-                    sortable sortField="rp_id"
-                    filterField="rp_id" filter
-                    showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', width: '3%' }} />
+                    <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id"
+                        sortable sortField="rp_id"
+                        filterField="rp_id" filter
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', width: '3%' }} />
 
-                <Column field="test_case_name" columnKey="test_case_name" header="Test Case"
-                    sortable
-                    filterField="test_case_name__icontains"
-                    showFilterMenu={false} filter showFilterMenuOptions={false} showClearButton={false}
-                    style={{ fontSize: '11px', width: '14%' }} />
+                    <Column field="test_case_name" columnKey="test_case_name" header="Test Case"
+                        sortable
+                        filterField="test_case_name__icontains"
+                        showFilterMenu={false} filter showFilterMenuOptions={false} showClearButton={false}
+                        style={{ fontSize: '11px', width: '14%' }} />
 
-                <Column field="test_set.test_set_name" columnKey="test_set.test_set_name" header="Test Set"
-                    sortable sortField="test_set__test_set_name"
-                    filterField="test_set__test_set_name__icontains"
-                    filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', width: '14%' }} />
+                    <Column field="test_set.test_set_name" columnKey="test_set.test_set_name" header="Test Set"
+                        sortable sortField="test_set__test_set_name"
+                        filterField="test_set__test_set_name__icontains"
+                        filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', width: '14%' }} />
 
-                <Column field="test_set.test_lab_path" columnKey="test_set.test_lab_path" header="Test Lab Path"
-                    sortable sortField="test_set__test_lab_path"
-                    filterField="test_set__test_lab_path__icontains"
-                    filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', width: '13%' }} />
+                    <Column field="test_set.test_lab_path" columnKey="test_set.test_lab_path" header="Test Lab Path"
+                        sortable sortField="test_set__test_lab_path"
+                        filterField="test_set__test_lab_path__icontains"
+                        filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', width: '13%' }} />
 
-                <Column field="test_set.testline_type" columnKey="test_set.testline_type" header="Testline Type"
-                    sortable sortField="test_set__testline_type__name"
-                    filterField="test_set__testline_type__name__icontains"
-                    filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    filterElement={testLineTypeFilter}
-                    style={{ fontSize: '11px', width: '10%', maxWidth: '11%' }} />
+                    <Column field="test_set.testline_type" columnKey="test_set.testline_type" header="Testline Type"
+                        sortable sortField="test_set__testline_type__name"
+                        filterField="test_set__testline_type__name__icontains"
+                        filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        filterElement={testLineTypeFilter}
+                        style={{ fontSize: '11px', width: '10%', maxWidth: '11%' }} />
 
-                <Column field="test_set.branch" header="Branch"
-                    sortable sortField="test_set__branch__name"
-                    filterField="test_set__branch__name__icontains"
-                    filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    filterElement={branchTypeFilter}
-                    style={{ fontSize: '11px', textAlign: 'center', width: '5%' }} />
+                    <Column field="test_set.branch" header="Branch"
+                        sortable sortField="test_set__branch__name"
+                        filterField="test_set__branch__name__icontains"
+                        filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        filterElement={branchTypeFilter}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '5%' }} />
 
-                <Column field="last_passing_logs.build" columnKey="last_passing_logs.build" header="Passed gNB"
-                    style={{ fontSize: '11px', width: '10%' }} />
+                    <Column field="last_passing_logs.build" columnKey="last_passing_logs.build" header="Passed gNB"
+                        style={{ fontSize: '11px', width: '10%' }} />
 
-                <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Passed AP"
-                    style={{ fontSize: '11px', width: '4%' }} />
+                    <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Passed AP"
+                        style={{ fontSize: '11px', width: '4%' }} />
 
-                <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed"
-                    sortable sortField="last_passing_logs__utecloud_run_id"
-                    filter filterField="last_passing_logs__utecloud_run_id"
-                    showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
+                    <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed"
+                        sortable sortField="last_passing_logs__utecloud_run_id"
+                        filter filterField="last_passing_logs__utecloud_run_id"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
 
-                <Column field="organization" columnKey="organization" header="Organization"
-                    sortable
-                    filter filterField="organization"
-                    showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', width: '8%' }} />
+                    <Column field="organization" columnKey="organization" header="Organization"
+                        sortable
+                        filter filterField="organization"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', width: '8%' }} />
 
-                <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="Run in RP in FB"
-                    sortable sortField="no_run_in_rp"
-                    filterField="no_run_in_rp" filterElement={noRunInRpFilter}
-                    filter filterType="boolian"
-                    showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
+                    <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="Run in RP in FB"
+                        sortable sortField="no_run_in_rp"
+                        filterField="no_run_in_rp" filterElement={noRunInRpFilter}
+                        filter filterType="boolian"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
 
-                <Column body={suspendedBodyTemplate} columnKey="execution_suspended" header="Suspended"
-                    sortable sortField="execution_suspended"
-                    filterField="execution_suspended" filterElement={suspendedFilter}
-                    filter filterType="boolian"
-                    showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                    style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
-            </DataTable >
+                    <Column body={suspendedBodyTemplate} columnKey="execution_suspended" header="Suspended"
+                        sortable sortField="execution_suspended"
+                        filterField="execution_suspended" filterElement={suspendedFilter}
+                        filter filterType="boolian"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
+                </DataTable > : null}
         </>
     )
 }
