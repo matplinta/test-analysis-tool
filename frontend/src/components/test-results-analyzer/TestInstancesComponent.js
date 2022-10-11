@@ -283,14 +283,14 @@ let TestInstancesComponent = () => {
                     <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="Run in RP in FB"
                         sortable sortField="no_run_in_rp"
                         filterField="no_run_in_rp" filterElement={noRunInRpFilter}
-                        filter filterType="boolian"
+                        filter filterType="boolean"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
 
                     <Column body={suspendedBodyTemplate} columnKey="execution_suspended" header="Suspended"
                         sortable sortField="execution_suspended"
                         filterField="execution_suspended" filterElement={suspendedFilter}
-                        filter filterType="boolian"
+                        filter filterType="boolean"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
                 </DataTable > : null}
