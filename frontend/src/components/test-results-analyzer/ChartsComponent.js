@@ -8,7 +8,6 @@
 import { useEffect, useState } from "react"
 import { Divider } from 'primereact/divider';
 import { Card } from 'primereact/card';
-import { Splitter, SplitterPanel } from 'primereact/splitter';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
@@ -22,8 +21,8 @@ import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { ScrollPanel } from 'primereact/scrollpanel';
 
-import { getFilterFields, getFilterSets, postFilters, postFilterSetsDetail, getFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import { getFilterFields, postFilterSetsDetail, getFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 import './ChartsComponent.css';
 

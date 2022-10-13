@@ -11,7 +11,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { FaEdit, FaRegTrashAlt } from 'react-icons/fa';
 import { MdAddCircle } from 'react-icons/md';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { Card } from 'primereact/card';
 import { Divider } from 'primereact/divider';
 import { DataTable } from 'primereact/datatable';
@@ -205,6 +205,8 @@ let FailMessageTypeGroupComponent = () => {
 
             <FailMessageGroupAddModal failMessageGroupToEdit={failMessageGroupToEdit} failMessageGroupToCopy={failMessageGroupToCopy}
                 showForm={showForm} handleFormClose={handleFormCloseAndRefresh} />
+
+            <ConfirmDialog />
         </>
     )
 }

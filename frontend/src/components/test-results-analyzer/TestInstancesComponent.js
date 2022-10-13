@@ -137,14 +137,14 @@ let TestInstancesComponent = () => {
         const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/qc/?columns=suspended,m_path,test_set.name,name,status,last_passed.timestamp,test_lvl_area%2Csw_build&id=";
         const rpLink = rpUrl + rowData.rp_id;
         return (
-            <a href={rpLink} target="_blank" style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
+            <a href={rpLink} target="_blank" rel="noreferrer" style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
         )
     }
 
     let logLinkBodyTemplate = (rowData) => {
         if (rowData.last_passing_logs !== null) {
             return (
-                <a href={rowData.last_passing_logs.url} target="_blank" style={{ fontSize: '11px' }}>
+                <a href={rowData.last_passing_logs.url} target="_blank" rel="noreferrer" style={{ fontSize: '11px' }}>
                     {rowData.last_passing_logs.utecloud_run_id}
                 </a>
             )
@@ -179,19 +179,19 @@ let TestInstancesComponent = () => {
     }
 
     const noRunInRpFilter = (options) => {
-        return <Dropdown className="p-column-filter" showClear
+        return <Dropdown showClear
             style={{ maxWidth: '200px' }} panelClassName="panel-style" itemTemplate={runTemplate}
             value={options.value} options={runStates} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
     const testLineTypeFilter = (options) => {
-        return <Dropdown className="p-column-filter" showClear
+        return <Dropdown showClear
             style={{ maxWidth: '200px' }} panelClassName="panel-style"
             value={options.value} options={testLinesTypes} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
     const branchTypeFilter = (options) => {
-        return <Dropdown className="p-column-filter dropdown-filter" showClear
+        return <Dropdown showClear
             style={{ maxWidth: '120px', fontSize: '5px' }} panelClassName="panel-style"
             value={options.value} options={branches} onChange={(e) => options.filterApplyCallback(e.value)} />
     }

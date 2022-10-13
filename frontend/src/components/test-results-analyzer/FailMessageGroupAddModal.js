@@ -83,32 +83,6 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCo
         }
     }
 
-    const setFormButtons = () => {
-        if (failMessageGroupToCopy !== null) {
-            return <div className="form-item">
-                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupAdd}>
-                    Copy Fail Message Group
-                </Button>
-            </div>
-        }
-        else if (failMessageGroupToEdit !== null) {
-            return <div className="form-item">
-                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupAdd}>
-                    Add Fail Message Group
-                </Button>
-                <Button className="p-button-primary " type="submit" onClick={clearForm}>
-                    Clear Form
-                </Button>
-            </div>
-        } else {
-            return <div className="form-item">
-                <Button className="p-button-primary " type="submit" onClick={handleFailMessageRegexGroupEdit}>
-                    Save
-                </Button>
-            </div>
-        }
-    }
-
     useEffect(() => {
         if (failMessageGroupToEdit !== null) fetchFailMessageGroupToEdit();
         else if (failMessageGroupToCopy !== null) fetchFailMessageGroupToCopy();

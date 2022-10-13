@@ -21,7 +21,7 @@ import { useCurrentUser } from '../../services/CurrentUserContext';
 
 import './TestSetFilterAddModal.css';
 
-let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handleFormShow }) => {
+let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
 
     const [testLinesTypes, setTestLinesTypes] = useState([]);
     const [selectedFailMessageTypeGroup, setSelectedFailMessageTypeGroup] = useState([]);
@@ -127,18 +127,17 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         filterToAdd.test_set_name = testSetName;
         filterToAdd.test_lab_path = testLabPath;
 
-        filterToAdd.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
-            let tmp = selectedFailMessageTypeGroup.includes(group.id);
-            if (tmp === true) return group
-        }).map(mapGroup => ({ "id": mapGroup.id }));
+        let fail_message_type_groups_tmp = [];
+        if (failMessageTypeGroupsList.length > 0) {
+            fail_message_type_groups_tmp = failMessageTypeGroupsList.filter(group => selectedFailMessageTypeGroup.includes(group.id));
+        }
+        filterToAdd.fail_message_type_groups = fail_message_type_groups_tmp.map(mapGroup => ({ "id": mapGroup.id }));
 
         filterToAdd.owners = owners.map(owner => ({ "username": owner }))
         filterToAdd.owners.push({ "username": currentUser });
 
         filterToAdd.subscribers = subscribers.map(subscriber => ({ "username": subscriber }));
         if (isSubscribedByMe) filterToAdd.subscribers.push({ "username": currentUser });
-
-        console.log(filterToAdd)
 
         postTestSetFilter(filterToAdd).then(
             (response) => {
@@ -164,10 +163,12 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose, handle
         filterToEdit.test_set_name = testSetName;
         filterToEdit.test_lab_path = testLabPath;
 
-        filterToEdit.fail_message_type_groups = failMessageTypeGroupsList.filter(group => {
-            let tmp = selectedFailMessageTypeGroup.includes(group.id);
-            if (tmp === true) return group
-        }).map(mapGroup => ({ "id": mapGroup.id }));
+        let fail_message_type_groups_tmp = [];
+        if (failMessageTypeGroupsList.length > 0) {
+            fail_message_type_groups_tmp = failMessageTypeGroupsList.filter(group => selectedFailMessageTypeGroup.includes(group.id));
+        }
+        filterToEdit.fail_message_type_groups = fail_message_type_groups_tmp.map(mapGroup => ({ "id": mapGroup.id }));
+
 
         filterToEdit.owners = owners.map(owner => ({ "username": owner }))
         if (isOwnedByMe) filterToEdit.owners.push({ "username": currentUser })

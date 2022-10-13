@@ -10,7 +10,7 @@ import { Dropdown } from 'primereact/dropdown';
 import TestRunsAnalyzeModal from './TestRunsAnalyzeModal';
 
 import { getTestRunsUsingFilter } from './../../services/test-results-analyzer/test-runs.service';
-import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../../services/Notify.js';
+import Notify, { AlertTypes, Infos, Errors, Warnings } from '../../services/Notify.js';
 
 import './TestRunTableComponent.css';
 

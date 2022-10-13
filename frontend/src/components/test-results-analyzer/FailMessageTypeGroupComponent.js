@@ -19,10 +19,6 @@ let FailMessageTypeGroupComponent = () => {
 
     const [loading, setLoading] = useState(true);
 
-    const [showForm, setShowForm] = useState(false);
-    const handleFormClose = () => setShowForm(false);
-    const handleFormShow = () => setShowForm(true);
-
     let { group } = useParams();
 
     let fetchFailMessageGroups = () => {
@@ -101,11 +97,6 @@ let FailMessageTypeGroupComponent = () => {
         setExpandedKeys([]);
     }
 
-    const handleFormCloseAndRefresh = () => {
-        handleFormClose();
-        fetchFailMessageGroups();
-    }
-
     const rowClassName = (node) => {
         if (node.key in expandedKeys) {
             return { 'highlight-expanded p-highlight': (!node.key.includes('-')) };
@@ -132,13 +123,13 @@ let FailMessageTypeGroupComponent = () => {
                 expandedKeys={expandedKeys} onToggle={e => setExpandedKeys(e.value)}
                 selectionKeys={selectedGroups} onSelectionChange={e => setSelectedGroups(e.value)}>
 
-                <Column field="group_name" header="Group Name" expander sortable filter filterPlaceholder="Filter by name"></Column>
-                <Column field="group_author" header="Group Author" sortable filter filterPlaceholder="Filter by author"></Column>
-                <Column field="type_name" header="Regex Name" sortable filter filterPlaceholder="Filter by name"></Column>
-                <Column field="regex" header="Regex" sortable filter filterPlaceholder="Filter by regex"></Column>
-                <Column field="type_author" header="Regex Author" sortable filter filterPlaceholder="Filter by author"></Column>
-                <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Filter by env issue type"></Column>
-                <Column field="description" header="Description" sortable filter filterPlaceholder="Filter by description"></Column>
+                <Column field="group_name" header="Group Name" expander sortable filter filterPlaceholder="Filter by name" style={{ maxWidth: '14%' }}></Column>
+                <Column field="group_author" header="Group Author" sortable filter filterPlaceholder="Filter by author" style={{ maxWidth: '14%' }}></Column>
+                <Column field="type_name" header="Regex Name" sortable filter filterPlaceholder="Filter by name" style={{ maxWidth: '14%' }}></Column>
+                <Column field="regex" header="Regex" sortable filter filterPlaceholder="Filter by regex" style={{ maxWidth: '14%' }}></Column>
+                <Column field="type_author" header="Regex Author" sortable filter filterPlaceholder="Filter by author" style={{ maxWidth: '14%' }}></Column>
+                <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Filter by env issue type" style={{ maxWidth: '14%' }}></Column>
+                <Column field="description" header="Description" sortable filter filterPlaceholder="Filter by description" style={{ maxWidth: '14%' }}></Column>
 
             </TreeTable>
         </>

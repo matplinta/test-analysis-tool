@@ -6,15 +6,11 @@ import { Button } from 'primereact/button';
 import TestRunTableComponent from './TestRunTableComponent';
 
 import { getTestRunsFilters } from '../../services/test-results-analyzer/test-runs.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 import './RegressionTestRuns.css'
 
 let RegressionTestRuns = () => {
-
-    const [regressionFiltersNodes, setRegressionFiltersNodes] = useState([]);
-    const [expandedFilterKeys, setExpandedFilterKeys] = useState({});
-    const [selectedFilterKeys, setSelectedFilterKeys] = useState(null);
 
     const [testSetFiltersNodes, setTestSetFiltersNodes] = useState([]);
     const [expandedTestSetKeys, setExpandedTestSetKeys] = useState({});
@@ -86,33 +82,6 @@ let RegressionTestRuns = () => {
         }
         setSelectedNodesKeys(selectedFilters)
     }
-
-    // let fetchTestSetFilters = (data) => {
-    //     if (regressionFiltersNodes.length === 0) {
-    //         let filters = {
-    //             key: 'reg_filters',
-    //             label: 'Regression filters',
-    //             data: 'Regression Filters',
-    //             children: []
-    //         }
-
-    //         const filterChildren = data.map((item, index) => {
-    //             return { key: item.pk, label: item.fields.name, data: item.model, children: [] }
-    //         })
-    //         filters.children = filterChildren;
-
-    //         let nodesTmp = [...regressionFiltersNodes];
-
-    //         nodesTmp.push(filters);
-    //         expandAll(nodesTmp, setExpandedFilterKeys);
-
-    //         if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
-    //             selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedFilterKeys);
-    //         }
-
-    //         setRegressionFiltersNodes(nodesTmp)
-    //     }
-    // }
 
     const fetchTestSetNames = (data) => {
         if (testSetFiltersNodes.length === 0) {
@@ -313,7 +282,6 @@ let RegressionTestRuns = () => {
 
     const defineApiUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
-        // filterUrl += defineApiUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
         filterUrl += defineApiUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
         filterUrl += defineApiUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
         filterUrl += defineApiUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
@@ -329,7 +297,6 @@ let RegressionTestRuns = () => {
 
     const defineWebUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
-        // filterUrl += defineWebUrlFromSelectedFilter(selectedFilterKeys, "reg_filters");
         filterUrl += defineWebUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
         filterUrl += defineWebUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
         filterUrl += defineWebUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
@@ -357,39 +324,12 @@ let RegressionTestRuns = () => {
         window.scrollTo(0, 0);
     }
 
-    // const showTooltifIfLabelTooLong = () => {
-    //     var elements = document.getElementsByClassName('p-treenode-label');
-    //     // console.log(elements);
-    //     for (let element of elements) {
-    //         // console.log(element ,element.offsetWidth, element.scrollWidth, element.clientWidth )
-    //         if (element.offsetWidth < element.scrollWidth) {
-    //             // your element have overflow
-    //             element.style.background = "yellow";
-    //             element.addEventListener('onmouseover', (e) => {
-    //                 console.log(e)
-    //                 console.log("najechalem")
-    //             })
-    //             // element.appendTo()
-    //         }
-    //         else {
-    //             //your element don't have overflow
-    //         }
-    //     }
-    // }
-
-    // const testFiltersCheckboxList = (
-    //     <div>
-    //         <Tree value={regressionFiltersNodes} expandedKeys={expandedFilterKeys} selectionMode="checkbox" selectionKeys={selectedFilterKeys} onSelectionChange={e => setSelectedFilterKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)} />
-    //     </div>
-    // )
-
     const nodeTemplate = (node, options) => {
         return (
             <>
                 <span className="p-treenode-label might-overflow">
                     {node.label}
                 </span>
-
             </>
         )
     }
@@ -398,7 +338,7 @@ let RegressionTestRuns = () => {
         <div>
             <Tree nodeTemplate={nodeTemplate} value={testSetFiltersNodes} expandedKeys={expandedTestSetKeys} selectionMode="checkbox"
                 selectionKeys={selectedTestSetKeys} onSelectionChange={e => setSelectedTestSetKeys(e.value)}
-                onToggle={e => setExpandedFilterKeys(e.value)} loading={loading} className="regression-filters-tree" />
+                onToggle={e => setExpandedTestSetKeys(e.value)} loading={loading} className="regression-filters-tree" />
         </div>
     )
 
@@ -406,7 +346,7 @@ let RegressionTestRuns = () => {
         <div>
             <Tree nodeTemplate={nodeTemplate} value={testLineTypeFiltersNodes} expandedKeys={expandedTestLineTypeKeys}
                 selectionMode="checkbox" selectionKeys={selectedTestLineTypeKeys}
-                onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)}
+                onSelectionChange={e => setSelectedTestLineTypeKeys(e.value)} onToggle={e => setExpandedTestLineTypeKeys(e.value)}
                 loading={loading} className="regression-filters-tree" />
         </div>
     )
@@ -415,7 +355,7 @@ let RegressionTestRuns = () => {
         <div>
             <Tree nodeTemplate={nodeTemplate} value={branchFiltersNodes} expandedKeys={expandedBranchKeys}
                 selectionMode="checkbox" selectionKeys={selectedBranchTypeKeys}
-                onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedFilterKeys(e.value)}
+                onSelectionChange={e => setSelectedBranchKeys(e.value)} onToggle={e => setExpandedBranchKeys(e.value)}
                 loading={loading} className="regression-filters-tree" />
         </div>
     )

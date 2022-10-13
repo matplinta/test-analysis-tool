@@ -1,24 +1,19 @@
 import { useEffect, useState } from "react";
 
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
 import { Tag } from 'primereact/tag';
-import { Tooltip } from 'primereact/tooltip';
 
 import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
 
 const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) => {
 
-    const [result, setResult] = useState(null);
     const [envIssueType, setEnvIssueType] = useState(null);
     const [comment, setComment] = useState("");
 
-    const [resultsList, setResultsList] = useState([]);
     const [envIssueTypesList, setEnvIssueTypesList] = useState([]);
 
     const fetchEnvIssueTypes = () => {
@@ -33,7 +28,6 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
     }
 
     const clearForm = () => {
-        setResult(null);
         setEnvIssueType(null);
         setComment("");
     }

@@ -4,14 +4,13 @@
 //   Date                    Author                     Bug                 List of changes
 //  --------------------------------------------------------------------------
 
-import { useState, useEffect, useRef } from 'react';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { useState, useEffect } from 'react';
+import { FilterMatchMode } from 'primereact/api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
-import { FiSettings } from 'react-icons/fi';
 import { FaRegTrashAlt, FaEdit } from 'react-icons/fa';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { MdAddCircle } from 'react-icons/md';
 
 import FailMessageTypeAddModal from './FailMessageTypeAddModal';
@@ -135,6 +134,8 @@ const FailRegexTypesComponent = () => {
             </DataTable >
 
             <FailMessageTypeAddModal failMessageToEdit={failMessageToEdit} showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
+
+            <ConfirmDialog />
         </>
     )
 }
