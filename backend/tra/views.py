@@ -3,6 +3,7 @@ from functools import reduce
 from sre_constants import SUCCESS
 from urllib import response
 from django.shortcuts import render
+from redis import ResponseError
 from rest_framework import permissions, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -29,6 +30,7 @@ from django.db.models import Count
 from .permissions import IsOwnerOfObject, IsSubscribedToObject
 
 from .serializers import (
+    NotificationSerializer,
     TestInstanceSerializer,
     TestRunSerializer, 
     TestlineTypeSerializer, 
@@ -47,6 +49,7 @@ from .models import (
     Branch,
     FailMessageTypeGroup,
     FeatureBuild,
+    Notification,
     Organization, 
     TestRunResult, 
     TestlineType, 
@@ -64,6 +67,7 @@ from .pagination import StandardResultsSetPagination
 import json
 import copy
 
+from celery.result import AsyncResult
 from . import test_runs_processing
 from . import tasks as celery_tasks
 from . import utils
@@ -111,6 +115,13 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
             return permissions + [IsAuthorOfObject()]
         return permissions
 
+
+
+class NotificationView(viewsets.ModelViewSet):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
 
 
 class TestlineTypeView(viewsets.ModelViewSet):
@@ -519,6 +530,74 @@ class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
     def get(self, request):
         celery_tasks.celery_pull_passed_testruns_by_all_testset_filters.delay()
         return Response("OK")
+
+
+class PullAllTestRunsBySelectedTestSetFiltersCelery(APIView):
+    @swagger_auto_schema(
+        description="Pull all test runs from ReportingPortal to DB by selected Test Set Filters",
+        operation_description="Pull all test runs from ReportingPortal to DB by selected Test Set Filters",
+        request_body=no_body,
+         manual_parameters=[
+            limit_rp,
+            testsetfilters_param
+        ],
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        limit = request.query_params.get('limit', None)
+        testsetfilters = request.query_params.get('testsetfilters', [])
+        tasks = []
+        for tsf_id in testsetfilters.split(','):
+            passed_task = celery_tasks.celery_pull_passed_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id), query_limit=limit)
+            na_env_task = celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id), query_limit=limit)
+            tasks.append(passed_task.task_id)
+            tasks.append(na_env_task.task_id)
+        return Response(tasks)
+
+
+class GetCeleryTasksStatus(APIView):
+    @swagger_auto_schema(
+        description="Get celery task's status",
+        operation_description="Get celery task's status",
+        request_body=no_body,
+         manual_parameters=[
+            task_id_param,
+        ],
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        taskid = request.query_params.get('taskid', None)
+        res = AsyncResult(taskid)
+        res.ready()
+        return Response({"ready": res.ready(), "status": res.state})
+
+
+class CheckIfAllTasksFinished(APIView):
+    @swagger_auto_schema(
+        description="Get celery task's status",
+        operation_description="Get celery task's status",
+        request_body=celery_task_ids_list,
+        responses={
+            200: "",
+            400: ""
+        },
+        tags=["celery"]
+    )
+    def post(self, request):
+        taskids = request.data
+        if not taskids:
+            return Response(f"You need to specify taskids", status=status.HTTP_400_BAD_REQUEST)
+        tasks = []
+        for taskid in taskids:
+            tasks.append(AsyncResult(taskid).ready())
+        return Response({"ready": all(tasks)})
+
 
 
 class DownloadLatestPassedLogsToStorage(APIView):

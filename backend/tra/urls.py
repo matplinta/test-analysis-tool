@@ -24,6 +24,7 @@ router.register(r'test_runs', views.TestRunView, 'testruns')
 router.register(r'branches', views.BranchView, 'branches')
 router.register(r'last_passing_logs', views.LastPassingLogsView, 'last_passing_logs')
 router.register(r'test_instances', views.TestInstanceView, 'test_instances')
+router.register(r'notifications', views.NotificationView, 'notifications')
 
 urlpatterns = [
     path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='tr_byquery'),
@@ -44,6 +45,8 @@ urlpatterns = [
          name='pull_notpassed_testruns_by_all_testset_filters_celery'),
     path('celery/pull_passed_testruns_by_all_testset_filters_celery/', views.PullPassedTestrunsByAllTestSetFiltersCelery.as_view(), 
          name='pull_passed_testruns_by_all_testset_filters_celery'),
+    path('celery/pull_testruns_by_testsetfilters/', views.PullAllTestRunsBySelectedTestSetFiltersCelery.as_view(), 
+         name='pull_testruns_by_testsetfilters'),
     path('celery/download_latest_passed_logs_to_storage/', views.DownloadLatestPassedLogsToStorage.as_view(), 
          name='download_latest_passed_logs_to_storage'),
     path('celery/remove_old_passed_logs_from_log_storage/', views.RemoveOldPassedLogsFromLogStorage.as_view(), 
@@ -54,6 +57,10 @@ urlpatterns = [
          name='fill_empty_test_instances_with_their_rp_ids'),
     path('celery/sync_norun_data_of_all_test_instances/', views.SyncNorunDataOfAllTestInstances.as_view(), 
          name='sync_norun_data_of_all_test_instances'),
+    path('celery/get_task_status/', views.GetCeleryTasksStatus.as_view(), 
+         name='get_task_status'),
+    path('celery/check_all_tasks_status/', views.CheckIfAllTasksFinished.as_view(), 
+         name='check_all_tasks_status'),
     
     
     path('', include(router.urls)),
