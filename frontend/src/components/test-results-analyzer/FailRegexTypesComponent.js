@@ -124,11 +124,11 @@ const FailRegexTypesComponent = () => {
                 emptyMessage="No fail message types found."
                 scrollHeight="calc(100vh - 150px)"
                 resizableColumns columnResizeMode="fit">
-                < Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '20%' }} ></Column >
-                <Column field="regex" header="Regex" sortable filter filterPlaceholder="Search by regex" style={{ width: '35%' }} ></Column>
-                <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Search by env issue tye" style={{ width: '15%' }} ></Column>
-                <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '15%' }}  ></Column>
-                <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description" style={{ width: '15%' }} ></Column>
+                <Column field="name" header="Name" sortable filter showFilterMenuOptions={false} showClearButton={false} style={{ width: '20%' }} ></Column >
+                <Column field="regex" header="Regex" sortable filter showFilterMenuOptions={false} showClearButton={false} style={{ width: '35%' }} ></Column>
+                <Column field="env_issue_type" header="Env Issue Type" sortable filter showFilterMenuOptions={false} showClearButton={false} style={{ width: '15%' }} ></Column>
+                <Column field="author" header="Author" sortable filter showFilterMenuOptions={false} showClearButton={false} style={{ width: '15%' }}  ></Column>
+                <Column field="description" header="Description" sortable filter showFilterMenuOptions={false} showClearButton={false} style={{ width: '15%' }} ></Column>
                 <Column body={editButton} header="Edit" style={{ textAlign: "center", minWidth: "60px" }} />
                 <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
             </DataTable >

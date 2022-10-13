@@ -133,7 +133,6 @@ let ChartsComponent = () => {
         if (filtersetName !== "") {
             let filterSetsToSend = [];
             for (let filter of filters) {
-                console.log(filter)
                 if (filter.field !== "" && filter.value !== "") {
                     let filterSetTmp = {};
                     // filterSetTmp.filter_set = filtersetName;
@@ -141,7 +140,6 @@ let ChartsComponent = () => {
                     filterSetTmp.field = filter.field.name;
                     filterSetsToSend.push(filterSetTmp);
                     let filterSetToSendAll = { "name": filtersetName, "filters": filterSetsToSend }
-                    console.log(filterSetToSendAll)
                     postFilterSetsDetail(filterSetToSendAll).then(
                         (result => {
                             console.log("success")

@@ -34,6 +34,8 @@ let FailMessageTypeGroupComponent = () => {
     const [failMessageGroupToEdit, setFailMessageGroupToEdit] = useState(null);
     const [failMessageGroupToCopy, setFailMessageGroupToCopy] = useState(null);
 
+    const [lastRemovedFailMessageGroupId, setLastRemovedFailMessageGroupId] = useState(null);
+
     const [loading, setLoading] = useState(true);
 
     const [showForm, setShowForm] = useState(false);
@@ -49,31 +51,49 @@ let FailMessageTypeGroupComponent = () => {
     let fetchFailMessageGroups = () => {
         getFailMessageTypeGroups(group).then(
             (response) => {
-                setFailMessageTypeGroups(response.data);
-                if (response.data.length > 0 && failMessageGroupToEdit !== null) {
-                    let selectedGroup = response.data.filter(group => group.id === failMessageGroupToEdit.id)[0];
+                let responseData;
+                // create one element array if data requested for single 
+                Array.isArray(response.data) ? responseData = response.data : responseData = [response.data];
+                setFailMessageTypeGroups(responseData);
+
+                // for singe regex group in url
+                if (!Array.isArray(response.data)) {
+                    setSelectedFailMessageTypeGroup(responseData[0]);
+                    setSelectedRegexList(responseData[0].fail_message_types);
+                }
+                // for edit regex group
+                else if (responseData.length > 0 && failMessageGroupToEdit !== null && lastRemovedFailMessageGroupId === null) {
+                    let selectedGroup = responseData.filter(group => group.id === failMessageGroupToEdit.id)[0];
                     setSelectedFailMessageTypeGroup(selectedGroup);
                     setSelectedRegexList(selectedGroup.fail_message_types);
                 }
-                if (response.data.length > 0 && failMessageGroupToCopy !== null) {
-                    let selectedGroup = response.data.filter(group => group.id === failMessageGroupToCopy.id)[0];
+                // for new regex group
+                else if (responseData.length > 0 && lastRemovedFailMessageGroupId === null) {
+                    let selectedGroup = responseData[responseData.length - 1];
                     setSelectedFailMessageTypeGroup(selectedGroup);
                     setSelectedRegexList(selectedGroup.fail_message_types);
+                }
+
+                else {
+                    setLastRemovedFailMessageGroupId(null);
+                    setSelectedFailMessageTypeGroup(null);
+                    setSelectedRegexList([]);
                 }
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
                 setLoading(false);
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_GROUPS_LIST, AlertTypes.error);
             }
         )
     }
 
     const handleFormCloseAndRefresh = () => {
         handleFormClose();
-        fetchFailMessageGroups();
         setFailMessageGroupToEdit(null);
         setFailMessageGroupToCopy(null);
+        fetchFailMessageGroups();
+        navigate('../../fail-regex-groups');
     }
 
     let editFailMessageGroup = (rowData) => {
@@ -99,6 +119,7 @@ let FailMessageTypeGroupComponent = () => {
         deleteFailMessageTypeRegexGroup(id).then(
             (result) => {
                 Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.success);
+                setLastRemovedFailMessageGroupId(id);
                 fetchFailMessageGroups();
                 setSelectedFailMessageTypeGroup(null);
                 setSelectedRegexList([]);
@@ -149,21 +170,24 @@ let FailMessageTypeGroupComponent = () => {
     useEffect(() => {
         fetchCurrentUser();
         fetchFailMessageGroups(group);
-    }, [])
+    }, [group])
 
     return (
         <>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={handleFormShow}>
-                <MdAddCircle size='20' />
-                <span style={{ marginLeft: '5px' }}>Add Regex Group</span>
-            </Button>
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={goToDetalsView}>
-                <AiOutlineLink size='20' />
-                <span style={{ marginLeft: '5px' }}>Go to details view</span>
-            </Button>
-
+            <div>
+                {group === undefined ?
+                    <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={handleFormShow}>
+                        <MdAddCircle size='20' />
+                        <span style={{ marginLeft: '5px' }}>Add Regex Group</span>
+                    </Button>
+                    : null}
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={goToDetalsView}>
+                    <AiOutlineLink size='20' />
+                    <span style={{ marginLeft: '5px' }}>Go to details view</span>
+                </Button>
+            </div>
             <div style={{ display: 'flex', marginTop: '5px', marginLeft: '3px', marginRight: '3px' }}>
-                <Card style={{ width: '35%' }}>
+                <Card style={{ width: '40%' }}>
                     <span style={{ fontWeight: 'bold', margin: '5px' }}>Select Regex Group to see details:</span>
                     <DataTable value={failMessageTypeGroups} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
                         size="small" className="fail-message-table"
@@ -175,16 +199,16 @@ let FailMessageTypeGroupComponent = () => {
                         selectionMode="single" selection={selectedFailMessageTypeGroup}
                         onSelectionChange={e => selectFailMessageTypeGroup(e.value)}>
 
-                        <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
-                        <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
+                        <Column field="name" header="Name" sortable filter style={{ width: '70%' }} showFilterMenuOptions={false} showClearButton={false}></Column >
+                        <Column field="author" header="Author" sortable filter style={{ width: '30%' }} showFilterMenuOptions={false} showClearButton={false}></Column>
                         <Column body={copyButton} header="Copy" style={{ textAlign: "center", minWidth: "60px" }} />
-                        <Column body={editButton} header="Edit" style={{ textAlign: "center", minWidth: "60px" }} />
-                        <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
+                        {group === undefined ? <Column body={editButton} header="Edit" style={{ textAlign: "center", minWidth: "60px" }} /> : null}
+                        {group === undefined ? <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} /> : null}
                     </DataTable >
 
                 </Card>
                 <Divider layout="vertical"></Divider>
-                <Card style={{ width: '65%' }}>
+                <Card style={{ width: '60%' }}>
                     <DataTable value={selectedRegexList} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
                         size="small" className="fail-message-table"
                         filterDisplay="row" loading={loading}
@@ -193,11 +217,11 @@ let FailMessageTypeGroupComponent = () => {
                         scrollHeight="calc(100vh - 180px)"
                         resizableColumns columnResizeMode="fit">
 
-                        <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" ></Column >
-                        <Column field="regex" header="Regex" sortable filter filterPlaceholder="Search by name" ></Column >
-                        <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" ></Column>
-                        <Column field="env_issue_type" header="Env Issue Type" sortable filter filterPlaceholder="Search by author" ></Column>
-                        <Column field="description" header="Description" sortable filter filterPlaceholder="Search by author" ></Column>
+                        <Column field="name" header="Name" sortable filter showFilterMenuOptions={false} showClearButton={false} ></Column>
+                        <Column field="regex" header="Regex" sortable filter showFilterMenuOptions={false} showClearButton={false} ></Column>
+                        <Column field="author" header="Author" sortable filter showFilterMenuOptions={false} showClearButton={false} ></Column>
+                        <Column field="env_issue_type" header="Env Issue Type" sortable filter showFilterMenuOptions={false} showClearButton={false} ></Column>
+                        <Column field="description" header="Description" sortable filter showFilterMenuOptions={false} showClearButton={false} ></Column>
 
                     </DataTable >
                 </Card>

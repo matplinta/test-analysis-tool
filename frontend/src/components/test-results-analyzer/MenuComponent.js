@@ -60,7 +60,7 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         }
     ]
 
-    const start = 
+    const start =
         <Link to='/'>
             <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>
         </Link>;

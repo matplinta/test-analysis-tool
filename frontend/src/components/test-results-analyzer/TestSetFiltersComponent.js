@@ -203,7 +203,6 @@ let TestSetFiltersComponent = ({ type }) => {
     }
 
     const confirmRemove = () => {
-        console.log("klikam")
         confirmDialog({
             message: '\nAre you sure you want to remove selected Test Set Filters?',
             header: 'Confirmation',

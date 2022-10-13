@@ -39,7 +39,6 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
             'result': "environment issue",
             'env_issue_type': envIssueType
         }
-        console.log(testRunToUpdate)
         postTestRun(testRunToUpdate).then(
             (success) => {
                 console.log("Success!")
@@ -57,9 +56,7 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
     }
 
     useEffect(() => {
-        console.log("otwieram okno")
         fetchEnvIssueTypes();
-        console.log(selectedTestRuns)
     }, [])
 
     return (
