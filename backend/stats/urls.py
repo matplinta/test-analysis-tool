@@ -17,21 +17,9 @@ urlpatterns = [
     # path('filtersets_detailed/', views.FilterSetDetailView.as_view(), name="filterset_detailed"),
     # path('filtersets_detailed/<int:filterset_id>', views.FilterSetDetailView.as_view(), name="filterset_detailed_pk"),
     # path('filters/by_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="filters_by_filterset"),
-    path('fail_barchart', views.GetChartForFailAnalysis.as_view(), name="failbarchart"),
-    # fail_barchart
-    #   QUERY PARAMS:
-    #       - filterset    [REQUIRED]   Id of filterset
-    #       - date_middle  [OPTIONAL]   Separation date (e.g. 2022-12-03)
-    #       - date_start   [OPTIONAL]   Start date (e.g. 2022-12-03) to filter against; must be used with date_end
-    #       - date_end     [OPTIONAL]   End date (e.g. 2022-12-03) to filter against;  must be used with date_start
+    path('fail_barchart', views.GetChartByExceptionType.as_view(), name="failbarchart"),
+    path('fail_barchart/subs_regfilters', views.GetChartByExceptionTypeForAllSubscribedTestSetFilters.as_view(), name="failbarchart_subs_regfilters"),
+    path('get_excel', views.GetExcelData.as_view(), name="excel_data"),
+    path('get_excel/subs_regfilters', views.GetExcelDataForAllSubscribedTestSetFilters.as_view(), name="excel_data_subs_regfilters"),
 
-    path('fail_barchart_subs_regfilters', views.GetFailChartForUsersAllSubscribedRegFilters.as_view(), name="failbarchart_subs_regfilters"),
-    # fail_barchart_subs_regfilters
-    #   PARAMS:
-    #       - limit                    [OPTIONAL]   Limit to data collection from RP
-    #       - fail_message_type_groups [OPTIONAL]   Ids of fail_message_type_groups, separated by commas;
-    #                                               Ommiting this setting will greatly impact visualization of generated chart!
-    #       - date_middle              [OPTIONAL]   Separation date (e.g. 2022-12-03)
-    #       - date_start               [OPTIONAL]   Start date (e.g. 2022-12-03) to filter against; must be used with date_end
-    #       - date_end                 [OPTIONAL]   End date (e.g. 2022-12-03) to filter against;  must be used with date_start
 ]

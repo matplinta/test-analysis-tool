@@ -34,7 +34,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.dev
-    command: celery -A backend worker -l info
+    command: celery -A backend worker -l info --pool solo
     volumes:
       - logs_storage_debug:${LOGS_STORAGE_DOCKER_PATH_DEBUG}
     env_file:

@@ -67,6 +67,36 @@ filterset_detailed_array_scheme = openapi.Schema(
     items=filterset_detailed_scheme
 )
 
+limit_rp = openapi.Parameter(
+    name="limit", 
+    in_=openapi.IN_QUERY,
+    description="RP API get limit",
+    type=openapi.TYPE_INTEGER,
+    required=False
+)
+
+testsetfilters_param = openapi.Parameter(
+    name="testsetfilters", 
+    in_=openapi.IN_QUERY,
+    description="TestSetFilter ids sparated by commas",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+task_id_param = openapi.Parameter(
+    name="taskid", 
+    in_=openapi.IN_QUERY,
+    description="celery taskid UUID",
+    type=openapi.TYPE_STRING,
+    required=True
+)
+
+celery_task_ids_list = openapi.Schema(
+    title="List of Celery TaskIds UUID",
+    type=openapi.TYPE_ARRAY,
+    items=task_id_param
+)
+
 fail_barchart_param_filterset = openapi.Parameter(
     name="filterset", 
     in_=openapi.IN_QUERY,
@@ -130,6 +160,12 @@ fail_barchart_response_scheme = openapi.Schema(
         ),
         "info": openapi.Schema(type=openapi.TYPE_STRING, description="Data range")
     }
+)
+
+
+excel_response_scheme = openapi.Schema(
+    title="Excel",
+    type=openapi.FORMAT_BINARY,
 )
 
 

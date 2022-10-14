@@ -19,6 +19,9 @@ import re
 class RepPortalError(Exception): 
     pass
 
+class RepPortalFieldNotFound(Exception): 
+    pass
+
 class RepPortal():
     CONFIG = 'rep-prod-one'
     API_THROTTLE_TIME = 60
@@ -271,7 +274,7 @@ class RepPortal():
         if not details:
             raise RepPortalError(f"Results do not contain info for this organization: {organization}")
         if status not in details.keys():
-            raise RepPortalError(f"Results do not contain info for this tests status: {status}")
+            raise RepPortalFieldNotFound(f"Results do not contain info for this tests status: {status}")
         
         params = parse_qs(urlsplit(elem[status]).query)
         params = {key: value[0] for key, value in params.items()}

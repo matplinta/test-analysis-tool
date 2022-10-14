@@ -5,7 +5,7 @@ from celery.schedules import crontab
 from backend.celery import app
 from django.conf import settings
 from .models import *
-from rep_portal.api import RepPortal, RepPortalError
+from rep_portal.api import RepPortal, RepPortalError, RepPortalFieldNotFound
 from . import test_runs_processing
 from .storage import get_storage_instance
 from . import utils
@@ -141,6 +141,8 @@ def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue
     if not auth_params:
         auth_params = utils.get_rp_api_auth_params()
     resp, url, data =  RepPortal(**auth_params).analyze_testruns(runs, comment, common_build, result, env_issue_type)
+    if resp is None:
+        return {"status": "failed", "url": url}
     return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
 
 
@@ -173,12 +175,16 @@ def celery_sync_norun_data_per_organization_and_branch(organization_name: int, b
     branch = Branch.objects.get(name=branch_name)
     ti_eligible_to_sync = TestInstance.objects.exclude(test_set__subscribers=None).filter(organization=organization, test_set__branch=branch)
     ti_eligible_ids = set([ti.rp_id for ti in ti_eligible_to_sync])
-
-    ti_noruns =  RepPortal(**auth_params).get_test_instances_for_present_feature_build_with_specified_status(
-        organization.name, status="no_run", release=branch.name)
+    warn_msg = ""
+    try:
+        ti_noruns =  RepPortal(**auth_params).get_test_instances_for_present_feature_build_with_specified_status(
+            organization.name, status="no_run", release=branch.name)
+    except RepPortalFieldNotFound as e:
+        ti_noruns = []
+        warn_msg = repr(e)
     ti_noruns_ids = set([ti["id"] for ti in ti_noruns])
     ti_intersection = ti_eligible_ids.intersection(ti_noruns_ids)
     ti_difference = ti_eligible_ids.difference(ti_noruns_ids)
     TestInstance.objects.filter(rp_id__in=list(ti_difference)).update(no_run_in_rp=False)
     TestInstance.objects.filter(rp_id__in=list(ti_intersection)).update(no_run_in_rp=True)
-    return {"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}
+    return {"warning_except": warn_msg ,"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}

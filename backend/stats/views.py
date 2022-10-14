@@ -1,7 +1,3 @@
-from email.header import Header
-from telnetlib import STATUS
-from django.shortcuts import render
-from rep_portal.api import RepPortal
 from rest_framework import pagination
 from rest_framework import generics
 from rest_framework import status
@@ -22,21 +18,12 @@ from stats.analyzer import Analyzer
 from datetime import date, datetime
 from itertools import chain
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
+from django.shortcuts import HttpResponse, get_object_or_404
 from drf_yasg.utils import swagger_auto_schema, no_body
 from drf_yasg import openapi
 from .filters import FilterSetFilterClass
+from tra import utils
 
-
-# class ListFiltersWithFilterSetView(generics.ListAPIView):
-#     permission_classes = (IsAuthenticated,)   
-#     serializer_class = FilterSerializerListOnly
-
-#     def get_queryset(self):
-#         filterset_id = self.kwargs['filterset_id']
-#         filter_set = FilterSet.objects.get(pk=filterset_id)
-#         queryset = Filter.objects.all()
-#         return queryset.filter(filter_set=filter_set)
 
 
 class FilterSetView(viewsets.ModelViewSet):
@@ -219,16 +206,13 @@ class GetDataForFailChartBase(APIView):
         return int(filterset) if filterset else filterset
 
     def _handle_dates_in_request(self, request):
-        date_middle = request.query_params.get("date_middle", None)
         date_start = request.query_params.get("date_start", None)
         date_end = request.query_params.get("date_end", None)
-        dates_keys = ["date_middle", "date_start", "date_end"]
-        dates_values = [date_middle, date_start, date_end]
-        dates = {}
-        for date_key, date_str in zip(dates_keys, dates_values):
-            if date_str:
-                dates[date_key] = datetime.strptime(date_str, "%Y-%m-%d").date()
-        return dates
+        if date_start:
+            date_start= datetime.strptime(date_start, "%Y-%m-%d").date()
+        if date_end:
+            date_end= datetime.strptime(date_end, "%Y-%m-%d").date()
+        return date_start, date_end
 
     def parse_filters_and_fmtgs(self, filterset_id):
         filter_set = FilterSet.objects.get(pk=filterset_id)
@@ -239,9 +223,9 @@ class GetDataForFailChartBase(APIView):
             fmtgs = [int(value) for value in fmtgs.split(",")]
         return filters, fmtgs
 
-    def parse_failmessagetypes(self, ids_list):
+    def parse_failmessagetypes_and_get_fail_message_dict(self, fmtg_ids_list):
         querysets = []
-        for _id in ids_list:
+        for _id in fmtg_ids_list:
             fail_message_type_group = tra_models.FailMessageTypeGroup.objects.get(id=_id)
             querysets.append(fail_message_type_group.fail_message_types.all())
 
@@ -253,31 +237,34 @@ class GetDataForFailChartBase(APIView):
         filters_raw = self.request.data
         filters = {filter["field"]: filter["value"] for filter in filters_raw}
         fmtgs = filters.pop("fail_message_type_groups", [])
-        fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
+        fail_message_dict = self.parse_failmessagetypes_and_get_fail_message_dict(ids_list=fmtgs)
         return fail_message_dict, filters
 
-    def init_analyzer_and_get_chart_data(self, fail_message_dict, filters):
-        dates = self._handle_dates_in_request(self.request)
+    def init_analyzer(self, fail_message_dict, filters):
+        date_start, date_end = self._handle_dates_in_request(self.request)
         analyzer = Analyzer(fail_message_dict, filters)
         analyzer.get_data_from_rp()
-        if dates:
-            data = analyzer.plot_runs_by_exception_types_by_date_ranges(**dates)
-        else:
-            data = analyzer.plot_runs_by_exception_types(plot=False)
-        return data
+        analyzer.get_data_filtered_by_date_ranges(date_start, date_end)
+        return analyzer
 
-    def download_df_csv_data(self):
-        return self.df.to_csv()
+    def get_fail_chart_data(self, analyzer: Analyzer):
+        return analyzer.get_chart_data_indexed_by_exception_type()
+
+    def get_excel_data(self, analyzer: Analyzer):
+        return analyzer.get_excel_file_binary_data_from_dataframe()
+
+    def get_excel_filename(self, filterset_id):
+        name = FilterSet.objects.get(id=filterset_id).name
+        return name.lower().replace(' ', '_').strip() + '.xlsx'
 
 
-class GetChartForFailAnalysis(GetDataForFailChartBase):
+class GetChartByExceptionType(GetDataForFailChartBase):
 
     @swagger_auto_schema(
-        description="Generate barchart data of failed test runs from RP",
-        operation_description="Generate barchart data of failed test runs from RP",
+        description="Generate chart data of failed test runs from RP",
+        operation_description="Generate chart data of failed test runs from RP",
         manual_parameters=[
             fail_barchart_param_filterset,
-            fail_barchart_param_date_middle,
             fail_barchart_param_date_start,
             fail_barchart_param_date_end
         ],
@@ -285,15 +272,16 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
             status.HTTP_200_OK: fail_barchart_response_scheme,
             status.HTTP_400_BAD_REQUEST: ""
         },
-        tags=["stats", "FailBarchart"]
+        tags=["stats", "FailChart"]
     )
     def get(self, request):
         filterset_id = self._handle_filterset_id_in_request(self.request)
         if not filterset_id:
-            return Response("You need to provide filterset_id in query params!", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You need to specify filterset by id in query params!", status=status.HTTP_400_BAD_REQUEST)
         filters, fmtgs = self.parse_filters_and_fmtgs(filterset_id)
-        fail_message_dict = self.parse_failmessagetypes(ids_list=fmtgs)
-        data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
+        fail_message_dict = self.parse_failmessagetypes_and_get_fail_message_dict(fmtg_ids_list=fmtgs)
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        data = self.get_fail_chart_data(analyzer)
         return Response(data)
 
     @swagger_auto_schema(
@@ -301,7 +289,6 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
         operation_description="Generate barchart data of failed test runs from RP",
         request_body=filterset_detailed_filters_array_scheme,
         manual_parameters=[
-            fail_barchart_param_date_middle,
             fail_barchart_param_date_start,
             fail_barchart_param_date_end
         ],
@@ -310,11 +297,66 @@ class GetChartForFailAnalysis(GetDataForFailChartBase):
     )
     def post(self, request):
         fail_message_dict, filters = self.get_filters_and_failmessagetypes_from_post_data()
-        data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        data = self.get_fail_chart_data(analyzer)
         return Response(data)
 
+class GetExcelData(GetDataForFailChartBase):
 
-class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestRunsBasedOnQueryDictinctValues):
+    @swagger_auto_schema(
+        description="Get excel data from Reporting Portal's data",
+        operation_description="Get excel data from Reporting Portal's data",
+        manual_parameters=[
+            fail_barchart_param_filterset,
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end
+        ],
+        responses={
+            status.HTTP_200_OK: excel_response_scheme,
+            status.HTTP_400_BAD_REQUEST: ""
+        },
+        tags=["stats", "FailChart"]
+    )
+    def get(self, request):
+        filterset_id = self._handle_filterset_id_in_request(self.request)
+        if not filterset_id:
+            return Response("You need to specify filterset by id in query params!", status=status.HTTP_400_BAD_REQUEST)
+        filename = self.get_excel_filename(filterset_id)
+        filters, fmtgs = self.parse_filters_and_fmtgs(filterset_id)
+        fail_message_dict = self.parse_failmessagetypes_and_get_fail_message_dict(fmtg_ids_list=fmtgs)
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        analyzer.add_normalized_exception_data_column()
+        data = self.get_excel_data(analyzer)
+        return HttpResponse(
+            data, 
+            headers={'Content-Disposition': f'attachment; filename={filename}'}, 
+            content_type='application/vnd.ms-excel'
+        )
+
+    @swagger_auto_schema(
+        description="Get excel data from Reporting Portal's data",
+        operation_description="Get excel data from Reporting Portal's data",
+        request_body=filterset_detailed_filters_array_scheme,
+        manual_parameters=[
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end
+        ],
+        responses={status.HTTP_200_OK: excel_response_scheme},
+        tags=["stats", "FailBarchart"]
+    )
+    def post(self, request):
+        fail_message_dict, filters = self.get_filters_and_failmessagetypes_from_post_data()
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        analyzer.add_normalized_exception_data_column()
+        data = self.get_excel_data(analyzer)
+        return HttpResponse(
+            data, 
+            headers={'Content-Disposition': 'attachment; filename=report.xlsx'}, 
+            content_type='application/vnd.ms-excel'
+        )
+
+
+class AllSubscribedTestSetFiltersBase(GetDataForFailChartBase):
     def _handle_limit_in_request(self, request):
         return request.query_params.get("limit", None)
 
@@ -322,7 +364,7 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
         fmtgs = request.query_params.get("fail_message_type_groups", [])
         if fmtgs:
             fmtgs = [int(value) for value in fmtgs.split(",")]
-        return self.parse_failmessagetypes(ids_list=fmtgs), fmtgs
+        return self.parse_failmessagetypes_and_get_fail_message_dict(fmtg_ids_list=fmtgs), fmtgs
 
     def prepare_filters_for_users_all_subs_regfilters(self):
         def _parse_branches(branches):
@@ -334,7 +376,7 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
                     branches_new.append(f"SBTS{branch}")
             return branches_new
 
-        fields_dict = self.get_distinct_values_based_on_subscribed_regfilters()
+        fields_dict = utils.get_distinct_values_based_on_subscribed_regfilters(self.request.user)
         test_sets =      [elem["pk"] for elem in fields_dict["test_set_name"]]
         testline_types = [elem["pk"] for elem in fields_dict["testline_type"]]
         branches =       [elem["pk"] for elem in fields_dict["branch"]]
@@ -357,11 +399,25 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
             setattr(obj, "value", value)
             obj.save()
 
+    def get_fail_message_dict_and_filters(self):
+        fail_message_dict, _fmtgs = self.prepare_failmessagetypes_for_users_all_subs_regfilters(self.request)
+        limit = self._handle_limit_in_request(self.request)
+        filters = self.prepare_filters_for_users_all_subs_regfilters()
+        if _fmtgs:
+            filters["fail_message_type_groups"] = ",".join([str(s) for s in _fmtgs])
+        if limit:
+            filters["limit"] = limit
+        self.handle_creation_or_update_of_users_allsubs_filterset(filters)
+        filters.pop('fail_message_type_groups', None)
+        return fail_message_dict, filters
+
+
+class GetChartByExceptionTypeForAllSubscribedTestSetFilters(AllSubscribedTestSetFiltersBase):
+
     @swagger_auto_schema(
         description="Generate barchart data of failed test runs from RP based on your subscribed TestSetFilter objects",
         operation_description="Generate barchart data of failed test runs from RP based on your subscribed TestSetFilter objects",
         manual_parameters=[
-            fail_barchart_param_date_middle,
             fail_barchart_param_date_start,
             fail_barchart_param_date_end,
             fail_barchart_param_limit,
@@ -370,20 +426,40 @@ class GetFailChartForUsersAllSubscribedRegFilters(GetDataForFailChartBase, TestR
         responses={
             status.HTTP_200_OK: fail_barchart_response_scheme
         },
-        tags=["stats", "FailBarchart"]
+        tags=["stats", "FailChart"]
     )
     def get(self, request):
-        fail_message_dict, _fmtgs = self.prepare_failmessagetypes_for_users_all_subs_regfilters(request)
-        limit = self._handle_limit_in_request(request)
-        filters = self.prepare_filters_for_users_all_subs_regfilters()
-        if _fmtgs:
-            filters["fail_message_type_groups"] = ",".join([str(s) for s in _fmtgs])
-        if limit:
-            filters["limit"] = limit
-        self.handle_creation_or_update_of_users_allsubs_filterset(filters)
-        filters.pop('fail_message_type_groups', None)
-        data = self.init_analyzer_and_get_chart_data(fail_message_dict, filters)
+        fail_message_dict, filters = self.get_fail_message_dict_and_filters()
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        data = self.get_fail_chart_data(analyzer)
         return Response(data)
+
+class GetExcelDataForAllSubscribedTestSetFilters(AllSubscribedTestSetFiltersBase):
+
+    @swagger_auto_schema(
+        description="Generate excel file from data from RP based on your subscribed TestSetFilter objects",
+        operation_description="Generate excel file from data from RP based on your subscribed TestSetFilter objects",
+        manual_parameters=[
+            fail_barchart_param_date_start,
+            fail_barchart_param_date_end,
+            fail_barchart_param_limit,
+            fail_barchart_param_fail_message_type_groups
+        ],
+        responses={
+            status.HTTP_200_OK: fail_barchart_response_scheme
+        },
+        tags=["stats", "FailChart"]
+    )
+    def get(self, request):
+        fail_message_dict, filters = self.get_fail_message_dict_and_filters()
+        analyzer = self.init_analyzer(fail_message_dict, filters)
+        analyzer.add_normalized_exception_data_column()
+        data = self.get_excel_data(analyzer)
+        return HttpResponse(
+            data, 
+            headers={'Content-Disposition': 'attachment; filename=report.xlsx'}, 
+            content_type='application/vnd.ms-excel'
+        )
 
 
 

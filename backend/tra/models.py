@@ -90,7 +90,7 @@ class Notification(models.Model):
     message = models.TextField(blank=False, null=False, help_text="Message contents")
     read = models.BooleanField(blank=True, default=False,  help_text="Indication if the message was read by the user")
     date = models.DateTimeField(help_text="Date of message")
-    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="notifications")
 
 
 class LastPassingLogs(models.Model):

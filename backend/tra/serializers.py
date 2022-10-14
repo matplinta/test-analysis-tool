@@ -10,12 +10,19 @@ from .models import (
     EnvIssueType, 
     FailMessageType,
     FeatureBuild,
-    LastPassingLogs
+    LastPassingLogs,
+    Notification
 )
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from backend.serializers import UserSerializer
 
+
+class NotificationSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.username", read_only=True)
+    class Meta:
+        model = Notification
+        fields = ('id', 'message', 'read', 'user', 'date')
 
 class FailMessageTypeSerializer(serializers.ModelSerializer):
     author = serializers.CharField(read_only=True, default=serializers.CurrentUserDefault())
