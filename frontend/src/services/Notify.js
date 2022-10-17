@@ -53,7 +53,7 @@ export const AlertTypes = Object.freeze({
 });
 
 export const Successes = {
-    'LOGIN': 'User was logged in succesfully',
+    'LOGIN': 'User was logged in successfully',
     'ADD_TEST_SET_FILTER': 'Test Set Filter added successfully!',
     'EDIT_TEST_SET_FILTER': 'Test Set Filter edited successfully!',
     'REMOVE_GLOBAL_FILTER_SUCCESS': 'Global filter removed successfully!',
@@ -63,21 +63,21 @@ export const Successes = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter were unsubscribed successfully!',
     'TEST_SET_FILTER_DELETED': 'Test set filter was removed successfully!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was edited successfully!',
-    'BRANCH_OFF': 'Branch Off performed succesfully!',
-    'EDIT_FAIL_MESSAGE_REGEX': 'Fail Message Regex edited succesfully!',
-    'ADD_FAIL_MESSAGE_REGEX': 'Fail Message Regex added succesfully!',
-    'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!',
-    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!',
-    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created succesfully!',
-    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited succesfully!',
-    'ANALYSE_TEST_RUN': 'Test runs was analyzed succesfully!'
+    'BRANCH_OFF': 'Branch Off performed successfully!',
+    'EDIT_FAIL_MESSAGE_REGEX': 'Fail Message Regex edited successfully!',
+    'ADD_FAIL_MESSAGE_REGEX': 'Fail Message Regex added successfully!',
+    'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed successfully!',
+    'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed successfully!',
+    'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created successfully!',
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited successfully!',
+    'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!'
 }
 
 export const Errors = {
     'LOGIN': 'Error during user login!',
     'LOGOUT': 'Error during user logout!',
     'REMOVE_GLOBAL_FILTER_ERROR': 'Error during global filter removing!',
-    'ADD_TEST_SET_FILTER': 'Error during Test Sert filter add!',
+    'ADD_TEST_SET_FILTER': 'Error during Test Set filter add!',
     'EDIT_TEST_SET_FILTER': 'Error during Test Set filter edit!',
     'FETCH_EDIT_TEST_SET_FILTER': 'Error during fetching Test Set Filter to edit!',
     'GET_TEST_RUNS': "Cannot get test runs!",
@@ -89,12 +89,12 @@ export const Errors = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter was not unsubscribed!',
     'TEST_SET_FILTERS_DELETED': 'Test set filters were not removed!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
-    'GET_TEST_SET_FILTER': 'Test set filters were not loaded succesfully!',
+    'GET_TEST_SET_FILTER': 'Test set filters were not loaded successfully!',
     'GET_BRANCHES': 'Error during fetching branches!',
-    'BRANCH_OFF': 'Error during pewrforming Branch Off!',
+    'BRANCH_OFF': 'Error during peerforming Branch Off!',
     'FETCH_USERS_LIST': 'Error during users fetching!',
     'FETCH_FAIL_MESSAGE_GROUPS_LIST': 'Error during Fail Messages Type Groups fetching!',
-    'FETCH_TEST_LINES_LIST': 'Error during Testlines Types fetching!',
+    'FETCH_TEST_LINES_LIST': 'Error during Test Lines Types fetching!',
     'EDIT_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex editing!',
     'ADD_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex adding!',
     'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',
@@ -108,11 +108,11 @@ export const Errors = {
     'FETCH_TEST_SET_FILTERS_BRANCHED': 'Error during fetching test set filters for selected branch!',
     'FETCH_TEST_SET_FILTERS': 'Error during fetching test set filters!',
     'FETCH_ENV_ISSUE_TYPES': 'Error during fetching environment issue types!',
-    'ANALYSE_TEST_RUN': 'Error durig setting test run as environment issue!'
+    'ANALYSE_TEST_RUN': 'Error during setting test run as environment issue!'
 }
 
 export const Warnings = {
-    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!!',
+    'RP_URL_No_RUN_SELECTED': 'No runs were selected in test run table!',
     'BRANCH_OFF': 'Please select new branch!',
     'EDIT_TEST_SET_FILTER_ANY_OWNER': 'There must be at least one owner for Test Set Filter'
 }
