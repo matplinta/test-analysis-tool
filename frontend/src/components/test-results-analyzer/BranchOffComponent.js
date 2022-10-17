@@ -43,7 +43,6 @@ const BranchOffComponent = () => {
     let fetchBranches = () => {
         getBranches().then(
             (response) => {
-                console.log(response)
                 let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '')
                 let branchesParsed = branchesTmp.map(branch => ({ "name": branch.name, "value": branch.name }))
                 setBranches(branchesParsed);
@@ -58,7 +57,6 @@ const BranchOffComponent = () => {
         setLoading(true);
         getTestSetFiltersBranched(branch).then(
             (response) => {
-                console.log(response)
                 let parsedTestSetFilters = response.data.map((filter) => {
                     return {
                         "id": filter.id,
@@ -76,7 +74,7 @@ const BranchOffComponent = () => {
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.FETCH_TEST_SET_FILTERS_BRANCHED, AlertTypes.error);
                 setLoading(false);
             }
         )

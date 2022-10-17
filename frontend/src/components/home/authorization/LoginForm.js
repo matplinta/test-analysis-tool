@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import { Button } from 'primereact/button';
 
 import AuthService from "../../../services/auth.service.js";
+import Notify, { AlertTypes, Errors, Successes } from '../../../services/Notify';
 
 let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
 
@@ -22,7 +23,7 @@ let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
                     setPassword('');
                 })
         } catch (err) {
-            console.log(err);
+            Notify.sendNotification(Errors.LOGIN, AlertTypes.error);
         }
     }
 
@@ -47,10 +48,6 @@ let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control required value={password} onChange={handleInputChange} type="password" placeholder="Enter password" />
             </Form.Group>
-
-            {/* <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Remember my login on this" />
-            </Form.Group> */}
 
             <Button className="p-button-primary" type="submit">
                 Log in

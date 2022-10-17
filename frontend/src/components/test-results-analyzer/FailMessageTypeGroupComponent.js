@@ -6,6 +6,7 @@ import { TreeTable } from 'primereact/treetable';
 import { ToggleButton } from 'primereact/togglebutton';
 
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import "./FailMessageTypeGroupComponent.css";
 
@@ -63,7 +64,7 @@ let FailMessageTypeGroupComponent = () => {
 
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.error);
                 setLoading(false);
             }
         )

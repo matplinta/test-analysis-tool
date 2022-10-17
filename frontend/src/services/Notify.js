@@ -53,6 +53,7 @@ export const AlertTypes = Object.freeze({
 });
 
 export const Successes = {
+    'LOGIN': 'User was logged in succesfully',
     'ADD_TEST_SET_FILTER': 'Test Set Filter added successfully!',
     'EDIT_TEST_SET_FILTER': 'Test Set Filter edited successfully!',
     'REMOVE_GLOBAL_FILTER_SUCCESS': 'Global filter removed successfully!',
@@ -68,10 +69,13 @@ export const Successes = {
     'REMOVE_FAIL_MESSAGE_REGEX': 'Fail Message Regex removed succesfully!',
     'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed succesfully!',
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created succesfully!',
-    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited succesfully!'
+    'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited succesfully!',
+    'ANALYSE_TEST_RUN': 'Test runs was analyzed succesfully!'
 }
 
 export const Errors = {
+    'LOGIN': 'Error during user login!',
+    'LOGOUT': 'Error during user logout!',
     'REMOVE_GLOBAL_FILTER_ERROR': 'Error during global filter removing!',
     'ADD_TEST_SET_FILTER': 'Error during Test Sert filter add!',
     'EDIT_TEST_SET_FILTER': 'Error during Test Set filter edit!',
@@ -85,6 +89,7 @@ export const Errors = {
     'TEST_SET_FILTER_UNSUBSCRIBED': 'Test set filter was not unsubscribed!',
     'TEST_SET_FILTERS_DELETED': 'Test set filters were not removed!',
     'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
+    'GET_TEST_SET_FILTER': 'Test set filters were not loaded succesfully!',
     'GET_BRANCHES': 'Error during fetching branches!',
     'BRANCH_OFF': 'Error during pewrforming Branch Off!',
     'FETCH_USERS_LIST': 'Error during users fetching!',
@@ -94,11 +99,16 @@ export const Errors = {
     'ADD_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex adding!',
     'REMOVE_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex removing!',
     'FETCH_FAIL_MESSAGE_REGEX': 'Error during Fail Message Regex fetching!',
+    'FETCH_FAIL_MESSAGE_REGEX_GROUP': 'Error during fetching Fail Message Regex Groups!',
     'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group removing!',
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group creating!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group editing!',
     'FETCH_SUMMARY': 'Error during fetching summary for the latest feature build!',
-    'FETCH_TEST_INSTANCES': 'Error during fetching test instances!'
+    'FETCH_TEST_INSTANCES': 'Error during fetching test instances!',
+    'FETCH_TEST_SET_FILTERS_BRANCHED': 'Error during fetching test set filters for selected branch!',
+    'FETCH_TEST_SET_FILTERS': 'Error during fetching test set filters!',
+    'FETCH_ENV_ISSUE_TYPES': 'Error during fetching environment issue types!',
+    'ANALYSE_TEST_RUN': 'Error durig setting test run as environment issue!'
 }
 
 export const Warnings = {

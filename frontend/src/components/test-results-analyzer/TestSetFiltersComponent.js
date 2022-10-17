@@ -75,7 +75,7 @@ let TestSetFiltersComponent = ({ type }) => {
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.GET_TEST_SET_FILTER, AlertTypes.error);
                 setLoading(false);
             }
         )
@@ -216,7 +216,7 @@ let TestSetFiltersComponent = ({ type }) => {
             (response) => {
                 setSelectedTestFilters([]);
                 fetchTestSetFilters(type);
-                Notify.sendNotification(Successes.TEST_SET_FILTERS_DELETED, AlertTypes.success);
+                Notify.sendNotification(Successes.TEST_SET_FILTER_DELETED, AlertTypes.success);
             }, (error) => {
                 Notify.sendNotification(Errors.TEST_SET_FILTERS_DELETED, AlertTypes.error);
             }
@@ -235,13 +235,15 @@ let TestSetFiltersComponent = ({ type }) => {
                 <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
             </Button>
             {type !== "subscribed" ?
-                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={sunscribeSelectedTestFilters}>
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm"
+                    onClick={sunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>
                     <BiBell size='20' />
                     <span style={{ marginLeft: '5px' }}>Subscribe selected</span>
                 </Button>
                 : null
             }
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm" onClick={unsunscribeSelectedTestFilters}>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm"
+                onClick={unsunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>
                 <BiBellOff size='20' />
                 <span style={{ marginLeft: '5px' }}>Unsubscribe selected</span>
             </Button>

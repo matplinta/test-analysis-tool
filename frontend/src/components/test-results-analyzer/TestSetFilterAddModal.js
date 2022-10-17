@@ -69,7 +69,6 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     }
 
     let fetchUsers = () => {
-        console.log("uzytkownik ", currentUser)
         AuthService.getUsers().then(
             (response) => {
                 if (response.data.length > 0) {

@@ -4,6 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
 import { getFailMessageTypes } from '../../services/test-results-analyzer/fail-message-type.service';
+import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 import './FailMessagesTableComponent.css';
 
@@ -21,20 +22,21 @@ const FailMessagesTableComponent = ({ selectedFailMessageTypes, setSelectedFailM
 
     const [loading, setLoading] = useState(true);
 
-    let fetchTestSetFilters = () => {
+    let fetchFailRegexTypes = () => {
         getFailMessageTypes().then(
             (response) => {
                 setFailRegexTypes(response.data);
                 setLoading(false);
             },
             (error) => {
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_REGEX, AlertTypes.error);
                 setLoading(false);
             }
         )
     }
 
     useEffect(() => {
-        fetchTestSetFilters();
+        fetchFailRegexTypes();
     }, [])
 
     return (

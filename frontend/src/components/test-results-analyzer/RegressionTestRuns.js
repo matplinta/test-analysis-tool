@@ -252,8 +252,7 @@ let RegressionTestRuns = () => {
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
-                Notify.sendNotification(Errors.GET_TEST_RUNS, AlertTypes.error);
+                Notify.sendNotification(Errors.GET_TEST_RUNS_FILTERS, AlertTypes.error);
                 setLoading(false);
             }
         )

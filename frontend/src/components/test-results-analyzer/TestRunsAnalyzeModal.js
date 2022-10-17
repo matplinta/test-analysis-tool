@@ -8,6 +8,8 @@ import { Tag } from 'primereact/tag';
 
 import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
+import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
+
 
 const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) => {
 
@@ -23,7 +25,7 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
                 setEnvIssueTypesList(data);
             },
             (error) => {
-                console.log("Error");
+                Notify.sendNotification(Errors.FETCH_ENV_ISSUE_TYPES, AlertTypes.error);
             })
     }
 
@@ -41,12 +43,12 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
         }
         postTestRun(testRunToUpdate).then(
             (success) => {
-                console.log("Success!")
                 clearForm();
                 handleFormCloseAndRefresh();
+                Notify.sendNotification(Successes.ANALYSE_TEST_RUN, AlertTypes.success);
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.ANALYSE_TEST_RUN, AlertTypes.error);
             })
     }
 

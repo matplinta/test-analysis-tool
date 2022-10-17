@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 import { RiErrorWarningLine } from "react-icons/ri";
 
 import AuthService from "../../../services/auth.service.js";
+import Notify, { AlertTypes, Errors } from "../../../services/Notify.js";
 
 import './LoginComponent.css';
 
@@ -22,10 +23,10 @@ let LogoutComponent = ({ handleSuccess }) => {
                     navigate({ pathname: "" });
                 },
                 (error) => {
-                    console.log(error)
+                    Notify.sendNotification(Errors.LOGOUT, AlertTypes.error);
                 })
         } catch (err) {
-            console.log(err);
+            Notify.sendNotification(Errors.LOGOUT, AlertTypes.error);
         }
     }
 
