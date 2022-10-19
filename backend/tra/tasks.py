@@ -19,24 +19,24 @@ if settings.DEBUG is False:
     @app.on_after_finalize.connect
     def setup_periodic_tasks(sender, **kwargs):
         sender.add_periodic_task(crontab(hour=18, day_of_week=3), celery_remove_old_feature_builds.s(), name='Delete older than last 3 FBs')
-        sender.add_periodic_task(crontab(minute=30, hour="*/6"), 
+        sender.add_periodic_task(crontab(minute=30, hour="*/4"), 
                                  celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
                                  name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
-        sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
-                                 celery_remove_old_passed_logs_from_log_storage.s(), 
-                                 name='celery_remove_old_passed_logs_from_log_storage')
-        sender.add_periodic_task(crontab(minute=0, hour="20"), 
+        sender.add_periodic_task(crontab(minute=15, hour="*/4"), 
                                  celery_pull_passed_testruns_by_all_testset_filters.s(), 
                                  name='celery_pull_passed_testruns_by_all_testset_filters')
         sender.add_periodic_task(crontab(minute=0, hour="21"), 
                                  celery_download_latest_passed_logs_to_storage.s(), 
                                  name='celery_download_latest_passed_logs_to_storage')
-        sender.add_periodic_task(crontab(minute=5, hour="*/8"), 
+        sender.add_periodic_task(crontab(minute=50, hour="*/4"), 
                                  celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
                                  name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
-        sender.add_periodic_task(crontab(minute=35, hour="*/8"), 
+        sender.add_periodic_task(crontab(minute=45, hour="*/4"), 
                                  celery_sync_norun_data_of_all_test_instances.s(), 
                                  name='celery_sync_norun_data_of_all_test_instances')
+        sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
+                                 celery_remove_old_passed_logs_from_log_storage.s(), 
+                                 name='celery_remove_old_passed_logs_from_log_storage')
 
 
 @app.task()

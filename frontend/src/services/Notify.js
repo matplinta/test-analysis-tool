@@ -98,7 +98,10 @@ export const Errors = {
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group creating!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Error during Fail Message Regex Group editing!',
     'FETCH_SUMMARY': 'Error during fetching summary for the latest feature build!',
-    'FETCH_TEST_INSTANCES': 'Error during fetching test instances!'
+    'FETCH_TEST_INSTANCES': 'Error during fetching test instances!',
+    'FETCH_USER_MESSAGES': 'Error during fetching user\' messages!',
+    'DELETE_USER_MESSAGE': 'Error during deleting user\' message!',
+    'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!'
 }
 
 export const Warnings = {
