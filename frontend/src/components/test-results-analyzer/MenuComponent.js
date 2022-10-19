@@ -43,6 +43,13 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     }
 
+    let markAsReadMessage = (selMsg) => {
+        if (selMsg !== null && selMsg.read === false) {
+            selMsg.read = true
+            updateUserMessages(selMsg)
+        }
+    } 
+
     useEffect(() => {
         fetchUserMessages();
     }, [])
@@ -104,7 +111,6 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         <div style={{ display: 'flex' }}>
             <Button  className="p-button-sm p-button-primary" onClick={(e) => op.current.toggle(e)}>
                 <i className="pi pi-bell p-overlay-badge" style={{fontSize: '1.5rem'}}>
-                    {/* {unreadMsgs === null? null : <Badge value={unreadMsgs} severity="danger" ></Badge>} */}
                     {unreadMsgs === null || unreadMsgs === 0 ? null : <Badge value={unreadMsgs} severity="danger" ></Badge>}
                 </i>
             </Button>
@@ -128,8 +134,11 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         }
     }
 
-    let dateTemplate = (date) => {
-        return <div className="font-normal text-color-secondary" style={{fontSize: '0.8rem'}}>{date.replace('T', ' ').replace('Z', '')}</div>
+    let dateTemplate = (date, read) => {
+        return <div 
+            className={read ? "font-normal text-color-secondary" : "font-bold text-blue-500 "} 
+            style={{fontSize: '0.7rem'}}>{date.replace('T', ' ').replace('Z', '')}
+        </div>
     }
 
     let messageTemplate = (message, read) => {
@@ -137,19 +146,21 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         if (message.length > charLimit) {
             message = message.slice(0, charLimit) + '...'
         }
-        return <div className={read ? 'inline' : 'inline font-bold'} style={{textAlign: 'left', width: '100%'}}>{message}</div>
+        return <div className={read ? '' : 'font-bold'} style={{textAlign: 'left', width: '100%'}}>{message}</div>
     }
 
     let message_short_list = (msgs) => {
         return (
             <> 
                 {msgs.slice(0, 5).map(({ id, message, read, user, date }) => (
-                <div className="shortMsgItem p-2" key={id} onmouseover=""> 
-                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <div className="shortMsgItem p-2" key={id}> 
+                    <div className='msgAndDate'>
                     {messageTemplate(message, read)}
-                    {dateTemplate(date)}
+                    {dateTemplate(date, read)}
                     </div>
-                    {read === false ? <i className="pi pi-circle-fill ml-2 inline" style={{ color: 'var(--blue-500)', fontSize: '1.2rem'}}></i> : null}
+                    {read === false ? <div className='circle' onClick={() => markAsReadMessage({ id, message, read, user, date })}>
+                        <i className="pi pi-circle-fill mx-2" style={{ color: 'var(--blue-500)', fontSize: '1.2rem'}}></i>
+                        </div> : null}
                 </div>
             ))}
         </>
@@ -161,10 +172,13 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
             <Menubar model={items} start={start} end={end} className="menu" style={{ height: '55px' }} />
             <Outlet />
-            <OverlayPanel ref={op} style={{width: '450px'}} className="">
+            <OverlayPanel ref={op} style={{width: '500px'}} className="">
                 
                 {messages !== null ? message_short_list(messages) : null}
-                <Button label="Show all messages" className="p-button-sm p-button-primary" style={{width: '100%'}} onClick={() => navigate("messages")}>
+                <Button label="Show all messages" className="p-button-sm p-button-primary" style={{width: '100%'}} onClick={(e) => {
+                    op.current.hide(e)
+                    navigate("messages")
+                }}>
                 </Button>
             </OverlayPanel>
         </>
