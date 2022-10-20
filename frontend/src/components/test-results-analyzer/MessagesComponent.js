@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
-import { Link } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useUserMessages } from '../../services/UserMessagesContext';
@@ -11,7 +9,6 @@ import './MessagesComponent.css';
 
 const MessagesComponent = () => {
 
-    // const [messages, setMessages] = useState(null);
     const [selectedMessage, setSelectedMessage] = useState(null);
     const { messages, fetchUserMessages, updateUserMessages } = useUserMessages();
 

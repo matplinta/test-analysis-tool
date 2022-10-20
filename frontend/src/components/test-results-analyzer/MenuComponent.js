@@ -10,18 +10,11 @@ import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { DataScroller } from 'primereact/datascroller';
-
 import logo_TRA from './../../assets/logo_TRA.png';
-
 import GoToAdminComponent from './../home/GoToAdminComponent';
 import LogoutComponent from './../home/authorization/LogoutComponent';
 import LoginComponent from './../home/authorization/LoginComponent';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { useUserMessages } from '../../services/UserMessagesContext';
-
-import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../../services/Notify.js';
-
 import './MenuComponent.css';
 
 
@@ -30,7 +23,6 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     const navigate = useNavigate();
     const op = useRef(null)
 
-    const [selectedMessage, setSelectedMessage] = useState(null);
     const [unreadMsgs, setUnreadMsgs] = useState(null);
     const { messages, fetchUserMessages, updateUserMessages } = useUserMessages();
 

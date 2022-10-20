@@ -11,16 +11,6 @@
   color: white;
 }
 
-/* .p-menubar .p-menubar-root-list>.p-menuitem>.p-menuitem-link:not(.p-disabled):hover {
-  background-color: #2876c4;
-  color: white;
-} */
-
-.row-unread {
-  /* background-color: rgb(248, 227, 214) !important; */
-  font-weight: bold;
-}
-
 .shortMsgItem:hover {
   background: #e7e9f8;
 }

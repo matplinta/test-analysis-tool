@@ -1,6 +1,6 @@
 import React from "react";
 import { getUserMessages, setUserMessage } from '../services/test-results-analyzer/user.service';
-// import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../services/Notify.js';
+import Notify, { AlertTypes, Successes, Infos, Errors, Warnings } from '../services/Notify.js';
 
 
 export const UserMessagesContext = React.createContext();
@@ -15,8 +15,7 @@ export const UserMessagesProvider = ({ children }) => {
 
             },
             (error) => {
-                // Notify.sendNotification(Errors.FETCH_USER_MESSAGES, AlertTypes.error);
-                console.log("error")
+                Notify.sendNotification(Errors.FETCH_USER_MESSAGES, AlertTypes.error);
             }
         )
     }
@@ -28,8 +27,7 @@ export const UserMessagesProvider = ({ children }) => {
 
             },
             (error) => {
-                // Notify.sendNotification(Errors.FETCH_USER_MESSAGES, AlertTypes.error);
-                console.log("error")
+                Notify.sendNotification(Errors.UPDATE_USER_MESSAGE, AlertTypes.error);
             }
         )
     }
