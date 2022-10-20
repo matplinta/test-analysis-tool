@@ -4,8 +4,8 @@
 //   Date                    Author                     Bug                 List of changes
 //  --------------------------------------------------------------------------
 
-import { useState, useEffect, useRef } from 'react';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { useState, useEffect } from 'react';
+import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
@@ -13,7 +13,7 @@ import { Button } from 'primereact/button';
 import { RiGitBranchFill } from 'react-icons/ri';
 
 import { getTestSetFiltersBranched, getBranches } from './../../services/test-results-analyzer/test-filters.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 import BranchOffModal from './BranchOffModal';
 
 const BranchOffComponent = () => {
@@ -28,7 +28,7 @@ const BranchOffComponent = () => {
     const handleFormClose = () => setShowForm(false);
     const handleFormShow = () => setShowForm(true);
 
-    const [filters, setFilters] = useState({
+    const [filters] = useState({
         'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -43,7 +43,6 @@ const BranchOffComponent = () => {
     let fetchBranches = () => {
         getBranches().then(
             (response) => {
-                console.log(response)
                 let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '')
                 let branchesParsed = branchesTmp.map(branch => ({ "name": branch.name, "value": branch.name }))
                 setBranches(branchesParsed);
@@ -58,7 +57,6 @@ const BranchOffComponent = () => {
         setLoading(true);
         getTestSetFiltersBranched(branch).then(
             (response) => {
-                console.log(response)
                 let parsedTestSetFilters = response.data.map((filter) => {
                     return {
                         "id": filter.id,
@@ -76,7 +74,7 @@ const BranchOffComponent = () => {
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.FETCH_TEST_SET_FILTERS_BRANCHED, AlertTypes.error);
                 setLoading(false);
             }
         )
@@ -93,7 +91,6 @@ const BranchOffComponent = () => {
     }
 
     const makeBranchOff = () => {
-        console.log("???????/", selectedBranch)
         handleFormShow();
     }
 

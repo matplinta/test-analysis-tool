@@ -15,7 +15,6 @@ export const CurrentUserProvider = ({ children }) => {
 
     const fetchCurrentUser = () => {
         let response = JSON.parse(localStorage.getItem(getLocalStorageItemName()));
-        console.log(response)
         setCurrentUser(response.username);
     }
 

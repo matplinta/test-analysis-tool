@@ -11,14 +11,10 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
-import { AiOutlineClose } from 'react-icons/ai';
-import { GiCheckMark } from 'react-icons/gi';
-import { MdBlock } from 'react-icons/md';
-import { VscDebugStart } from 'react-icons/vsc';
-
+import { MdPauseCircle, MdPlayCircle } from 'react-icons/md';
 import { getTestInstancesByQuery } from './../../services/test-results-analyzer/test-instances.service';
 import { getBranches, getTestLineTypes } from './../../services/test-results-analyzer/test-filters.service';
-import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
+import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 
 import './TestInstanceComponent.css';
@@ -45,7 +41,7 @@ let TestInstancesComponent = () => {
         sortField: null,
         sortOrder: null,
         filters: {
-            "rp_id": { value: null, matchMode: 'contains' },
+            "rp_id__in": { value: null, matchMode: 'equal' },
             'test_case_name__icontains': { value: null, matchMode: 'contains' },
             'test_set__test_lab_path__icontains': { value: null, matchMode: 'contains' },
             'test_set__branch__name__icontains': { value: null, matchMode: 'contains' },
@@ -57,6 +53,8 @@ let TestInstancesComponent = () => {
             'no_run_in_rp': { value: null, matchMode: 'equal' }
         }
     });
+
+    let runStates = [{ label: 'NO RUN', value: true }, { label: "RUN", value: false }];
 
     let fetchTestInstancesByFilter = (lazyParams) => {
         setLoading(true);
@@ -70,6 +68,7 @@ let TestInstancesComponent = () => {
                 } else {
                     setTestInstances([]);
                     setLoading(false);
+                    setStateLoading(false);
                 }
             },
             (error) => {
@@ -138,14 +137,14 @@ let TestInstancesComponent = () => {
         const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/qc/?columns=suspended,m_path,test_set.name,name,status,last_passed.timestamp,test_lvl_area%2Csw_build&id=";
         const rpLink = rpUrl + rowData.rp_id;
         return (
-            <a href={rpLink} target="_blank" style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
+            <a href={rpLink} target="_blank" rel="noreferrer" style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
         )
     }
 
     let logLinkBodyTemplate = (rowData) => {
         if (rowData.last_passing_logs !== null) {
             return (
-                <a href={rowData.last_passing_logs.url} target="_blank" style={{ fontSize: '11px' }}>
+                <a href={rowData.last_passing_logs.url} target="_blank" rel="noreferrer" style={{ fontSize: '11px' }}>
                     {rowData.last_passing_logs.utecloud_run_id}
                 </a>
             )
@@ -153,36 +152,46 @@ let TestInstancesComponent = () => {
     }
 
     let noRunInRpBodyTemplate = (rowData) => {
-        if (!rowData.no_run_in_rp)
-            return <AiOutlineClose size='25' style={{ color: 'red' }} />
+        if (rowData.no_run_in_rp)
+            return <span style={{ color: 'red', fontWeight: 'bold', fontSize: '15px' }}>NO RUN</span>
         else
-            return <GiCheckMark size='25' style={{ color: 'green' }} />
+            return <span style={{ color: 'green', fontWeight: 'bold', fontSize: '15px' }}>RUN</span>
     }
 
     let suspendedBodyTemplate = (rowData) => {
         if (rowData.execution_suspended)
-            return <MdBlock size='25' style={{ color: 'red' }} />
+            return <MdPauseCircle size='35' style={{ color: 'red' }} />
         else
-            return <VscDebugStart size='25' style={{ color: 'green' }} />
+            return <MdPlayCircle size='35' style={{ color: 'green' }} />
     }
 
     const suspendedFilter = (options) => {
         return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
+    const runTemplate = (option) => {
+        if (option.value) {
+            return <div style={{ color: 'red', fontWeight: 'bold', fontSize: '15px' }}>{option.label}</div>
+        }
+        else {
+            return <div style={{ color: 'green', fontWeight: 'bold', fontSize: '15px' }}>{option.label}</div>
+        }
+    }
+
     const noRunInRpFilter = (options) => {
-        return <TriStateCheckbox value={options.value} onChange={(e) => options.filterApplyCallback(e.value)} />
+        return <Dropdown showClear
+            style={{ maxWidth: '200px' }} panelClassName="panel-style" itemTemplate={runTemplate}
+            value={options.value} options={runStates} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
     const testLineTypeFilter = (options) => {
-        return <Dropdown className="p-column-filter" showClear
+        return <Dropdown showClear
             style={{ maxWidth: '200px' }} panelClassName="panel-style"
             value={options.value} options={testLinesTypes} onChange={(e) => options.filterApplyCallback(e.value)} />
-
     }
 
     const branchTypeFilter = (options) => {
-        return <Dropdown className="p-column-filter dropdown-filter" showClear
+        return <Dropdown showClear
             style={{ maxWidth: '120px', fontSize: '5px' }} panelClassName="panel-style"
             value={options.value} options={branches} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
@@ -226,7 +235,7 @@ let TestInstancesComponent = () => {
 
                     <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id"
                         sortable sortField="rp_id"
-                        filterField="rp_id" filter
+                        filterField="rp_id__in" filter
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', width: '3%' }} />
 
@@ -268,19 +277,13 @@ let TestInstancesComponent = () => {
                     <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Passed AP"
                         style={{ fontSize: '11px', width: '4%' }} />
 
-                    <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed"
+                    <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed Logs"
                         sortable sortField="last_passing_logs__utecloud_run_id"
                         filter filterField="last_passing_logs__utecloud_run_id"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
 
-                    <Column field="organization" columnKey="organization" header="Organization"
-                        sortable
-                        filter filterField="organization"
-                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                        style={{ fontSize: '11px', width: '8%' }} />
-
-                    <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="Run in RP in FB"
+                    <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="RUN in RP in FB"
                         sortable sortField="no_run_in_rp"
                         filterField="no_run_in_rp" filterElement={noRunInRpFilter}
                         filter filterType="boolean"

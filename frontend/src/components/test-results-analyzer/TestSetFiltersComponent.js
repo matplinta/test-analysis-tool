@@ -4,12 +4,12 @@
 //   Date                    Author                     Bug                 List of changes
 //  --------------------------------------------------------------------------
 
-import { useState, useEffect, useRef } from 'react';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { useState, useEffect } from 'react';
+import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Button } from 'primereact/button';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
 import { VscExpandAll } from 'react-icons/vsc';
 import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
 import { MdAddCircle } from 'react-icons/md';
@@ -17,7 +17,7 @@ import { BiEdit } from 'react-icons/bi';
 
 import UserFilterAddModal from './TestSetFilterAddModal';
 import {
-    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters, deleteTestSetFilter,
+    postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters,
     postTestSetFilterSubscribe, postTestSetFilterUnsubscribe, deleteTestSetFilterBatch
 } from '../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
@@ -41,7 +41,7 @@ let TestSetFiltersComponent = ({ type }) => {
     const handleFormClose = () => setShowForm(false);
     const handleFormShow = () => setShowForm(true);
 
-    const [filters, setFilters] = useState({
+    const [filters] = useState({
         'test_set_name': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -75,25 +75,11 @@ let TestSetFiltersComponent = ({ type }) => {
                 setLoading(false);
             },
             (error) => {
-                console.log(error);
+                Notify.sendNotification(Errors.GET_TEST_SET_FILTER, AlertTypes.error);
                 setLoading(false);
             }
         )
     }
-
-    let removeUserFilter = (id) => {
-        deleteTestSetFilter(id).then(
-            (response) => {
-                let testFiltersList = testFilters.map(testFilter => testFilter.id !== id)
-                fetchTestSetFilters();
-                Notify.sendNotification(Successes.REMOVE_GLOBAL_FILTER_SUCCESS, AlertTypes.success);
-
-            },
-            (error) => {
-                Notify.sendNotification(Errors.REMOVE_GLOBAL_FILTER_ERROR, AlertTypes.error);
-            })
-    }
-
 
     let handleTestSetFormCloseAndRefresh = () => {
         handleFormClose();
@@ -147,7 +133,7 @@ let TestSetFiltersComponent = ({ type }) => {
                     if (testFilter.id === rowData.id) {
                         let subscribersTmp = testFilter.subscribers;
                         subscribersTmp = subscribersTmp.replace(currentUser, ',').replace(', ,', '').replace(', ,,', '');
-                        if (subscribersTmp == ',') subscribersTmp = subscribersTmp.replace(',', '');
+                        if (subscribersTmp === ',') subscribersTmp = subscribersTmp.replace(',', '');
                         testFilter.subscribers = subscribersTmp;
                     }
                     return testFilter;
@@ -190,7 +176,6 @@ let TestSetFiltersComponent = ({ type }) => {
 
     const selectSelectedTestFilters = (selectedTestFiltersValue) => {
         setSelectedTestFilters(selectedTestFiltersValue);
-        console.log(selectedTestFilters)
     }
 
     const sunscribeSelectedTestFilters = () => {
@@ -231,7 +216,7 @@ let TestSetFiltersComponent = ({ type }) => {
             (response) => {
                 setSelectedTestFilters([]);
                 fetchTestSetFilters(type);
-                Notify.sendNotification(Successes.TEST_SET_FILTERS_DELETED, AlertTypes.success);
+                Notify.sendNotification(Successes.TEST_SET_FILTER_DELETED, AlertTypes.success);
             }, (error) => {
                 Notify.sendNotification(Errors.TEST_SET_FILTERS_DELETED, AlertTypes.error);
             }
@@ -250,18 +235,20 @@ let TestSetFiltersComponent = ({ type }) => {
                 <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
             </Button>
             {type !== "subscribed" ?
-                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={sunscribeSelectedTestFilters}>
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm"
+                    onClick={sunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>
                     <BiBell size='20' />
                     <span style={{ marginLeft: '5px' }}>Subscribe selected</span>
                 </Button>
                 : null
             }
-            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm" onClick={unsunscribeSelectedTestFilters}>
+            <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-secondary p-button-sm"
+                onClick={unsunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>
                 <BiBellOff size='20' />
                 <span style={{ marginLeft: '5px' }}>Unsubscribe selected</span>
             </Button>
             {type === "owned" ?
-                < Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-danger p-button-sm" onClick={confirmRemove}>
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-danger p-button-sm" onClick={confirmRemove}>
                     <BiTrash size='20' />
                     <span style={{ marginLeft: '5px' }}>Remove selected</span>
                 </Button>
@@ -290,6 +277,7 @@ let TestSetFiltersComponent = ({ type }) => {
             </DataTable>
 
             <UserFilterAddModal filterIdToEdit={filterIdToEdit} showForm={showForm} handleFormClose={handleTestSetFormCloseAndRefresh} handleFormShow={handleFormShow} />
+            <ConfirmDialog />
         </>
     )
 }

@@ -1,24 +1,21 @@
 import { useEffect, useState } from "react";
 
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
 import { Tag } from 'primereact/tag';
-import { Tooltip } from 'primereact/tooltip';
 
 import { getEnvIssueTypes } from './../../services/test-results-analyzer/fail-message-type.service';
 import { postTestRun } from "../../services/test-results-analyzer/test-runs.service";
+import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
+
 
 const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) => {
 
-    const [result, setResult] = useState(null);
     const [envIssueType, setEnvIssueType] = useState(null);
     const [comment, setComment] = useState("");
 
-    const [resultsList, setResultsList] = useState([]);
     const [envIssueTypesList, setEnvIssueTypesList] = useState([]);
 
     const fetchEnvIssueTypes = () => {
@@ -28,12 +25,11 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
                 setEnvIssueTypesList(data);
             },
             (error) => {
-                console.log("Error");
+                Notify.sendNotification(Errors.FETCH_ENV_ISSUE_TYPES, AlertTypes.error);
             })
     }
 
     const clearForm = () => {
-        setResult(null);
         setEnvIssueType(null);
         setComment("");
     }
@@ -45,15 +41,14 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
             'result': "environment issue",
             'env_issue_type': envIssueType
         }
-        console.log(testRunToUpdate)
         postTestRun(testRunToUpdate).then(
             (success) => {
-                console.log("Success!")
                 clearForm();
                 handleFormCloseAndRefresh();
+                Notify.sendNotification(Successes.ANALYSE_TEST_RUN, AlertTypes.success);
             },
             (error) => {
-                console.log("Error!")
+                Notify.sendNotification(Errors.ANALYSE_TEST_RUN, AlertTypes.error);
             })
     }
 
@@ -63,9 +58,7 @@ const TestRunsAnalyzeModal = ({ selectedTestRuns, showForm, handleFormClose }) =
     }
 
     useEffect(() => {
-        console.log("otwieram okno")
         fetchEnvIssueTypes();
-        console.log(selectedTestRuns)
     }, [])
 
     return (

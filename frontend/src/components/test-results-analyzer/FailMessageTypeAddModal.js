@@ -5,6 +5,7 @@
 //  --------------------------------------------------------------------------
 
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
@@ -13,7 +14,7 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
 
 import { postFailMessageType, getEnvIssueTypes, putFailMessageType } from './../../services/test-results-analyzer/fail-message-type.service';
-import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
+import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
 
 import './FailMessageTypeAddModal.css';
 

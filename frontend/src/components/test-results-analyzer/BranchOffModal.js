@@ -6,19 +6,13 @@
 
 import { useEffect, useState } from "react";
 
-import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { SelectButton } from 'primereact/selectbutton';
-import { Tag } from 'primereact/tag';
-import { Tooltip } from 'primereact/tooltip';
 import { Checkbox } from 'primereact/checkbox';
 
 import { getBranches, postBranchOff } from './../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
-import { AiFillEdit } from "react-icons/ai";
 
 
 const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, oldBranch }) => {
@@ -32,7 +26,6 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, old
     let fetchBranches = () => {
         getBranches().then(
             (response) => {
-                console.log(oldBranch)
                 let branchesTmp = response.data.filter(branch => branch.name !== 'Trunk' && branch.name !== '' && branch.name !== oldBranch)
                 let branchesParsed = branchesTmp.map(branch => ({ "name": branch.name, "value": branch.name }))
                 setBranches(branchesParsed);

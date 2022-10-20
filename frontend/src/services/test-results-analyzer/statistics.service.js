@@ -20,12 +20,17 @@ export const postFilters = async (filters) => {
 }
 
 export const postFilterSetsDetail = async (filtersets) => {
-    return (await axios.post('/api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
+    return (await axios.post('api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
 }
 
 export const getFilterSetsDetail = async () => {
     return (await axios.get('api/tra/stats/filtersets_detailed', { headers: authHeader() }));
 }
+
 export const getUserSummary = async () => {
     return (await axios.get('api/tra/summary/', { headers: authHeader() }));
+}
+
+export const deleteFilterSetsDetail = async (id) => {
+    return (await axios.delete('api/tra/stats/filtersets_detailed/' + id, { headers: authHeader() }));
 }
