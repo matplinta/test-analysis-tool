@@ -157,13 +157,14 @@ let ChartsComponent = () => {
                 let filterSetToSendAll = { "name": filtersetName, "filters": filtersList }
                 console.log(filterSetToSendAll)
                 postFilterSetsDetail(filterSetToSendAll).then(
-                    (success => {
+                    (success) => {
                         console.log("success", success)
                         Notify.sendNotification(Successes.ADD_FILTER_SET, AlertTypes.success);
                         fetchFilterSets();
                     }, (error) => {
+                        console.log("error", error)
                         Notify.sendNotification(Errors.ADD_FILTER_SET, AlertTypes.error);
-                    }))
+                    })
             } else {
                 Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
             }

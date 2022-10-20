@@ -20,7 +20,7 @@ export const postFilters = async (filters) => {
 }
 
 export const postFilterSetsDetail = async (filtersets) => {
-    return (await axios.post('/api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
+    return (await axios.post('api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
 }
 
 export const getFilterSetsDetail = async () => {
