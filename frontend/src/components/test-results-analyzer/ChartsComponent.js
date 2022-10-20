@@ -20,11 +20,15 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { ScrollPanel } from 'primereact/scrollpanel';
+import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
+import { FaRegTrashAlt } from 'react-icons/fa';
 
-import { getFilterFields, postFilterSetsDetail, getFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import { getFilterFields, postFilterSetsDetail, getFilterSetsDetail, deleteFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 import './ChartsComponent.css';
+import { Successes } from '../../services/Notify';
 
 
 let ChartsComponent = () => {
@@ -40,7 +44,6 @@ let ChartsComponent = () => {
     const [loading, setLoading] = useState(true);
 
     const filterTemplate = {
-        // filter_set: filtersetName,
         field: "",
         value: ""
     }
@@ -49,6 +52,8 @@ let ChartsComponent = () => {
 
     const [displayAlert, setDisplayAlert] = useState(false)
 
+    const { currentUser, fetchCurrentUser } = useCurrentUser();
+
     const addFilter = () => {
         setFilters([...filters, filterTemplate])
     }
@@ -56,7 +61,7 @@ let ChartsComponent = () => {
     const fetchFilterFields = () => {
         getFilterFields().then(
             (results) => {
-                setFilterFields(results.data);
+                setFilterFields(results.data.map(item => item.name));
                 setUnselectedFilterFields(results.data);
             }, (error) => {
 
@@ -74,8 +79,7 @@ let ChartsComponent = () => {
     }
 
     const onFilterChange = (item, index, e) => {
-
-        if (selectedFilterFields.filter(selectedFilter => selectedFilter.field.id === e.value.id).length > 0) {
+        if (selectedFilterFields.filter(selectedFilter => selectedFilter.field === e.value).length > 0) {
             setDisplayAlert(true)
         } else {
             let tmp = [...filters]
@@ -127,29 +131,41 @@ let ChartsComponent = () => {
 
     const selectFilterSet = (filterSet) => {
         setSelectedFilterSet(filterSet)
+        setFiltersetName(filterSet.name);
+        setFilters(filterSet.filters);
+        // setFilters(filterSet.filters);
+
+    }
+
+    const preapreFiltersListToAdd = () => {
+        let filtersList = [];
+        for (let filter of filters) {
+            if (filter.field !== "" && filter.value !== "") {
+                let filterSetTmp = {};
+                filterSetTmp.value = filter.value;
+                filterSetTmp.field = filter.field;
+                filtersList.push(filterSetTmp);
+            }
+        }
+        return filtersList;
     }
 
     const saveFilterSet = () => {
         if (filtersetName !== "") {
-            let filterSetsToSend = [];
-            for (let filter of filters) {
-                if (filter.field !== "" && filter.value !== "") {
-                    let filterSetTmp = {};
-                    // filterSetTmp.filter_set = filtersetName;
-                    filterSetTmp.value = filter.value;
-                    filterSetTmp.field = filter.field.name;
-                    filterSetsToSend.push(filterSetTmp);
-                    let filterSetToSendAll = { "name": filtersetName, "filters": filterSetsToSend }
-                    postFilterSetsDetail(filterSetToSendAll).then(
-                        (result => {
-                            console.log("success")
-                        }, (error) => {
-                            console.log("error")
-                        }))
-                } else {
-                    filterSetsToSend = [];
-                    Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
-                }
+            let filtersList = preapreFiltersListToAdd();
+            if (filtersList.length === filters.length) {
+                let filterSetToSendAll = { "name": filtersetName, "filters": filtersList }
+                console.log(filterSetToSendAll)
+                postFilterSetsDetail(filterSetToSendAll).then(
+                    (success => {
+                        console.log("success", success)
+                        Notify.sendNotification(Successes.ADD_FILTER_SET, AlertTypes.success);
+                        fetchFilterSets();
+                    }, (error) => {
+                        Notify.sendNotification(Errors.ADD_FILTER_SET, AlertTypes.error);
+                    }))
+            } else {
+                Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
             }
         } else {
             Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
@@ -162,10 +178,48 @@ let ChartsComponent = () => {
     }
 
     const clearFilterSet = () => {
+        setSelectedFilterSet(null);
+        setFiltersetName("");
+        setFilters([filterTemplate]);
+        setSelectedFilterFields([]);
+        setUnselectedFilterFields(filterFields);
+    }
+
+    const genereteNewFilterSet = () => {
 
     }
 
+    let removeTestSet = (id) => {
+        deleteFilterSetsDetail(id).then(
+            (response) => {
+                Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.success);
+                fetchFilterSets();
+            },
+            (error) => {
+                Notify.sendNotification(Errors.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.error);
+            }
+        )
+    }
+
+    const confirmRemove = (rawData) => {
+        confirmDialog({
+            message: '\nAre you sure you want to remove Filter Set?',
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => removeTestSet(rawData.id)
+        });
+    };
+
+    let removeButton = (rowData) => {
+        return (
+            <Button className="p-button-danger p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)} disabled={!rowData.author.includes(currentUser)}>
+                <FaRegTrashAlt size='20' />
+            </Button>
+        );
+    }
+
     useEffect(() => {
+        fetchCurrentUser();
         fetchFilterFields();
         fetchFilterSets();
     }, [])
@@ -184,13 +238,13 @@ let ChartsComponent = () => {
                         </Row>
 
                         Filters
-                        <ScrollPanel style={{ width: '100%', height: '275px' }} className="custombar">
+                        <ScrollPanel style={{ width: '100%', height: '400px' }} className="custombar">
                             <div style={{ padding: '3px', lineHeight: '1.5' }}>
                                 {filters.map((item, index) => {
                                     return (
                                         <Row key={index} id={index} style={{ paddingLeft: '8px' }}>
                                             <Col xl={5} style={{ padding: '2px' }}>
-                                                <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)} optionLabel="name" placeholder="Select filter" style={{ width: '100%' }} />
+                                                <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)} placeholder="Select filter" style={{ width: '100%' }} />
                                             </Col>
                                             <Col xl={6} style={{ padding: '2px' }}>
                                                 <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1} cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
@@ -200,7 +254,6 @@ let ChartsComponent = () => {
                                                     <VscClose size='30' />
                                                 </Button>
                                             </Col>
-
                                         </Row>
                                     );
                                 })}
@@ -222,13 +275,12 @@ let ChartsComponent = () => {
                         </Row>
                     </Container>
 
-
                 </Card>
                 <Divider layout="vertical"></Divider>
                 <Card style={{ width: '50%' }}>
                     <DataTable value={filterSets} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
                         size="small" className="fail-message-table"
-                        filters={filters} filterDisplay="row" loading={loading}
+                        filterDisplay="row" loading={loading}
                         globalFilterFields={['name', 'regex', 'author', 'description']}
                         emptyMessage="No filter sets found."
                         scrollHeight="50vh"
@@ -237,6 +289,8 @@ let ChartsComponent = () => {
 
                         <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
                         <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
+                        <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
+
                     </DataTable >
                 </Card>
             </div >
@@ -245,6 +299,8 @@ let ChartsComponent = () => {
                 <br />
                 <p>Filter field value can be selected only once in this form. Please add value to selected before if you want to define next value for this filter or select another filter field.</p>
             </Dialog>
+
+            <ConfirmDialog />
         </>
     )
 }

@@ -70,7 +70,8 @@ export const Successes = {
     'REMOVE_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group removed successfully!',
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created successfully!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited successfully!',
-    'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!'
+    'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
+    'ADD_FILTER_SET': 'Filter set was added successfully!'
 }
 
 export const Errors = {
@@ -107,8 +108,10 @@ export const Errors = {
     'FETCH_TEST_INSTANCES': 'Error during fetching test instances!',
     'FETCH_TEST_SET_FILTERS_BRANCHED': 'Error during fetching test set filters for selected branch!',
     'FETCH_TEST_SET_FILTERS': 'Error during fetching test set filters!',
+    'DELETE_TEST_SET_FILTERS': 'Error during removing test set filters!',
     'FETCH_ENV_ISSUE_TYPES': 'Error during fetching environment issue types!',
-    'ANALYSE_TEST_RUN': 'Error during setting test run as environment issue!'
+    'ANALYSE_TEST_RUN': 'Error during setting test run as environment issue!',
+    'ADD_FILTER_SET': 'Error during Filter Set adding!'
 }
 
 export const Warnings = {
