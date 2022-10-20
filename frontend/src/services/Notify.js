@@ -111,7 +111,10 @@ export const Errors = {
     'DELETE_TEST_SET_FILTERS': 'Error during removing test set filters!',
     'FETCH_ENV_ISSUE_TYPES': 'Error during fetching environment issue types!',
     'ANALYSE_TEST_RUN': 'Error during setting test run as environment issue!',
-    'ADD_FILTER_SET': 'Error during Filter Set adding!'
+    'ADD_FILTER_SET': 'Error during Filter Set adding!',
+    'FETCH_USER_MESSAGES': 'Error during fetching user\' messages!',
+    'DELETE_USER_MESSAGE': 'Error during deleting user\' message!',
+    'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!'
 }
 
 export const Warnings = {

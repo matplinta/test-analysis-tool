@@ -92,6 +92,9 @@ class Notification(models.Model):
     date = models.DateTimeField(help_text="Date of message")
     user = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name="notifications")
 
+    class Meta:
+        ordering = ['-date']
+
 
 class LastPassingLogs(models.Model):
     id              = models.BigAutoField(primary_key=True)
