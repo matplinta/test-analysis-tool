@@ -34,7 +34,7 @@ let LogoutComponent = ({ setIsUserLoggedIn }) => {
 
     return (
         <div style={{ display: 'inline' }}>
-            <Button style={{ height: '35px' }} className="p-button-primary" onClick={handleShow}>
+            <Button className="p-button-primary" onClick={handleShow}>
                 Logout
             </Button>
 
