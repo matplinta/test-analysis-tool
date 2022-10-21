@@ -11,7 +11,7 @@ def delete_logs_in_storage(sender, instance: models.LastPassingLogs, using, **kw
         resp = storage.delete(name=instance.location)
 
 
-@receiver(post_save, sender=models.TestSetFilter)
-def schedule_pull_from_rp(sender, instance: models.TestSetFilter, created, **kwargs):
-    celery_tasks.celery_pull_testruns_by_testsetfilters.delay(testset_filters_ids=[instance.id], user_ids=[user.id for user in instance.owners.all()])
+# @receiver(post_save, sender=models.TestSetFilter)
+# def schedule_pull_from_rp(sender, instance: models.TestSetFilter, created, **kwargs):
+#     celery_tasks.celery_pull_testruns_by_testsetfilters.delay(testset_filters_ids=[instance.id], user_ids=[user.id for user in instance.owners.all()])
     

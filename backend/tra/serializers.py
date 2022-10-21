@@ -108,10 +108,9 @@ class EnvIssueTypeSerializer(serializers.ModelSerializer):
 
 class TestSetSerializer(serializers.ModelSerializer):
     branch = serializers.CharField(source="branch.name", read_only=True)
-    testline_type = serializers.CharField(source="testline_type.name", read_only=True)
     class Meta:
         model = TestSetFilter
-        fields = ('id', 'branch', 'test_set_name', 'test_lab_path', 'testline_type')
+        fields = ('id', 'branch', 'test_set_name', 'test_lab_path')
         read_only_fields = ('branch',)
         extra_kwargs = {
             'test_set_name': {'validators': []},
@@ -126,7 +125,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'rp_id', 'test_set', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended')
+        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended')
         read_only_fields = ('last_passing_logs',)
         extra_kwargs = {
             'test_set': {'validators': []},
@@ -201,7 +200,7 @@ class TestRunSerializer(serializers.ModelSerializer):
 
 
 class TestSetFilterSerializer(serializers.ModelSerializer):
-    testline_type = serializers.CharField(source='testline_type.name')
+    testline_types = TestlineTypeSerializer(many=True)
     fail_message_type_groups = FailMessageTypeGroupROSerializer(many=True)
     owners = UserSerializer(many=True)
     subscribers = UserSerializer(many=True)
@@ -209,12 +208,13 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestSetFilter
-        fields = ('id', 'limit', 'test_set_name', 'test_lab_path', 'branch', 'testline_type', 'owners', 'subscribers', 'fail_message_type_groups',)
+        fields = ('id', 'limit', 'test_set_name', 'test_lab_path', 'branch', 'testline_types', 'owners', 'subscribers', 'fail_message_type_groups',)
         # read_only_fields = ('owners', 'subscribers',)
         extra_kwargs = {
             'fail_message_type_groups': {'validators': []},
             'owners': {'validators': []},
             'subscribers': {'validators': []},
+            'testline_types': {'validators': []},  #TODO handle testline_types validation
         }
         
     def validate_owners(self, value):
@@ -228,35 +228,33 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        testline_type_data = validated_data.pop('testline_type')
+        testline_types_data = validated_data.pop('testline_types')
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
         owners_data = validated_data.pop('owners')
         subscribers_data = validated_data.pop('subscribers')
 
-        testline_type_instance = TestlineType.objects.get(**testline_type_data)
-        regression_filter_instance = TestSetFilter.objects.create(testline_type=testline_type_instance,
-                                                                  **validated_data)
+        tsfilter_instance = TestSetFilter.objects.create(**validated_data)
         
+        testline_types = [TestlineType.objects.get(**ttd) for ttd in testline_types_data]
         fmtgs = [FailMessageTypeGroup.objects.get(**fmtg) for fmtg in fail_message_type_groups_data]
         owners = [User.objects.get(**owner) for owner in owners_data]
         subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
-        regression_filter_instance.owners.add(*owners)
-        regression_filter_instance.subscribers.add(*subscribers)
-        regression_filter_instance.fail_message_type_groups.add(*fmtgs)
-        return regression_filter_instance
+        tsfilter_instance.testline_types.add(*testline_types)
+        tsfilter_instance.owners.add(*owners)
+        tsfilter_instance.subscribers.add(*subscribers)
+        tsfilter_instance.fail_message_type_groups.add(*fmtgs)
+        return tsfilter_instance
 
 
     def update(self, instance, validated_data):
         instance.test_set_name = validated_data.pop('test_set_name')
         _ = validated_data.pop('branch', None)
-        testline_type_data = validated_data.pop('testline_type')
-        testline_type_instance = TestlineType.objects.get(**testline_type_data)
-        instance.testline_type = testline_type_instance
-
+        testline_types_data = validated_data.pop('testline_types')
         fail_message_type_groups_data = validated_data.pop('fail_message_type_groups')
         owners_data = validated_data.pop('owners')
         subscribers_data = validated_data.pop('subscribers')
 
+        testline_types = [TestlineType.objects.get(**ttd) for ttd in testline_types_data]
         fmtgs = [FailMessageTypeGroup.objects.get(**fmtg) for fmtg in fail_message_type_groups_data]
         owners = [User.objects.get(**owner) for owner in owners_data]
         subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
@@ -267,6 +265,7 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
 
         instance.save()
 
+        instance.testline_types.set(testline_types)
         instance.fail_message_type_groups.set(fmtgs)
         instance.owners.set(owners)
         instance.subscribers.set(subscribers)

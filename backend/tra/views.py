@@ -420,8 +420,7 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         queryset = TestRun.objects.all()
         tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
-            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter), tsfilters, Q())
+            reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
         )
         return queryset
 
@@ -435,7 +434,7 @@ class TestInstancesBasedOnQuery(generics.ListAPIView):
         'test_set__test_set_name',
         'test_set__test_lab_path',
         'test_set__branch__name',
-        'test_set__testline_type__name',
+        'testline_type__name',
         'last_passing_logs__utecloud_run_id',
         'test_case_name',
         'organization__name',

@@ -25,10 +25,9 @@ class TestRunFilter(filters.FilterSet):
     )
 
     def reg_filter_filter_method(self, queryset, name, value):
-        reg_filters = value
+        tsfilters = value
         queryset = queryset.filter(
-            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter.test_set), reg_filters, Q())
+            reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter.test_set), tsfilters, Q())
         )
         return queryset
 
@@ -57,7 +56,7 @@ class TestInstanceFilter(filters.FilterSet):
             'test_set__test_set_name': ['icontains'],
             'test_set__test_lab_path': ['icontains'],
             'test_set__branch__name': ['icontains'],
-            'test_set__testline_type__name': ['icontains'],
+            'testline_type__name': ['icontains'],
             'last_passing_logs__utecloud_run_id': ['exact'],
             'test_case_name': ['icontains'],
             'organization__name': ['icontains'],
