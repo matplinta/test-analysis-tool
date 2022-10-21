@@ -548,15 +548,9 @@ class PullAllTestRunsBySelectedTestSetFiltersCelery(APIView):
         tags=["celery"]
     )
     def get(self, request):
-        limit = request.query_params.get('limit', None)
         testsetfilters = request.query_params.get('testsetfilters', [])
-        tasks = []
-        for tsf_id in testsetfilters.split(','):
-            passed_task = celery_tasks.celery_pull_passed_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id), query_limit=limit)
-            na_env_task = celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id), query_limit=limit)
-            tasks.append(passed_task.task_id)
-            tasks.append(na_env_task.task_id)
-        return Response(tasks)
+        taskid = celery_tasks.celery_pull_testruns_by_testsetfilters.delay(testset_filters_ids=[int(_id) for _id in testsetfilters.split(',')], user_ids=[request.user.id])
+        return Response(taskid.id)
 
 
 class GetCeleryTasksStatus(APIView):
