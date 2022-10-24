@@ -237,7 +237,7 @@ class GetDataForFailChartBase(APIView):
         filters_raw = self.request.data
         filters = {filter["field"]: filter["value"] for filter in filters_raw}
         fmtgs = filters.pop("fail_message_type_groups", [])
-        fail_message_dict = self.parse_failmessagetypes_and_get_fail_message_dict(ids_list=fmtgs)
+        fail_message_dict = self.parse_failmessagetypes_and_get_fail_message_dict(fmtg_ids_list=fmtgs)
         return fail_message_dict, filters
 
     def init_analyzer(self, fail_message_dict, filters):
