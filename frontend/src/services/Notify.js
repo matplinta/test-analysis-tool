@@ -11,6 +11,13 @@ class NotificationService {
         theme: 'colored'
     }
 
+    configurationLonger = {
+        position: toast.POSITION.TOP_RIGHT,
+        transition: Zoom,
+        theme: 'colored',
+        autoClose: 6000
+    }
+
     sendNotification = (message, type) => {
         try {
             if (message) {
@@ -21,7 +28,7 @@ class NotificationService {
                         notifications.next(() => toast.success(msg, this.configuration));
                         break;
                     case AlertTypes.info:
-                        notifications.next(() => toast.info(msg, this.configuration));
+                        notifications.next(() => toast.info(msg, this.configurationLonger));
                         break;
                     case AlertTypes.warn:
                         notifications.next(() => toast.warn(msg, this.configuration));
@@ -71,7 +78,8 @@ export const Successes = {
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created successfully!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited successfully!',
     'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
-    'ADD_FILTER_SET': 'Filter set was added successfully!'
+    'ADD_FILTER_SET': 'Filter set was added successfully!',
+    'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!'
 }
 
 export const Errors = {
@@ -114,7 +122,10 @@ export const Errors = {
     'ADD_FILTER_SET': 'Error during Filter Set adding!',
     'FETCH_USER_MESSAGES': 'Error during fetching user\' messages!',
     'DELETE_USER_MESSAGE': 'Error during deleting user\' message!',
-    'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!'
+    'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!',
+    'DOWNLOAD_EXCEL': 'Error during excel generating!',
+    'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!'
+
 }
 
 export const Warnings = {
@@ -124,5 +135,6 @@ export const Warnings = {
 }
 
 export const Infos = {
-    'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!'
+    'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!',
+    'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded. After that excel file with report will be downloaded to your computer!'
 }

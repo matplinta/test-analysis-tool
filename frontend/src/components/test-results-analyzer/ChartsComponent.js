@@ -16,32 +16,36 @@ import { VscClose } from 'react-icons/vsc';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { Dialog } from 'primereact/dialog';
 import { ScrollPanel } from 'primereact/scrollpanel';
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { Calendar } from 'primereact/calendar';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { RiFileExcel2Line } from 'react-icons/ri';
+import { FaChartBar } from 'react-icons/fa';
+import { ConfirmDialog } from 'primereact/confirmdialog';
+import { Tooltip } from 'primereact/tooltip';
 
-import { getFilterFields, postFilterSetsDetail, getFilterSetsDetail, deleteFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import {
+    getFilterFields, postFilterSetsDetail, getExcelFromSavedFilterSet, postToGetExcelFromTemporaryDefinedFilterSet
+} from './../../services/test-results-analyzer/statistics.service';
 import { useCurrentUser } from '../../services/CurrentUserContext';
-import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
+import Notify, { AlertTypes, Errors, Infos, Successes } from '../../services/Notify.js';
 
 import './ChartsComponent.css';
-import { Successes } from '../../services/Notify';
+import FilterStesTableComponent from "./FilterSetsTableComponent";
+import GenerateChartComponent from "./GenerateChartComponent";
 
 
 let ChartsComponent = () => {
 
     const [filtersetName, setFiltersetName] = useState("");
     const [filterFields, setFilterFields] = useState(null);
-    const [filterSets, setFilterSets] = useState(null);
     const [selectedFilterSet, setSelectedFilterSet] = useState(null);
 
     const [selectedFilterFields, setSelectedFilterFields] = useState([]);
     const [unselectedFilterFields, setUnselectedFilterFields] = useState([]);
 
-    const [loading, setLoading] = useState(true);
+    const [reloadTestSetFilters, setReloadTestSetFilters] = useState(false);
 
     const filterTemplate = {
         field: "",
@@ -51,6 +55,17 @@ let ChartsComponent = () => {
     const [filters, setFilters] = useState([filterTemplate]);
 
     const [displayAlert, setDisplayAlert] = useState(false)
+
+    const [dates, setDates] = useState(null)
+
+    const [blockedPanel, setBlockedPanel] = useState(false);
+
+    let today = new Date();
+    let year = today.getFullYear();
+    let prevYear = year - 1;
+    let minDate = new Date();
+    minDate.setFullYear(prevYear);
+    let maxDate = new Date();
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
@@ -68,16 +83,6 @@ let ChartsComponent = () => {
             })
     }
 
-    const fetchFilterSets = () => {
-        getFilterSetsDetail().then(
-            (results) => {
-                setFilterSets(results.data.results)
-                setLoading(false);
-            }, (error) => {
-                setLoading(false);
-            })
-    }
-
     const onFilterChange = (item, index, e) => {
         if (selectedFilterFields.filter(selectedFilter => selectedFilter.field === e.value).length > 0) {
             setDisplayAlert(true)
@@ -92,7 +97,6 @@ let ChartsComponent = () => {
             setUnselectedFilterFields(unselectedfilterFieldsList)
             setSelectedFilterFields(selectedfilterFieldsList);
         }
-
     }
 
     const onFilterValueChange = (item, index, e) => {
@@ -113,28 +117,16 @@ let ChartsComponent = () => {
             setUnselectedFilterFields(unselectedfilterFieldsList)
             setSelectedFilterFields(selectedfilterFieldsList);
         }
-
     }
 
     const setFiltersetNameOnFiltersList = (e) => {
         setFiltersetName(e.target.value)
-        // let tmp = [...filters];
-        // tmp = tmp.map(filter => {
-        //     return {
-        //         // filter_set: e.target.value,
-        //         field: filter.field,
-        //         value: filter.value
-        //     }
-        // })
-        // setFilters(tmp);
     }
 
     const selectFilterSet = (filterSet) => {
         setSelectedFilterSet(filterSet)
         setFiltersetName(filterSet.name);
         setFilters(filterSet.filters);
-        // setFilters(filterSet.filters);
-
     }
 
     const preapreFiltersListToAdd = () => {
@@ -155,14 +147,11 @@ let ChartsComponent = () => {
             let filtersList = preapreFiltersListToAdd();
             if (filtersList.length === filters.length) {
                 let filterSetToSendAll = { "name": filtersetName, "filters": filtersList }
-                console.log(filterSetToSendAll)
                 postFilterSetsDetail(filterSetToSendAll).then(
                     (success) => {
-                        console.log("success", success)
                         Notify.sendNotification(Successes.ADD_FILTER_SET, AlertTypes.success);
-                        fetchFilterSets();
+                        setReloadTestSetFilters(true);
                     }, (error) => {
-                        console.log("error", error)
                         Notify.sendNotification(Errors.ADD_FILTER_SET, AlertTypes.error);
                     })
             } else {
@@ -186,73 +175,113 @@ let ChartsComponent = () => {
         setUnselectedFilterFields(filterFields);
     }
 
-    const genereteNewFilterSet = () => {
-
+    const saveExcel = (data) => {
+        let date = new Date();
+        let dateFormated = date.toLocaleDateString() + '-' + date.toLocaleTimeString().replaceAll(':', '/').replaceAll(' ', '/');
+        const outputFilename = `report_${dateFormated}.xls`;
+        const url = URL.createObjectURL(new Blob([data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', outputFilename);
+        document.body.appendChild(link);
+        link.click();
     }
 
-    let removeTestSet = (id) => {
-        deleteFilterSetsDetail(id).then(
+    const getExcelFromSavedFilterSetAndSave = () => {
+        getExcelFromSavedFilterSet(selectedFilterSet.id, dates).then(
             (response) => {
-                Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.success);
-                fetchFilterSets();
+                saveExcel(response.data);
+                setBlockedPanel(false);
+                Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
             },
             (error) => {
-                Notify.sendNotification(Errors.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.error);
+                Notify.sendNotification(Error.DOWNLOAD_EXCEL, AlertTypes.error);
+                setBlockedPanel(false);
             }
         )
     }
 
-    const confirmRemove = (rawData) => {
-        confirmDialog({
-            message: '\nAre you sure you want to remove Filter Set?',
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => removeTestSet(rawData.id)
-        });
-    };
+    const postExcelFromSavedFilterSetAndSave = () => {
+        postToGetExcelFromTemporaryDefinedFilterSet(filters, dates).then(
+            (response) => {
+                saveExcel(response.data);
+                setBlockedPanel(false);
+                Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
+            },
+            (error) => {
+                Notify.sendNotification(Error.DOWNLOAD_EXCEL, AlertTypes.error);
+                setBlockedPanel(false);
+            }
+        )
+    }
 
-    let removeButton = (rowData) => {
-        return (
-            <Button className="p-button-danger p-button-sm" style={{ padding: '8px', height: '35px' }} onClick={() => confirmRemove(rowData)} disabled={!rowData.author.includes(currentUser)}>
-                <FaRegTrashAlt size='20' />
-            </Button>
-        );
+    const downloadFilterSetExcel = () => {
+        setBlockedPanel(true);
+        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.info);
+
+        if (selectedFilterSet !== null)
+            getExcelFromSavedFilterSetAndSave();
+        else
+            postExcelFromSavedFilterSetAndSave();
     }
 
     useEffect(() => {
         fetchCurrentUser();
         fetchFilterFields();
-        fetchFilterSets();
     }, [])
 
     return (
         <>
-            <div style={{ display: 'flex', marginTop: '5px', marginLeft: '3px', marginRight: '3px' }}>
-                <Card style={{ width: '50%' }}>
-                    <Container style={{ padding: '2px' }}>
-
-                        <Row style={{ paddingLeft: '8px' }}>
-                            <Col style={{ padding: '2px' }}>
-                                <label htmlFor="name" className="block">Filterset Name</label>
-                                <InputText id="name" value={filtersetName} onChange={setFiltersetNameOnFiltersList} style={{ width: "99%", marginBottom: '5px' }} className="block" />
+            <div className="m-3 flex">
+                <Card style={{ width: '55%' }}>
+                    <Container className="pl-2">
+                        <Row>
+                            <Col>
+                                <Button className="p-button-success font-bold mr-1" type="submit" onClick={saveFilterSet}>
+                                    Save Filter Set
+                                </Button>
+                                <Button className="p-button-secondary font-bold mr-1" type="submit" onClick={clearFilterSet}
+                                    tooltip="Clear form to create new Filter Set" >
+                                    Clear Filter Set
+                                </Button>
                             </Col>
                         </Row>
 
-                        Filters
-                        <ScrollPanel style={{ width: '100%', height: '400px' }} className="custombar">
-                            <div style={{ padding: '3px', lineHeight: '1.5' }}>
+                        <Row>
+                            <Col>
+                                <label htmlFor="name" className="block font-bold">
+                                    <span>Filterset Name</span>
+                                    <Tooltip target=".filter-set-name-info-icon" />
+                                    <i className="filter-set-name-info-icon pi pi-info-circle ml-1"
+                                        data-pr-tooltip="Fill if you want to save Filter Set defined below"
+                                        data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
+                                </label>
+                                <InputText id="name" value={filtersetName} onChange={setFiltersetNameOnFiltersList} style={{ width: "99%" }} className="block mb-2 mt-1" />
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <span className="font-bold">Filters List</span>
+                            </Col>
+                        </Row>
+
+                        <ScrollPanel style={{ width: '99%', height: '300px' }} className="custombar">
+                            <div className="mt-1 ml-0">
                                 {filters.map((item, index) => {
                                     return (
-                                        <Row key={index} id={index} style={{ paddingLeft: '8px' }}>
-                                            <Col xl={5} style={{ padding: '2px' }}>
-                                                <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)} placeholder="Select filter" style={{ width: '100%' }} />
+                                        <Row key={index} id={index} className="mb-2 ml-0">
+                                            <Col xl={3} className="pr-0">
+                                                <Dropdown value={item.field} options={filterFields} onChange={(e) => onFilterChange(item, index, e)}
+                                                    placeholder="Select filter" style={{ width: '100%' }} />
                                             </Col>
-                                            <Col xl={6} style={{ padding: '2px' }}>
-                                                <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1} cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
+                                            <Col xl={8} className="pr-0 m-0">
+                                                <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1}
+                                                    cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
                                             </Col>
-                                            <Col xl={'auto'} style={{ padding: '2px' }}>
-                                                <Button className="p-button-primary p-button-sm" onClick={() => removeFilter(item, index)} style={{ padding: '5px', height: '47px', marginBottom: '3px' }} >
-                                                    <VscClose size='30' />
+                                            <Col xl={1} className="m-0">
+                                                <Button className="p-button-primary yellow-200 p-button-sm" onClick={() => removeFilter(item, index)}
+                                                    style={{ padding: '5px', height: '47px' }} >
+                                                    <VscClose size='40' />
                                                 </Button>
                                             </Col>
                                         </Row>
@@ -261,44 +290,71 @@ let ChartsComponent = () => {
                             </div>
                         </ScrollPanel>
 
-                        <Row style={{ paddingLeft: '8px' }}>
-                            <Col style={{ padding: '2px' }}>
-                                <Button icon="pi pi-plus" className="p-button-rounded" aria-label="Filter" onClick={addFilter} style={{ marginTop: '5px', marginBottom: '7px' }} />
+                        <Row>
+                            <Col>
+                                <Button icon="pi pi-plus" className="p-button-rounded p-button-primary" aria-label="Filter" onClick={addFilter}
+                                    tooltip="Click to add new empty filter to filters list form" style={{ marginTop: '5px', marginBottom: '7px' }} />
                             </Col>
                         </Row>
 
-                        <Row style={{ paddingLeft: '8px' }}>
-                            <Col style={{ padding: '2px' }}>
-                                <Button className="p-button-primary " type="submit" onClick={saveFilterSet}>Save Filter Set</Button>
-                                <Button className="p-button-primary " type="submit" onClick={generateChart}>Generate Chart</Button>
-                                <Button className="p-button-primary " type="submit" onClick={clearFilterSet}>Clear Filter Set</Button>
+                        <Divider style={{ height: '5px' }} />
+
+                        <Row>
+                            <Col>
+                                <label htmlFor="range" className="block font-bold">Select Time Range
+                                    <Tooltip target=".filter-set-name-info-icon" />
+                                    <i className="filter-set-name-info-icon pi pi-info-circle ml-1"
+                                        data-pr-tooltip="Select dates to generate chart or excel from time period"
+                                        data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
+                                </label>
+                                <Calendar id="range" value={dates} onChange={(e) => setDates(e.value)} selectionMode="range" readOnlyInput
+                                    dateFormat="dd-mm-yy" showIcon showButtonBar className="mb-3 mt-1 calendar-style" style={{ width: '260px' }}
+                                    minDate={minDate} maxDate={maxDate} />
+                            </Col>
+                        </Row>
+
+
+                        <Row>
+                            <Col>
+                                <Button className="p-button-primary font-bold mr-1" type="submit" onClick={generateChart} >
+                                    <FaChartBar size='26' />
+                                    <span className='ml-2'>Generate Chart</span>
+                                </Button>
+                                <Button className="font-bold mr-1" style={{ backgroundColor: '#217346', borderColor: '#217346' }}
+                                    onClick={downloadFilterSetExcel} >
+                                    <RiFileExcel2Line size='20' />
+                                    <span className='ml-2'>Download Excel</span>
+                                </Button>
                             </Col>
                         </Row>
                     </Container>
 
                 </Card>
                 <Divider layout="vertical"></Divider>
-                <Card style={{ width: '50%' }}>
-                    <DataTable value={filterSets} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
-                        size="small" className="fail-message-table"
-                        filterDisplay="row" loading={loading}
-                        globalFilterFields={['name', 'regex', 'author', 'description']}
-                        emptyMessage="No filter sets found."
-                        scrollHeight="50vh"
-                        resizableColumns columnResizeMode="fit"
-                        selectionMode="single" selection={selectedFilterSet} onSelectionChange={e => selectFilterSet(e.value)}>
-
-                        <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
-                        <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
-                        <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
-
-                    </DataTable >
+                <Card style={{ width: '45%' }}>
+                    <FilterStesTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
+                        reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters} />
                 </Card>
             </div >
 
-            <Dialog header="Selected field has already been used!" visible={displayAlert} onHide={() => setDisplayAlert(false)} dismissableMask={true} style={{ width: '30vw' }}>
+            <div className="m-3">
+                <Card>
+                    <GenerateChartComponent />
+                </Card>
+            </div>
+
+            <Dialog visible={blockedPanel} >
+                <ProgressSpinner
+                    style={{ width: '250px', height: '250px', position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+                    strokeWidth="5" fill="#999999" />
+            </Dialog>
+
+
+            <Dialog header="Selected field has already been used!" visible={displayAlert} onHide={() => setDisplayAlert(false)}
+                dismissableMask={true} style={{ width: '30vw' }}>
                 <br />
-                <p>Filter field value can be selected only once in this form. Please add value to selected before if you want to define next value for this filter or select another filter field.</p>
+                <p>Filter field value can be selected only once in this form. Please add value to selected before if you want
+                    to define next value for this filter or select another filter field.</p>
             </Dialog>
 
             <ConfirmDialog />
