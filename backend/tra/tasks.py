@@ -1,9 +1,13 @@
-from typing import List, Set
+from time import sleep
+from typing import List, Union
 from celery.utils.log import get_task_logger
 from celery import shared_task
 from celery.schedules import crontab
+from django.contrib.auth.models import User
+from datetime import datetime
 from backend.celery import app
 from django.conf import settings
+from celery.result import AsyncResult
 from .models import *
 from rep_portal.api import RepPortal, RepPortalError, RepPortalFieldNotFound
 from . import test_runs_processing
@@ -135,6 +139,39 @@ def celery_pull_passed_testruns_by_testset_filter(testset_filter_id, query_limit
 def celery_sync_suspension_status_of_test_instances_by_testset_filter(self, testset_filter_id, limit=None):
     return test_runs_processing.sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id, limit)
 
+
+@shared_task(name="celery_pull_testruns_by_testsetfilters")
+def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[List[int], None]=None):
+    def get_shortened_name(name):
+        if len(name) < 35:
+            return name
+        else:
+            return name[:32] + '...'
+    tasks = []
+    for tsf_id in testset_filters_ids:
+        passed_task = celery_pull_passed_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id))
+        na_env_task = celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(testset_filter_id=int(tsf_id))
+        tasks.append(passed_task.task_id)
+        tasks.append(na_env_task.task_id)
+
+
+    str_list_of_tsf_msg = ', '.join([f"{get_shortened_name(tsf.test_set_name)}: {tsf.branch.name}" for tsf in TestSetFilter.objects.filter(id__in=testset_filters_ids)])
+    msg = f"Test runs for TestSetFilters: {str_list_of_tsf_msg} have successfully pulled data from the Reporting Portal!"
+    if user_ids: 
+        while all([AsyncResult(taskid).ready() for taskid in tasks]) is not True:
+            sleep(5)
+
+        tasks_statuses = [AsyncResult(taskid).status for taskid in tasks]
+        for user in User.objects.filter(id__in=user_ids):
+            if all([status == "SUCCESS" for status in tasks_statuses]):
+                Notification.objects.create(user=user, message=msg, date=datetime.now())
+            else:
+                msg = f"There was a problem with pulling of data from RP for the following TestSetFilters: {str_list_of_tsf_msg}. For details please contact admin."
+                Notification.objects.create(user=user, message=msg, date=datetime.now())
+
+        return {"msg": msg, "user_id": user.id}
+    return {"msg": msg}
+    
 
 @shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
 def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, auth_params=None):
