@@ -126,5 +126,5 @@ class LastPassingLogsAdmin(admin.ModelAdmin):
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['message', 'id', 'read', 'date']
-    list_filter = ['read', ]
+    list_filter = ['read', 'user']
     search_fields = ['message', 'read', 'date']
