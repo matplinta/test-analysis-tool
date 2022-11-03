@@ -1,32 +1,23 @@
-from distutils.command.build import build
-from rep_portal.api import RepPortal, RepPortalError
 import json
-from datetime import datetime
 import logging
-from typing import List, Dict, Tuple
-from django.conf import settings
-from itertools import chain
-import re
 import os
-from django.db import IntegrityError
-from django.contrib.auth.models import User
-from celery import shared_task
-from .models import (
-    FeatureBuild,
-    LastPassingLogs,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-)
+import re
+from datetime import datetime
+from distutils.command.build import build
+from itertools import chain
+from typing import Dict, List, Tuple
 
-from . import utils
+from celery import shared_task
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import IntegrityError
+from rep_portal.api import RepPortal, RepPortalError
+
 from . import tasks as celery_tasks
+from . import utils
+from .models import (EnvIssueType, FailMessageType, FailMessageTypeGroup,
+                     FeatureBuild, LastPassingLogs, Organization, TestInstance,
+                     TestlineType, TestRun, TestRunResult, TestSetFilter)
 
 
 class TestRunWithSuchRPIDAlreadyExists(Exception):
@@ -99,10 +90,13 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     test_set_filter = TestSetFilter.objects.get(
         test_set_name=rp_test_run["qc_test_set"],
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", ""),
-        testline_type=rp_test_run['test_col']["testline_type"]
+        testline_types=rp_test_run['test_col']["testline_type"]
     )
     organization, _ = Organization.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
+    )
+    testline_type, _ = TestlineType.objects.get_or_create(
+        name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
     if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
         test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
@@ -110,6 +104,8 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             test_instance.test_set = test_set_filter
         if test_instance.test_case_name != rp_test_run["test_case"]["name"]:
             test_instance.test_case_name = rp_test_run["test_case"]["name"]
+        if test_instance.testline_type != testline_type: 
+            test_instance.testline_type = testline_type
         # if test_instance.organization != organization:
         #     test_instance.organization = organization
         test_instance.save()
@@ -118,11 +114,9 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             rp_id=rp_test_run["qc_test_instance"]["id"],
             test_set=test_set_filter,
             test_case_name=rp_test_run["test_case"]["name"],
-            organization=organization
+            organization=organization,
+            testline_type=testline_type
         )
-    testline_type, _ = TestlineType.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
-    )
     env_issue_type, _ = EnvIssueType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["env_issue_type"])
     )

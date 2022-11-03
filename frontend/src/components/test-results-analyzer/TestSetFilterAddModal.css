@@ -11,3 +11,7 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
+
+.p-dialog .p-dialog-content {
+    background-color: rgb(232, 239, 247) !important;
+}
