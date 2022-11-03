@@ -99,7 +99,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     test_set_filter = TestSetFilter.objects.get(
         test_set_name=rp_test_run["qc_test_set"],
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", ""),
-        testline_type=rp_test_run['test_col']["testline_type"]
+        testline_types=rp_test_run['test_col']["testline_type"]
     )
     organization, _ = Organization.objects.get_or_create(
         name=return_empty_if_none(rp_test_run["qc_test_instance"]["organization"])
