@@ -68,8 +68,8 @@ class BranchAdmin(admin.ModelAdmin):
 
 @admin.register(TestInstance)
 class TestInstanceAdmin(admin.ModelAdmin):
-    list_display = ['rp_id', 'test_case_name', 'id', 'test_set', 'last_passing_logs', 'organization', 'execution_suspended', 'no_run_in_rp']
-    list_filter = ['execution_suspended', 'organization', 'no_run_in_rp']
+    list_display = ['rp_id', 'test_case_name', 'id', 'test_set', 'testline_type', 'last_passing_logs', 'organization', 'execution_suspended', 'no_run_in_rp']
+    list_filter = ['execution_suspended', 'organization', 'no_run_in_rp', 'testline_type']
     search_fields = ['test_set__test_set_name', 'test_case_name', 'rp_id']
 
 
@@ -111,8 +111,8 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
 
 @admin.register(TestSetFilter)
 class TestSetFilterAdmin(admin.ModelAdmin):
-    list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'testline_type', 'limit']
-    list_filter = ['test_set_name', 'testline_type', 'branch']
+    list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'limit']
+    list_filter = ['test_set_name', 'branch']
     search_fields = ['test_set_name', ]
 
 
@@ -126,5 +126,5 @@ class LastPassingLogsAdmin(admin.ModelAdmin):
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['message', 'id', 'read', 'date']
-    list_filter = ['read', ]
+    list_filter = ['read', 'user']
     search_fields = ['message', 'read', 'date']

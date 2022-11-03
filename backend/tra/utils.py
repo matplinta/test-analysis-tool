@@ -1,44 +1,28 @@
-from django.contrib.auth.models import User
-from dateutil import tz
-from urllib.parse import urlparse, urljoin
 import datetime
+import json
 import logging
 import os
-import pytz
-import json
-from django.conf import settings
-from django.core.serializers import serialize
 from functools import reduce
+from urllib.parse import urljoin, urlparse
+
+import pytz
+from dateutil import tz
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.serializers import serialize
 from django.db.models import Q
 
-from .models import (
-    Branch,
-    FeatureBuild,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-)
-
-from .serializers import (
-    TestInstanceSerializer,
-    TestRunSerializer, 
-    TestlineTypeSerializer, 
-    TestSetFilterSerializer,
-    FailMessageTypeSerializer,
-    FailMessageTypeGroupSerializer,
-    EnvIssueTypeSerializer,
-    TestRunResultSerializer,
-    FeatureBuildSerializer,
-    UserSerializer,
-    BranchSerializer,
-    LastPassingLogsSerializer
-)
+from .models import (Branch, EnvIssueType, FailMessageType,
+                     FailMessageTypeGroup, FeatureBuild, Organization,
+                     TestInstance, TestlineType, TestRun, TestRunResult,
+                     TestSetFilter)
+from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
+                          FailMessageTypeGroupSerializer,
+                          FailMessageTypeSerializer, FeatureBuildSerializer,
+                          LastPassingLogsSerializer, TestInstanceSerializer,
+                          TestlineTypeSerializer, TestRunResultSerializer,
+                          TestRunSerializer, TestSetFilterSerializer,
+                          UserSerializer)
 
 
 def get_timezone_aware_datetime(_datetime):
@@ -92,7 +76,7 @@ def get_autoanalyzer_user() -> User:
 def get_filters_for_rp_api(testrun_result: str, testset_filter: TestSetFilter):
     return {
         "result": testrun_result,
-        "testline_type": testset_filter.testline_type.name,
+        "testline_type": ",".join([tl_type.name for tl_type in testset_filter.testline_types.all()]),
         "test_set": testset_filter.test_set_name,
         "test_lab_path": testset_filter.test_lab_path
     }
@@ -135,8 +119,7 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
         queryset = TestRun.objects.all()
         tsfilters = TestSetFilter.objects.filter(subscribers=user)
         queryset = queryset.filter(
-            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter), tsfilters, Q())
+            reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
         )
 
         fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))

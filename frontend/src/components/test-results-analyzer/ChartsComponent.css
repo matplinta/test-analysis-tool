@@ -9,5 +9,42 @@
 }
 
 .p-scrollpanel.custombar .p-scrollpanel-bar:hover {
+    background-color: #003870;
+    border-color: #003870;
+}
+
+.p-scrollpanel.custombar .p-scrollpanel-bar {
     background-color: #004c9a;
+    border-color: #004c9a;
+}
+
+@keyframes p-progress-spinner-color {
+
+    100%,
+    0% {
+        stroke: #9b9b9b;
+    }
+
+    40% {
+        stroke: #0057e7;
+    }
+
+    66% {
+        stroke: #01c03a;
+    }
+
+    80%,
+    90% {
+        stroke: #c800e2;
+    }
+}
+
+.p-calendar-w-btn-right .p-datepicker-trigger {
+    background-color: #004c9a;
+    border-color: #004c9a;
+}
+
+.p-calendar-w-btn-right .p-datepicker-trigger:hover {
+    background-color: #003870;
+    border-color: #003870;
 }

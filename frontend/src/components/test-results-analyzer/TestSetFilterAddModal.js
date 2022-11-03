@@ -7,7 +7,6 @@
 
 import { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
@@ -24,6 +23,7 @@ import './TestSetFilterAddModal.css';
 let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
 
     const [testLinesTypes, setTestLinesTypes] = useState([]);
+    const [selectedTestLinesTypes, setSelectedTestLinesTypes] = useState([]);
     const [selectedFailMessageTypeGroup, setSelectedFailMessageTypeGroup] = useState([]);
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
     const [usersList, setUsersList] = useState([]);
@@ -32,7 +32,6 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
 
     const [testSetName, setTestSetName] = useState("");
     const [testLabPath, setTestLabPath] = useState("");
-    const [testLineType, setTestLineType] = useState([]);
     const [owners, setOwners] = useState([]);
     const [subscribers, setSubscribers] = useState([]);
     const [isOwnedByMe, setIsOwnedByMe] = useState(true);
@@ -89,7 +88,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     }
 
     let handleTestLineTypeChange = (e) => {
-        setTestLineType(e.target.value);
+        setSelectedTestLinesTypes(e.target.value);
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
@@ -107,7 +106,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     let clearForm = () => {
         setTestSetName("");
         setTestLabPath("");
-        setTestLineType(null);
+        setSelectedTestLinesTypes([]);
         setSelectedFailMessageTypeGroup([]);
         setOwners([]);
         setSubscribers([]);
@@ -117,14 +116,14 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         let filterToAdd = {
             "test_set_name": "",
             "test_lab_path": "",
-            "testline_type": null,
+            "testline_types": [],
             "fail_message_type_groups": [],
             "owners": [],
             "subscribers": []
         }
-        filterToAdd.testline_type = testLineType;
         filterToAdd.test_set_name = testSetName;
         filterToAdd.test_lab_path = testLabPath;
+        filterToAdd.testline_types = selectedTestLinesTypes.map(map_tl => ({ "name": map_tl }));
 
         let fail_message_type_groups_tmp = [];
         if (failMessageTypeGroupsList.length > 0) {
@@ -153,14 +152,14 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         let filterToEdit = {
             "test_set_name": "",
             "test_lab_path": "",
-            "testline_type": null,
+            "testline_types": [],
             "fail_message_type_groups": [],
             "owners": [],
             "subscribers": []
         }
-        filterToEdit.testline_type = testLineType;
         filterToEdit.test_set_name = testSetName;
         filterToEdit.test_lab_path = testLabPath;
+        filterToEdit.testline_types = selectedTestLinesTypes.map(map_tl => ({ "name": map_tl }));
 
         let fail_message_type_groups_tmp = [];
         if (failMessageTypeGroupsList.length > 0) {
@@ -196,7 +195,8 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
             (result) => {
                 setTestSetName(result.data.test_set_name);
                 setTestLabPath(result.data.test_lab_path);
-                setTestLineType(result.data.testline_type);
+                if (result.data.testline_types.length !== 0)
+                    setSelectedTestLinesTypes(result.data.testline_types.map(tl => tl.name));
                 if (result.data.fail_message_type_groups.length !== 0)
                     setSelectedFailMessageTypeGroup(result.data.fail_message_type_groups.map(group => group.id));
                 if (result.data.owners.length !== 0)
@@ -234,9 +234,9 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
                     <InputText value={testLabPath} onChange={handleTestLabPathChange} style={{ width: "100%" }} />
                 </div>
                 <div className="form-item">
-                    <label>Testline Type (from UTE Cloud)</label>
+                    <label>All Testline Types used in TestSet (from UTE Cloud)</label>
                     <br />
-                    <Dropdown value={testLineType} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
+                    <MultiSelect value={selectedTestLinesTypes} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
                         optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
