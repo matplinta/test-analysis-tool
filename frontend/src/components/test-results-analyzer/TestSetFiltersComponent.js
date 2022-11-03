@@ -265,8 +265,8 @@ let TestSetFiltersComponent = ({ type }) => {
                 <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
                 <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
-                <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
-                <Column field="testline_types" header="Testline Types" sortable filter filterPlaceholder="Search by testline type" ></Column>
+                <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch"></Column>
+                <Column field="testline_types" header="Testline Types" sortable filter filterPlaceholder="Search by testline type" style={{  minWidth: "220px" }}></Column>
                 <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
                 <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>
