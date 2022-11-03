@@ -1,21 +1,14 @@
-from django_filters import rest_framework as filters
 from functools import reduce
+
 from django.contrib.auth.models import User
 from django.db.models import Q
-from .models import (
-    FailMessageTypeGroup,
-    FeatureBuild,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    Branch, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-)
+from django_filters import rest_framework as filters
+
+from .models import (Branch, EnvIssueType, FailMessageType,
+                     FailMessageTypeGroup, FeatureBuild, Organization,
+                     TestInstance, TestlineType, TestRun, TestRunResult,
+                     TestSetFilter)
+
 
 class TestRunFilter(filters.FilterSet):
     reg_filters = filters.ModelMultipleChoiceFilter(

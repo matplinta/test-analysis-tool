@@ -1,32 +1,23 @@
-from distutils.command.build import build
-from rep_portal.api import RepPortal, RepPortalError
 import json
-from datetime import datetime
 import logging
-from typing import List, Dict, Tuple
-from django.conf import settings
-from itertools import chain
-import re
 import os
-from django.db import IntegrityError
-from django.contrib.auth.models import User
-from celery import shared_task
-from .models import (
-    FeatureBuild,
-    LastPassingLogs,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-)
+import re
+from datetime import datetime
+from distutils.command.build import build
+from itertools import chain
+from typing import Dict, List, Tuple
 
-from . import utils
+from celery import shared_task
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import IntegrityError
+from rep_portal.api import RepPortal, RepPortalError
+
 from . import tasks as celery_tasks
+from . import utils
+from .models import (EnvIssueType, FailMessageType, FailMessageTypeGroup,
+                     FeatureBuild, LastPassingLogs, Organization, TestInstance,
+                     TestlineType, TestRun, TestRunResult, TestSetFilter)
 
 
 class TestRunWithSuchRPIDAlreadyExists(Exception):

@@ -1,44 +1,28 @@
-from django.contrib.auth.models import User
-from dateutil import tz
-from urllib.parse import urlparse, urljoin
 import datetime
+import json
 import logging
 import os
-import pytz
-import json
-from django.conf import settings
-from django.core.serializers import serialize
 from functools import reduce
+from urllib.parse import urljoin, urlparse
+
+import pytz
+from dateutil import tz
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.serializers import serialize
 from django.db.models import Q
 
-from .models import (
-    Branch,
-    FeatureBuild,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-)
-
-from .serializers import (
-    TestInstanceSerializer,
-    TestRunSerializer, 
-    TestlineTypeSerializer, 
-    TestSetFilterSerializer,
-    FailMessageTypeSerializer,
-    FailMessageTypeGroupSerializer,
-    EnvIssueTypeSerializer,
-    TestRunResultSerializer,
-    FeatureBuildSerializer,
-    UserSerializer,
-    BranchSerializer,
-    LastPassingLogsSerializer
-)
+from .models import (Branch, EnvIssueType, FailMessageType,
+                     FailMessageTypeGroup, FeatureBuild, Organization,
+                     TestInstance, TestlineType, TestRun, TestRunResult,
+                     TestSetFilter)
+from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
+                          FailMessageTypeGroupSerializer,
+                          FailMessageTypeSerializer, FeatureBuildSerializer,
+                          LastPassingLogsSerializer, TestInstanceSerializer,
+                          TestlineTypeSerializer, TestRunResultSerializer,
+                          TestRunSerializer, TestSetFilterSerializer,
+                          UserSerializer)
 
 
 def get_timezone_aware_datetime(_datetime):
