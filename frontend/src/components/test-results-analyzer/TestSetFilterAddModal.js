@@ -7,15 +7,19 @@
 
 import { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { MultiSelect } from 'primereact/multiselect';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from 'primereact/tooltip';
+import { FaInfoCircle } from 'react-icons/fa'
 
 import { getTestLineTypes, postTestSetFilter, getTestSetFilter, putTestSetFilter } from '../../services/test-results-analyzer/test-filters.service';
+import { schedulePullOfTestRunsDataByTestSetFilters } from '../../services/test-results-analyzer/test-runs.service';
 import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import AuthService from '../../services/auth.service.js';
-import Notify, { AlertTypes, Successes, Errors, Warnings } from '../../services/Notify.js';
+import Notify, { AlertTypes, Successes, Errors, Warnings, Infos } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
 import './TestSetFilterAddModal.css';
@@ -31,6 +35,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
     const [testSetName, setTestSetName] = useState("");
+    const [limit, setLimit] = useState(50);
     const [testLabPath, setTestLabPath] = useState("");
     const [owners, setOwners] = useState([]);
     const [subscribers, setSubscribers] = useState([]);
@@ -83,6 +88,10 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         setTestSetName(e.target.value);
     }
 
+    let handleLimitChange = (e) => {
+        setLimit(e.target.value);
+    }
+
     let handleTestLabPathChange = (e) => {
         setTestLabPath(e.target.value);
     }
@@ -106,6 +115,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     let clearForm = () => {
         setTestSetName("");
         setTestLabPath("");
+        setLimit(50);
         setSelectedTestLinesTypes([]);
         setSelectedFailMessageTypeGroup([]);
         setOwners([]);
@@ -122,6 +132,9 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
             "subscribers": []
         }
         filterToAdd.test_set_name = testSetName;
+        if (limit !== null) {
+            filterToAdd.limit = limit;
+        }
         filterToAdd.test_lab_path = testLabPath;
         filterToAdd.testline_types = selectedTestLinesTypes.map(map_tl => ({ "name": map_tl }));
 
@@ -140,6 +153,15 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         postTestSetFilter(filterToAdd).then(
             (response) => {
                 Notify.sendNotification(Successes.ADD_TEST_SET_FILTER, AlertTypes.success);
+
+                schedulePullOfTestRunsDataByTestSetFilters(response.data.id.toString()).then(
+                    (response) => {
+                        Notify.sendNotification(Infos.SCHEDULE_PULL, AlertTypes.info);
+                    },
+                    (error) => {
+                        Notify.sendNotification(Errors.SCHEDULE_PULL, AlertTypes.error);
+                    })
+
                 clearForm();
                 handleFormClose();
             },
@@ -158,6 +180,9 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
             "subscribers": []
         }
         filterToEdit.test_set_name = testSetName;
+        if (limit !== null) {
+            filterToEdit.limit = limit;
+        }
         filterToEdit.test_lab_path = testLabPath;
         filterToEdit.testline_types = selectedTestLinesTypes.map(map_tl => ({ "name": map_tl }));
 
@@ -194,6 +219,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         getTestSetFilter(id).then(
             (result) => {
                 setTestSetName(result.data.test_set_name);
+                setLimit(result.data.limit);
                 setTestLabPath(result.data.test_lab_path);
                 if (result.data.testline_types.length !== 0)
                     setSelectedTestLinesTypes(result.data.testline_types.map(tl => tl.name));
@@ -238,6 +264,12 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
                     <br />
                     <MultiSelect value={selectedTestLinesTypes} options={testLinesTypes} onChange={handleTestLineTypeChange} style={{ width: "100%" }}
                         optionLabel="label" filter showClear filterBy="label" />
+                </div>
+                <div className="form-item">
+                    <Tooltip target=".infoIcon" content="Specifies how many test runs should be pulled from RP during data synchronization. Typically try to fill this field with 2-3x the count of the test instances in this TestSet in order to anticipate more than one executions." position="top"  style={{ fontSize: "13px" }}/>
+                    <label>Limit <FaInfoCircle className='infoIcon'/></label>
+                    <br></br>
+                    <InputNumber  value={limit} onValueChange={handleLimitChange} min={1} max={100}/>
                 </div>
                 <div className="form-item">
                     <label>Fail Message Type Groups</label>

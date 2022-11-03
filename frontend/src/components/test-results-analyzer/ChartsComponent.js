@@ -33,7 +33,7 @@ import Notify, { AlertTypes, Errors, Infos, Successes } from '../../services/Not
 
 import './ChartsComponent.css';
 import FilterStesTableComponent from "./FilterSetsTableComponent";
-import GenerateChartComponent from "./GenerateChartComponent";
+// import GenerateChartComponent from "./GenerateChartComponent";
 
 
 let ChartsComponent = () => {
@@ -339,7 +339,7 @@ let ChartsComponent = () => {
 
             <div className="m-3">
                 <Card>
-                    <GenerateChartComponent />
+                    {/* <GenerateChartComponent /> */}
                 </Card>
             </div>
 

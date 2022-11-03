@@ -1,6 +1,5 @@
-from doctest import Example
-from drf_yasg.utils import swagger_auto_schema, no_body
 from drf_yasg import openapi
+from drf_yasg.utils import no_body, swagger_auto_schema
 
 
 def get_paged_scheme(object_scheme):

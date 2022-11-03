@@ -4,7 +4,7 @@
 //   Date                    Author                     Bug                 List of changes
 //  --------------------------------------------------------------------------
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FilterMatchMode } from 'primereact/api';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
@@ -14,13 +14,16 @@ import { VscExpandAll } from 'react-icons/vsc';
 import { BiBell, BiBellOff, BiTrash } from 'react-icons/bi';
 import { MdAddCircle } from 'react-icons/md';
 import { BiEdit } from 'react-icons/bi';
+import { IoArrowDownCircleSharp } from 'react-icons/io5';
+import { Toast } from 'primereact/toast';
 
 import UserFilterAddModal from './TestSetFilterAddModal';
 import {
     postSubscribeBatch, postUnsubscribeBatch, getTestSetFilters,
     postTestSetFilterSubscribe, postTestSetFilterUnsubscribe, deleteTestSetFilterBatch
 } from '../../services/test-results-analyzer/test-filters.service';
-import Notify, { AlertTypes, Successes, Errors } from '../../services/Notify.js';
+import { schedulePullOfTestRunsDataByTestSetFilters } from '../../services/test-results-analyzer/test-runs.service';
+import Notify, { AlertTypes, Successes, Errors, Infos } from '../../services/Notify.js';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 
 
@@ -28,6 +31,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './TestSetFiltersComponent.css';
 
 let TestSetFiltersComponent = ({ type }) => {
+
+    const toast = useRef(null);
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
@@ -178,6 +183,17 @@ let TestSetFiltersComponent = ({ type }) => {
         setSelectedTestFilters(selectedTestFiltersValue);
     }
 
+    const triggerPull = () => {
+        schedulePullOfTestRunsDataByTestSetFilters(selectedTestFilters.map((testFilter) => (testFilter.id)).join(',')).then(
+            (response) => {
+                Notify.sendNotification(Infos.SCHEDULE_PULL_SELECTED, AlertTypes.info);
+                Notify.sendNotification(Infos.SCHEDULE_PULL_WAIT, AlertTypes.sticky);
+            }, (error) => {
+                Notify.sendNotification(Errors.SCHEDULE_PULL_SELECTED, AlertTypes.error);
+            }
+        )
+    }
+
     const sunscribeSelectedTestFilters = () => {
         postSubscribeBatch(selectedTestFilters.map((testFilter) => ({ "id": testFilter.id }))).then(
             (response) => {
@@ -230,10 +246,20 @@ let TestSetFiltersComponent = ({ type }) => {
 
     return (
         <>
+            <Toast ref={toast} />
             <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={addFilter}>
                 <MdAddCircle size='20' />
                 <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
             </Button>
+            {type === "subscribed" ?
+                <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button p-button-sm" onClick={triggerPull}
+                disabled={selectedTestFilters.length === 0}>
+                <IoArrowDownCircleSharp size='20' />
+                <span style={{ marginLeft: '5px' }}>Trigger test runs pull</span>
+            </Button>
+                : null
+            }
+            
             {type !== "subscribed" ?
                 <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm"
                     onClick={sunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>

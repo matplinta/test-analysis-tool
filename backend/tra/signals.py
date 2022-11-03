@@ -1,8 +1,10 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
+
 from . import models
-from .storage import get_storage_instance
 from . import tasks as celery_tasks
+from .storage import get_storage_instance
+
 
 @receiver(post_delete, sender=models.LastPassingLogs)
 def delete_logs_in_storage(sender, instance: models.LastPassingLogs, using, **kwargs):

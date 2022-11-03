@@ -11,6 +11,13 @@ class NotificationService {
         theme: 'colored'
     }
 
+    configurationSticky = {
+        position: toast.POSITION.TOP_RIGHT,
+        transition: Zoom,
+        autoClose: false,
+        // theme: 'colored'
+    }
+
     configurationLonger = {
         position: toast.POSITION.TOP_RIGHT,
         transition: Zoom,
@@ -29,6 +36,9 @@ class NotificationService {
                         break;
                     case AlertTypes.info:
                         notifications.next(() => toast.info(msg, this.configurationLonger));
+                        break;
+                    case AlertTypes.sticky:
+                        notifications.next(() => toast.info(msg, this.configurationSticky));
                         break;
                     case AlertTypes.warn:
                         notifications.next(() => toast.warn(msg, this.configuration));
@@ -55,6 +65,7 @@ export default Notify;
 export const AlertTypes = Object.freeze({
     success: Symbol('success'),
     info: Symbol('info'),
+    sticky: Symbol('info'),
     warn: Symbol('warn'),
     error: Symbol('error')
 });
@@ -80,6 +91,7 @@ export const Successes = {
     'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
     'ADD_FILTER_SET': 'Filter set was added successfully!',
     'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!'
+    
 }
 
 export const Errors = {
@@ -124,7 +136,9 @@ export const Errors = {
     'DELETE_USER_MESSAGE': 'Error during deleting user\' message!',
     'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!',
     'DOWNLOAD_EXCEL': 'Error during excel generating!',
-    'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!'
+    'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!',
+    'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
+    'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!'
 
 }
 
@@ -136,5 +150,8 @@ export const Warnings = {
 
 export const Infos = {
     'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!',
-    'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded. After that excel file with report will be downloaded to your computer!'
+    'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded. After that excel file with report will be downloaded to your computer!',
+    'SCHEDULE_PULL': 'Test runs pull for created TestSetFilter was triggered.',
+    'SCHEDULE_PULL_SELECTED': 'Test runs pull for selected TestSetFilters was triggered',
+    'SCHEDULE_PULL_WAIT': 'The pull may take up to ~1 minute. Please refresh the page then'
 }
