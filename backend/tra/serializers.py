@@ -1,21 +1,12 @@
-from .models import (
-    FailMessageTypeGroup,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    Branch,
-    EnvIssueType, 
-    FailMessageType,
-    FeatureBuild,
-    LastPassingLogs,
-    Notification
-)
-from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 from backend.serializers import UserSerializer
+
+from .models import (Branch, EnvIssueType, FailMessageType,
+                     FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
+                     Notification, Organization, TestInstance, TestlineType,
+                     TestRun, TestRunResult, TestSetFilter)
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -97,6 +88,9 @@ class TestlineTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestlineType
         fields = ('name',)
+        extra_kwargs = {
+            'name': {'validators': []}
+        }
 
 
 class EnvIssueTypeSerializer(serializers.ModelSerializer):

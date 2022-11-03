@@ -46,7 +46,7 @@ let TestSetFiltersComponent = ({ type }) => {
         'test_lab_path': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'branch': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'description': { value: null, matchMode: FilterMatchMode.CONTAINS },
-        'testline_type': { value: null, matchMode: FilterMatchMode.CONTAINS },
+        'testline_types': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'owners': { value: null, matchMode: FilterMatchMode.CONTAINS },
         'subscribers': { value: null, matchMode: FilterMatchMode.CONTAINS }
     })
@@ -64,7 +64,7 @@ let TestSetFiltersComponent = ({ type }) => {
                         "test_set_name": filter.test_set_name,
                         "test_lab_path": filter.test_lab_path,
                         "branch": filter.branch,
-                        "testline_type": filter.testline_type,
+                        "testline_types": filter.testline_types.map(type => type.name).join(', '),
                         "owners": filter.owners.map(owner => owner.username).join(', '),
                         "subscribers": filter.subscribers.map(subscriber => subscriber.username).join(', '),
                         "description": filter.description,
@@ -266,7 +266,7 @@ let TestSetFiltersComponent = ({ type }) => {
                 <Column field="test_set_name" header="Test Set Name" sortable filter filterPlaceholder="Search by test set name"></Column>
                 <Column field="test_lab_path" header="Test Lab Path" sortable filter filterPlaceholder="Search by test lab path"></Column>
                 <Column field="branch" header="Branch" sortable filter filterPlaceholder="Search by branch" ></Column>
-                <Column field="testline_type" header="Testline Type" sortable filter filterPlaceholder="Search by testline type" ></Column>
+                <Column field="testline_types" header="Testline Types" sortable filter filterPlaceholder="Search by testline type" ></Column>
                 <Column field="owners" header="Owners" filter filterPlaceholder="Search by owner" />
                 <Column field="subscribers" header="Subscribers" filter filterPlaceholder="Search by subscriber" />
                 <Column field="description" header="Description" sortable filter filterPlaceholder="Search by description"></Column>
