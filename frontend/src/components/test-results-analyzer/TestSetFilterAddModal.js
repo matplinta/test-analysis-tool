@@ -159,12 +159,7 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
         }
         filterToEdit.test_set_name = testSetName;
         filterToEdit.test_lab_path = testLabPath;
-
-        let testLineTypes_tmp = [];
-        if (testLinesTypes.length > 0) {
-            testLineTypes_tmp = testLinesTypes.filter(group => selectedTestLinesTypes.includes(group.name));
-        }
-        filterToEdit.testline_types = testLineTypes_tmp.map(mapGroup => ({ "name": mapGroup.name }));
+        filterToEdit.testline_types = selectedTestLinesTypes.map(map_tl => ({ "name": map_tl }));
 
         let fail_message_type_groups_tmp = [];
         if (failMessageTypeGroupsList.length > 0) {
