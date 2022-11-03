@@ -5,7 +5,7 @@
 //  --------------------------------------------------------------------------
 
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Divider } from 'primereact/divider';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
@@ -25,6 +25,9 @@ import { FaChartBar } from 'react-icons/fa';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 
+import FilterStesTableComponent from "./FilterSetsTableComponent";
+import GenerateChartComponent from "./GenerateChartComponent";
+
 import {
     getFilterFields, postFilterSetsDetail, getExcelFromSavedFilterSet, postToGetExcelFromTemporaryDefinedFilterSet
 } from './../../services/test-results-analyzer/statistics.service';
@@ -32,8 +35,6 @@ import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Infos, Successes } from '../../services/Notify.js';
 
 import './ChartsComponent.css';
-import FilterStesTableComponent from "./FilterSetsTableComponent";
-import GenerateChartComponent from "./GenerateChartComponent";
 
 
 let ChartsComponent = () => {
@@ -59,6 +60,10 @@ let ChartsComponent = () => {
     const [dates, setDates] = useState(null)
 
     const [blockedPanel, setBlockedPanel] = useState(false);
+
+    const [chartVisible, setChartVisible] = useState(false);
+
+    const [chartLoaded, setChartLoaded] = useState(false);
 
     let today = new Date();
     let year = today.getFullYear();
@@ -102,7 +107,7 @@ let ChartsComponent = () => {
     const onFilterValueChange = (item, index, e) => {
         let tmp = [...filters]
         tmp[index].value = e.target.value;
-        setFilters(tmp)
+        setFilters(tmp);
     }
 
     const removeFilter = (item, index) => {
@@ -164,7 +169,8 @@ let ChartsComponent = () => {
     }
 
     const generateChart = () => {
-
+        setChartLoaded(false);
+        setChartVisible(true);
     }
 
     const clearFilterSet = () => {
@@ -276,7 +282,8 @@ let ChartsComponent = () => {
                                             </Col>
                                             <Col xl={8} className="pr-0 m-0">
                                                 <InputTextarea value={item.value} onChange={(e) => onFilterValueChange(item, index, e)} rows={1}
-                                                    cols={30} autoResize placeholder="Provide value" style={{ width: '100%' }} />
+                                                    autoResize={true}
+                                                    cols={30} placeholder="Provide value" style={{ width: '100%', height: '50px' }} />
                                             </Col>
                                             <Col xl={1} className="m-0">
                                                 <Button className="p-button-primary yellow-200 p-button-sm" onClick={() => removeFilter(item, index)}
@@ -313,12 +320,11 @@ let ChartsComponent = () => {
                             </Col>
                         </Row>
 
-
                         <Row>
                             <Col>
                                 <Button className="p-button-primary font-bold mr-1" type="submit" onClick={generateChart} >
                                     <FaChartBar size='26' />
-                                    <span className='ml-2'>Generate Chart</span>
+                                    <span className='ml-2'>Generate Failed Runs Chart</span>
                                 </Button>
                                 <Button className="font-bold mr-1" style={{ backgroundColor: '#217346', borderColor: '#217346' }}
                                     onClick={downloadFilterSetExcel} >
@@ -328,27 +334,36 @@ let ChartsComponent = () => {
                             </Col>
                         </Row>
                     </Container>
-
                 </Card>
+
                 <Divider layout="vertical"></Divider>
+
                 <Card style={{ width: '45%' }}>
-                    <FilterStesTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
-                        reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters} />
+                    <Container className="pl-2">
+                        <Row>
+                            <Col>
+                                <FilterStesTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
+                                    reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters} />
+                            </Col>
+                        </Row>
+                    </Container>
                 </Card>
             </div >
 
-            <div className="m-3">
-                <Card>
-                    <GenerateChartComponent />
-                </Card>
-            </div>
+
+            <Dialog visible={chartVisible} style={{ width: '99%' }} onHide={() => setChartVisible(false)}>
+                <div className="m-3">
+                    <Card>
+                        <GenerateChartComponent selectedFilterSet={selectedFilterSet} filters={filters} datesPeriod={dates} setBlockedPanel={setBlockedPanel} setChartLoaded={setChartLoaded} />
+                    </Card>
+                </div>
+            </Dialog>
 
             <Dialog visible={blockedPanel} >
                 <ProgressSpinner
                     style={{ width: '250px', height: '250px', position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
                     strokeWidth="5" fill="#999999" />
             </Dialog>
-
 
             <Dialog header="Selected field has already been used!" visible={displayAlert} onHide={() => setDisplayAlert(false)}
                 dismissableMask={true} style={{ width: '30vw' }}>

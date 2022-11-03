@@ -11,10 +11,12 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { confirmDialog } from 'primereact/confirmdialog';
+import { FilterMatchMode } from 'primereact/api';
+import { SelectButton } from 'primereact/selectbutton';
 
 import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
-import { deleteFilterSetsDetail, getFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import { deleteFilterSetsDetail, getFilterSetsDetail, getMyFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
 
 let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTestSetFilters, setReloadTestSetFilters }) => {
 
@@ -24,8 +26,23 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
+    const toggleOptions = ['My Filter Sets', 'All Filter Sets'];
+    const [toggleValue, setToggleValue] = useState('My Filter Sets');
+
     const fetchFilterSets = () => {
         getFilterSetsDetail().then(
+            (results) => {
+                setFilterSets(results.data.results)
+                setLoading(false);
+                setReloadTestSetFilters(false);
+            }, (error) => {
+                setLoading(false);
+                Notify.sendNotification(Errors.FETCH_FILTER_SETS, AlertTypes.error);
+            })
+    }
+
+    const fetchMyFilterSets = () => {
+        getMyFilterSetsDetail().then(
             (results) => {
                 setFilterSets(results.data.results)
                 setLoading(false);
@@ -67,34 +84,51 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
 
     let selectFilterSetInTable = (filterSet) => {
         selectFilterSet(filterSet)
-        fetchFilterSets();
+        // fetchFilterSets();
+    }
+
+    let fetchFilterSetsWrapper = (value) => {
+        if (value === 'My Filter Sets') {
+            fetchMyFilterSets();
+        } else {
+            fetchFilterSets();
+        }
+    }
+
+    let onToggleValueChange = (value) => {
+        setToggleValue(value);
+        fetchFilterSetsWrapper(value);
     }
 
     useEffect(() => {
         fetchCurrentUser();
-        fetchFilterSets();
+        fetchFilterSetsWrapper(toggleValue);
     }, [])
 
     useEffect(() => {
-        fetchFilterSets();
+        fetchFilterSetsWrapper(toggleValue);
     }, [reloadTestSetFilters])
 
     return (
-        <DataTable value={filterSets} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
-            size="small" className="fail-message-table"
-            filterDisplay="row" loading={loading}
-            globalFilterFields={['name', 'regex', 'author', 'description']}
-            emptyMessage="No filter sets found."
-            scrollHeight="70vh"
-            resizableColumns columnResizeMode="fit"
-            selectionMode="single" selection={selectedFilterSet}
-            onSelectionChange={e => selectFilterSetInTable(e.value)}>
+        <>
+            <SelectButton value={toggleValue} options={toggleOptions} onChange={(e) => onToggleValueChange(e.value)}
+                className="select-button-my-all ml-1 mb-3" />
+            <DataTable value={filterSets} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
+                size="small" className="fail-message-table"
+                filterDisplay="row" loading={loading}
+                globalFilterFields={['name', 'regex', 'author', 'description']}
+                emptyMessage="No filter sets found."
+                scrollHeight="calc(100vh - 220px)"
+                resizableColumns columnResizeMode="fit"
+                selectionMode="single" selection={selectedFilterSet}
+                onSelectionChange={e => selectFilterSetInTable(e.value)}>
 
-            <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
-            <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
-            <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
+                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
+                <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
+                <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
 
-        </DataTable >
+            </DataTable >
+        </>
     )
 }
 

@@ -28,6 +28,10 @@ export const getFilterSetsDetail = async () => {
     return (await axios.get('api/tra/stats/filtersets_detailed', { headers: authHeader() }));
 }
 
+export const getMyFilterSetsDetail = async () => {
+    return (await axios.get('api/tra/stats/filtersets_detailed/my/', { headers: authHeader() }));
+}
+
 export const getUserSummary = async () => {
     return (await axios.get('api/tra/summary/', { headers: authHeader() }));
 }
