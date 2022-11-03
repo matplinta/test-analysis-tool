@@ -27,7 +27,6 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
     const [selectedFailMessageTypeGroup, setSelectedFailMessageTypeGroup] = useState([]);
     const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
     const [usersList, setUsersList] = useState([]);
-    // const [testLineTypesList, setTestLineTypesList] = useState([]);
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
