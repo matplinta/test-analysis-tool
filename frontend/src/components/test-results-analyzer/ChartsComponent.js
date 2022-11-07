@@ -43,7 +43,7 @@ import './ChartsComponent.css';
 let ChartsComponent = () => {
 
     const [filtersetName, setFiltersetName] = useState("");
-    const [filterFields, setFilterFields] = useState(null);
+    const [filterFields, setFilterFields] = useState([]);
     const [selectedFilterSet, setSelectedFilterSet] = useState(null);
 
     const [selectedFilterFields, setSelectedFilterFields] = useState([]);
@@ -60,7 +60,7 @@ let ChartsComponent = () => {
 
     const [filters, setFilters] = useState([filterTemplate]);
 
-    const [displayAlert, setDisplayAlert] = useState(false)
+    const [displayAlertFieldAlreadyUsed, setDisplayAlertFieldAlreadyUsed] = useState(false)
 
     const [dates, setDates] = useState(null);
 
@@ -103,7 +103,7 @@ let ChartsComponent = () => {
 
     const onFilterChange = (item, index, e) => {
         if (selectedFilterFields.filter(selectedFilter => selectedFilter.field === e.value).length > 0) {
-            setDisplayAlert(true)
+            setDisplayAlertFieldAlreadyUsed(true)
         } else {
             let tmp = [...filters]
             tmp[index].field = e.value;
@@ -389,13 +389,16 @@ let ChartsComponent = () => {
 
                         <Row>
                             <Col>
-                                <Button icon="pi pi-plus" className="p-button-rounded p-button-primary" aria-label="Filter" onClick={addFilter}
-                                    tooltip="Click to add new empty filter to filters list form" style={{ marginTop: '5px', marginBottom: '7px' }} />
+                                {filterFields !== null &&
+                                    <Button icon="pi pi-plus" className="p-button-rounded p-button-primary" aria-label="Filter" onClick={addFilter}
+                                        tooltip="Click to add new empty filter to filters list form" style={{ marginTop: '5px', marginBottom: '7px' }}
+                                        disabled={filters.length >= filterFields.length} />
+                                }
                             </Col>
                         </Row>
 
                         <Row>
-                            <label htmlFor="fail_message_group" className="block font-bold">
+                            <label htmlFor="fail_message_group" className="font-bold">
                                 <span>Fail message Groups</span>
                                 <Tooltip target=".fail-message-group-info-icon" />
                                 <i className="fail-message-group-info-icon pi pi-info-circle ml-1"
@@ -403,19 +406,19 @@ let ChartsComponent = () => {
                                     data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
                             </label>
                             <MultiSelect value={selectedFailMessageTypeGroups} options={failMessageTypeGroupsList} onChange={handleFailMessageTypeGroupsChange}
-                                optionLabel="name" optionValue="id" filter showClear filterBy="label" id="fail_message_group" className="ml-3 mb-2 mt-1 mr-2"
-                                style={{ marginLeft: "5px", maxWidth: '96%' }} />
+                                optionLabel="name" optionValue="id" filter showClear id="fail_message_group" className="ml-2 mb-2 mt-1 mr-2"
+                                style={{ maxWidth: '96%' }} />
                         </Row>
 
                         <Row>
-                            <label htmlFor="limit" className="block font-bold">
+                            <label htmlFor="limit" className="font-bold">
                                 <span>Limit</span>
                                 <Tooltip target=".limit-info-icon" />
                                 <i className="limit-info-icon pi pi-info-circle ml-1"
                                     data-pr-tooltip="dodac opis limit"
                                     data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
                             </label>
-                            <InputNumber id="limit" value={limit} onValueChange={(e) => setLimit(e.value)} mode="decimal" useGrouping={false} className="mb-2 mt-1" style={{ maxWidth: '30%' }} />
+                            <InputNumber id="limit" value={limit} onValueChange={(e) => setLimit(e.value)} mode="decimal" useGrouping={false} className="mb-2 mt-1" style={{ marginLeft: '0', maxWidth: '30%' }} />
                         </Row>
 
                         <Divider style={{ height: '10px', color: 'black' }} />
@@ -479,7 +482,7 @@ let ChartsComponent = () => {
                     strokeWidth="5" fill="#999999" />
             </Dialog>
 
-            <Dialog header="Selected field has already been used!" visible={displayAlert} onHide={() => setDisplayAlert(false)}
+            <Dialog header="Selected field has already been used!" visible={displayAlertFieldAlreadyUsed} onHide={() => setDisplayAlertFieldAlreadyUsed(false)}
                 dismissableMask={true} style={{ width: '30vw' }}>
                 <br />
                 <p>Filter field value can be selected only once in this form. Please add value to selected before if you want

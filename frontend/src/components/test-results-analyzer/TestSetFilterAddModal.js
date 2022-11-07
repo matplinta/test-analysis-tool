@@ -266,10 +266,15 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
                         optionLabel="label" filter showClear filterBy="label" />
                 </div>
                 <div className="form-item">
-                    <Tooltip target=".infoIcon" content="Specifies how many test runs should be pulled from RP during data synchronization. Typically try to fill this field with 2-3x the count of the test instances in this TestSet in order to anticipate more than one executions." position="top"  style={{ fontSize: "13px" }}/>
-                    <label>Limit <FaInfoCircle className='infoIcon'/></label>
+                    <label>
+                        <span>Limit</span>
+                        <Tooltip target=".infoIcon" />
+                        <i className="infoIcon pi pi-info-circle ml-1"
+                            data-pr-tooltip="Specifies how many test runs should be pulled from RP during data synchronization. Typically try to fill this field with 2-3x the count of the test instances in this TestSet in order to anticipate more than one executions."
+                            data-pr-position="right" style={{ fontSize: '0.9rem', cursor: 'pointer' }} />
+                    </label>
                     <br></br>
-                    <InputNumber  value={limit} onValueChange={handleLimitChange} min={1} max={100}/>
+                    <InputNumber value={limit} onValueChange={handleLimitChange} min={1} max={100} />
                 </div>
                 <div className="form-item">
                     <label>Fail Message Type Groups</label>
@@ -301,20 +306,21 @@ let TestSetFilterAddModal = ({ filterIdToEdit, showForm, handleFormClose }) => {
                     <MultiSelect value={subscribers} options={usersList} onChange={handleSubscribers} style={{ width: "100%" }}
                         optionLabel="username" optionValue="username" filter showClear filterBy="username" />
                 </div>
-                {filterIdToEdit === null ?
-                    <div className="form-item">
-                        <Button className="p-button-primary " type="submit" onClick={handleFilterAdd}>
-                            Add Filter
-                        </Button>
-                        <Button className="p-button-primary " type="submit" onClick={clearForm}>
-                            Clear Form
-                        </Button>
-                    </div>
-                    : <div className="form-item">
-                        <Button className="p-button-primary " type="submit" onClick={handleFilterEdit}>
-                            Save Filter
-                        </Button>
-                    </div>
+                {
+                    filterIdToEdit === null ?
+                        <div className="form-item">
+                            <Button className="p-button-primary " type="submit" onClick={handleFilterAdd}>
+                                Add Filter
+                            </Button>
+                            <Button className="p-button-primary " type="submit" onClick={clearForm}>
+                                Clear Form
+                            </Button>
+                        </div>
+                        : <div className="form-item">
+                            <Button className="p-button-primary " type="submit" onClick={handleFilterEdit}>
+                                Save Filter
+                            </Button>
+                        </div>
                 }
             </Dialog >
 
