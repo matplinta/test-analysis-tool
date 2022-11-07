@@ -11,7 +11,7 @@ class FilterSerializerListOnly(serializers.ModelSerializer):
 
 
 class FilterSerializer(serializers.ModelSerializer):
-    filter_set = serializers.CharField(source="filter_set.name")
+    # filter_set = serializers.CharField(source="filter_set.id")
     field = serializers.CharField(source="field.name")
 
     class Meta:
@@ -20,7 +20,7 @@ class FilterSerializer(serializers.ModelSerializer):
 
     def validate_filter_set(self, value):
         try: 
-            fs = FilterSet.objects.get(name=value)
+            fs = FilterSet.objects.get(id=value)
         except FilterSet.DoesNotExist:
             raise serializers.ValidationError(f"Specified FilterSet: {value} does not exist")
         return value
