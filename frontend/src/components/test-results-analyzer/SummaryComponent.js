@@ -83,7 +83,7 @@ const SummaryComponent = () => {
     return (
         <>
             {summary !== null && loading === false ?
-                <div className="surface-ground summarySurfaceBackground px-4 py-8 md:px-6 lg:px-8">
+                <div className="summarySurfaceBackground px-4 py-8 md:px-6 lg:px-8">
                     <div className="grid">
                         <div className={`col-12 px-6 pb-4 md:col-12 lg:col-12`}>
                             <h3>{`Summary of the latest FB's runs`}</h3>

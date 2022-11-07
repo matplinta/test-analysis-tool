@@ -70,7 +70,8 @@
 }
 
 body {
-  background-color: #f2f2f2;
+  /* background-color: #f2f2f2; */
+  background-color: var(--surface-ground);
   height: 100vh;
   margin: 0;
   position: relative;

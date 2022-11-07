@@ -45,7 +45,7 @@ let TestInstancesComponent = () => {
             'test_case_name__icontains': { value: null, matchMode: 'contains' },
             'test_set__test_lab_path__icontains': { value: null, matchMode: 'contains' },
             'test_set__branch__name__icontains': { value: null, matchMode: 'contains' },
-            'test_set__testline_type__name__icontains': { value: null, matchMode: 'contains' },
+            'testline_type__name__icontains': { value: null, matchMode: 'contains' },
             'test_set__test_set_name__icontains': { value: null, matchMode: 'contains' },
             'last_passing_logs__utecloud_run_id': { value: null, matchMode: 'contains' },
             'organization__name__icontains': { value: null, matchMode: 'contains' },
@@ -257,9 +257,9 @@ let TestInstancesComponent = () => {
                         filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', width: '13%' }} />
 
-                    <Column field="test_set.testline_type" columnKey="test_set.testline_type" header="Testline Type"
-                        sortable sortField="test_set__testline_type__name"
-                        filterField="test_set__testline_type__name__icontains"
+                    <Column field="testline_type" columnKey="testline_type" header="Testline Type"
+                        sortable sortField="testline_type__name"
+                        filterField="testline_type__name__icontains"
                         filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         filterElement={testLineTypeFilter}
                         style={{ fontSize: '11px', width: '10%', maxWidth: '11%' }} />
