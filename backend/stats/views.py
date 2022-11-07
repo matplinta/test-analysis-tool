@@ -134,11 +134,11 @@ class FilterSetDetailView(viewsets.GenericViewSet):
             if elem not in request.data.keys():
                 raise serializers.ValidationError({elem: "value missing"})
         filterset_name = request.data["name"]
+        filterset, created = FilterSet.objects.get_or_create(name=filterset_name, author=request.user)
         filters = request.data["filters"]
         for elem in filters:
-            elem["filter_set"] = filterset_name
+            elem["filter_set"] = filterset.id
 
-        filterset, created = FilterSet.objects.get_or_create(name=filterset_name, author=request.user)
         self.check_object_permissions(self.request, filterset)
 
         serializer = FilterSerializer(data=filters, many=True)

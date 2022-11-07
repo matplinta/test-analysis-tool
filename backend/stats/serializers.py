@@ -11,7 +11,7 @@ class FilterSerializerListOnly(serializers.ModelSerializer):
 
 
 class FilterSerializer(serializers.ModelSerializer):
-    # filter_set = serializers.CharField(source="filter_set.id")
+    filter_set = serializers.IntegerField(source="filter_set.id")
     field = serializers.CharField(source="field.name")
 
     class Meta:
