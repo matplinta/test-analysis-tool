@@ -48,13 +48,10 @@ let LoginForm = ({ handleSuccess, handleFail, handleClose }) => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control required value={password} onChange={handleInputChange} type="password" placeholder="Enter password" />
             </Form.Group>
-
-            <Button className="p-button-primary" type="submit">
-                Log in
-            </Button>
-            <Button className="p-button-primary" type="submit" onClick={handleClose}>
-                Cancel
-            </Button>
+            <div style={{display: 'flex'}}>
+                <Button label="Log in" className="p-button-primary" style={{ flex: '1'}} type="submit"></Button>
+                {handleClose !== null ? <Button label="Cancel" className="p-button-primary" style={{float: 'right', flex: '1'}} type="submit" onClick={handleClose}></Button> : null}
+            </div>
         </Form>
     )
 }
