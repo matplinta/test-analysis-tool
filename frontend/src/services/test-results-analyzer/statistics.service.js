@@ -63,6 +63,7 @@ export const postToGetExcelFromTemporaryDefinedFilterSet = async (filterSet, dat
 }
 
 export const getChartFromSavedFilterSet = async (filterSetId, dates) => {
+    console.log(dates)
     let dateFilter = null;
     dates !== null ? dateFilter = `&date_start=${formatDate(dates[0])}&date_end=${formatDate(dates[1])}` : dateFilter = "";
     return (await axios.get('api/tra/stats/fail_barchart' + '?filterset=' + filterSetId + dateFilter, { headers: authHeader() }));

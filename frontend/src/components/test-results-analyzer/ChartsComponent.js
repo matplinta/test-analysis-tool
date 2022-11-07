@@ -23,14 +23,18 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { RiFileExcel2Line } from 'react-icons/ri';
 import { FaChartBar } from 'react-icons/fa';
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import { MultiSelect } from 'primereact/multiselect';
 import { Tooltip } from 'primereact/tooltip';
+import { InputNumber } from 'primereact/inputnumber';
 
 import FilterStesTableComponent from "./FilterSetsTableComponent";
 import GenerateChartComponent from "./GenerateChartComponent";
 
 import {
-    getFilterFields, postFilterSetsDetail, getExcelFromSavedFilterSet, postToGetExcelFromTemporaryDefinedFilterSet
+    getFilterFields, postFilterSetsDetail, getExcelFromSavedFilterSet, postToGetExcelFromTemporaryDefinedFilterSet,
+    getChartFromSavedFilterSet, postToGetChartFromTemporaryDefinedFilterSet
 } from './../../services/test-results-analyzer/statistics.service';
+import { getFailMessageTypeGroups } from '../../services/test-results-analyzer/fail-message-type.service';
 import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Infos, Successes } from '../../services/Notify.js';
 
@@ -46,6 +50,8 @@ let ChartsComponent = () => {
     const [selectedFilterFields, setSelectedFilterFields] = useState([]);
     const [unselectedFilterFields, setUnselectedFilterFields] = useState([]);
 
+    const [limit, setLimit] = useState(1000);
+
     const [reloadTestSetFilters, setReloadTestSetFilters] = useState(false);
 
     const filterTemplate = {
@@ -57,13 +63,22 @@ let ChartsComponent = () => {
 
     const [displayAlert, setDisplayAlert] = useState(false)
 
-    const [dates, setDates] = useState(null)
+    const [dates, setDates] = useState(null);
 
     const [blockedPanel, setBlockedPanel] = useState(false);
 
     const [chartVisible, setChartVisible] = useState(false);
 
-    const [chartLoaded, setChartLoaded] = useState(false);
+    let [chartDataTemplate, setChartDataTemplate] = useState({
+        "labels": [],
+        "datasets": [{
+            "label": "",
+            "data": []
+        }]
+    })
+
+    const [selectedFailMessageTypeGroups, setSelectedFailMessageTypeGroups] = useState([]);
+    const [failMessageTypeGroupsList, setFailMessageTypeGroupsList] = useState([]);
 
     let today = new Date();
     let year = today.getFullYear();
@@ -81,7 +96,8 @@ let ChartsComponent = () => {
     const fetchFilterFields = () => {
         getFilterFields().then(
             (results) => {
-                setFilterFields(results.data.map(item => item.name));
+                let filterFields = results.data.filter(field => field.name !== "fail_message_type_groups" && field.name !== "limit");
+                setFilterFields(filterFields.map(item => item.name));
                 setUnselectedFilterFields(results.data);
             }, (error) => {
 
@@ -129,29 +145,61 @@ let ChartsComponent = () => {
     }
 
     const selectFilterSet = (filterSet) => {
-        setSelectedFilterSet(filterSet)
         setFiltersetName(filterSet.name);
-        setFilters(filterSet.filters);
+
+        let filterSetCopy = Object.assign({}, filterSet);
+
+        let limitObject = filterSetCopy.filters.filter(item => item.field === "limit");
+        if (limitObject.length > 0) {
+            setLimit(limitObject[0].value);
+        } else {
+            setLimit(1000);
+        }
+
+        let failMessagesGroups = filterSetCopy.filters.filter(item => item.field === "fail_message_type_groups");
+        if (failMessagesGroups.length > 0) {
+            let failMessagesGroupsIdsArray = failMessagesGroups[0].value.split(',')
+            failMessagesGroupsIdsArray = failMessagesGroupsIdsArray.map(item => parseInt(item));
+            setSelectedFailMessageTypeGroups(failMessagesGroupsIdsArray);
+        } else {
+            setSelectedFailMessageTypeGroups([]);
+        }
+
+        filterSetCopy.filters = filterSetCopy.filters.filter(item => item.field !== "limit" && item.field !== "fail_message_type_groups")
+        setSelectedFilterSet(filterSetCopy);
+
+        setFilters(filterSetCopy.filters);
     }
 
-    const preapreFiltersListToAdd = () => {
+    const prepareFiltersListToAdd = () => {
         let filtersList = [];
         for (let filter of filters) {
+            let filterSetTmp = {};
             if (filter.field !== "" && filter.value !== "") {
-                let filterSetTmp = {};
                 filterSetTmp.value = filter.value;
                 filterSetTmp.field = filter.field;
                 filtersList.push(filterSetTmp);
             }
+            return filtersList;
         }
-        return filtersList;
+    }
+
+    const prepareFiltersListWithLimitAndGroups = () => {
+        let filtersListWithLimitAndGroups = [...filters];
+        filtersListWithLimitAndGroups.push({ "field": "limit", "value": limit });
+        if (selectedFailMessageTypeGroups !== null && selectedFailMessageTypeGroups !== []) {
+            filtersListWithLimitAndGroups.push(
+                { "field": "fail_message_type_groups", "value": selectedFailMessageTypeGroups.join(',') }
+            )
+        }
+        return filtersListWithLimitAndGroups;
     }
 
     const saveFilterSet = () => {
+        let filtersList = prepareFiltersListToAdd();
         if (filtersetName !== "") {
-            let filtersList = preapreFiltersListToAdd();
             if (filtersList.length === filters.length) {
-                let filterSetToSendAll = { "name": filtersetName, "filters": filtersList }
+                let filterSetToSendAll = { "name": filtersetName, "filters": prepareFiltersListWithLimitAndGroups() }
                 postFilterSetsDetail(filterSetToSendAll).then(
                     (success) => {
                         Notify.sendNotification(Successes.ADD_FILTER_SET, AlertTypes.success);
@@ -160,17 +208,12 @@ let ChartsComponent = () => {
                         Notify.sendNotification(Errors.ADD_FILTER_SET, AlertTypes.error);
                     })
             } else {
-                Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
+                Notify.sendNotification(Errors.EMPTY_FIELDS_FILTERS_LIST, AlertTypes.error);
             }
         } else {
-            Notify.sendNotification(Errors.EMPTY_FIELDS, AlertTypes.error);
+            Notify.sendNotification(Errors.EMPTY_FIELDS_FILTERSET_NAME, AlertTypes.error);
         }
 
-    }
-
-    const generateChart = () => {
-        setChartLoaded(false);
-        setChartVisible(true);
     }
 
     const clearFilterSet = () => {
@@ -179,6 +222,8 @@ let ChartsComponent = () => {
         setFilters([filterTemplate]);
         setSelectedFilterFields([]);
         setUnselectedFilterFields(filterFields);
+        setLimit(1000);
+        setSelectedFailMessageTypeGroups([]);
     }
 
     const saveExcel = (data) => {
@@ -193,29 +238,29 @@ let ChartsComponent = () => {
         link.click();
     }
 
-    const getExcelFromSavedFilterSetAndSave = () => {
-        getExcelFromSavedFilterSet(selectedFilterSet.id, dates).then(
-            (response) => {
-                saveExcel(response.data);
-                setBlockedPanel(false);
-                Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
-            },
-            (error) => {
-                Notify.sendNotification(Error.DOWNLOAD_EXCEL, AlertTypes.error);
-                setBlockedPanel(false);
-            }
-        )
-    }
+    // const getExcelFromSavedFilterSetAndSave = () => {
+    //     getExcelFromSavedFilterSet(selectedFilterSet.id, getFullDateRange(dates)).then(
+    //         (response) => {
+    //             saveExcel(response.data);
+    //             setBlockedPanel(false);
+    //             Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
+    //         },
+    //         (error) => {
+    //             Notify.sendNotification(Errors.DOWNLOAD_EXCEL, AlertTypes.error);
+    //             setBlockedPanel(false);
+    //         }
+    //     )
+    // }
 
     const postExcelFromSavedFilterSetAndSave = () => {
-        postToGetExcelFromTemporaryDefinedFilterSet(filters, dates).then(
+        postToGetExcelFromTemporaryDefinedFilterSet(filters, getFullDateRange(dates)).then(
             (response) => {
                 saveExcel(response.data);
                 setBlockedPanel(false);
                 Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
             },
             (error) => {
-                Notify.sendNotification(Error.DOWNLOAD_EXCEL, AlertTypes.error);
+                Notify.sendNotification(Errors.DOWNLOAD_EXCEL, AlertTypes.error);
                 setBlockedPanel(false);
             }
         )
@@ -223,17 +268,107 @@ let ChartsComponent = () => {
 
     const downloadFilterSetExcel = () => {
         setBlockedPanel(true);
-        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.info);
+        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.info, 12000);
 
-        if (selectedFilterSet !== null)
-            getExcelFromSavedFilterSetAndSave();
-        else
-            postExcelFromSavedFilterSetAndSave();
+        // if (selectedFilterSet !== null)
+        // getExcelFromSavedFilterSetAndSave();
+        // else
+        postExcelFromSavedFilterSetAndSave();
+    }
+
+    const getFullDateRange = (datesRange) => {
+        if (datesRange === null) {
+            return null;
+        } else if (datesRange[0] !== null && datesRange[1] === null) {
+            return [datesRange[0], new Date()];
+        } else {
+            return datesRange;
+        }
+    }
+
+    // const fetchChartFromSavedFilterSet = (filterSetId) => {
+    //     getChartFromSavedFilterSet(filterSetId, getFullDateRange(dates)).then(
+    //         (results) => {
+    //             setChartDataTemplate({
+    //                 "labels": results.data.labels,
+    //                 "datasets": [{
+    //                     "label": results.data.info,
+    //                     "data": results.data.Occurrences
+    //                 }]
+    //             })
+    //             setBlockedPanel(false);
+    //             setChartVisible(true);
+    //             Notify.sendNotification(Successes.DOWNLOAD_CHART, AlertTypes.success);
+    //         }, (error) => {
+    //             setBlockedPanel(false);
+    //             Notify.sendNotification(Errors.DOWNLOAD_CHART, AlertTypes.error);
+    //         })
+    // }
+
+    const fetchChartFromTemporaryFilterSet = (filtersList) => {
+        postToGetChartFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(dates)).then(
+            (results) => {
+                setChartDataTemplate({
+                    "labels": results.data.labels,
+                    "datasets": [{
+                        "label": results.data.info,
+                        "data": results.data.Occurrences
+                    }]
+                })
+                console.log({
+                    "labels": results.data.labels,
+                    "datasets": [{
+                        "label": results.data.info,
+                        "data": results.data.Occurrences
+                    }]
+                })
+                setBlockedPanel(false);
+                setChartVisible(true);
+                Notify.sendNotification(Successes.DOWNLOAD_CHART, AlertTypes.success);
+            }, (error) => {
+                setBlockedPanel(false);
+                Notify.sendNotification(Errors.DOWNLOAD_CHART, AlertTypes.error);
+            })
+    }
+
+    const generateChart = () => {
+        setBlockedPanel(true);
+        Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.info, 12000);
+        // if (selectedFilterSet !== null) {
+        // fetchChartFromSavedFilterSet(selectedFilterSet.id, dates);
+        // }
+        // else {
+        let newFiltersList = prepareFiltersListWithLimitAndGroups();
+        console.log(newFiltersList)
+        fetchChartFromTemporaryFilterSet(newFiltersList, dates);
+        // }
+    }
+
+    let handleFailMessageTypeGroupsChange = (e) => {
+        setSelectedFailMessageTypeGroups(e.target.value)
+    }
+
+    let fetchFailMessageTypeGroups = () => {
+        getFailMessageTypeGroups().then(
+            (response) => {
+                if (response.data.length > 0) {
+                    const failMessageTypeGroupsValue = response.data.map(item => {
+                        return {
+                            name: " Group: " + item.name + " (Author: " + item.author + ")", id: item.id
+                        }
+                    })
+                    setFailMessageTypeGroupsList(failMessageTypeGroupsValue);
+                }
+            },
+            (error) => {
+                Notify.sendNotification(Errors.FETCH_FAIL_MESSAGE_GROUPS_LIST, AlertTypes.error);
+            })
     }
 
     useEffect(() => {
         fetchCurrentUser();
         fetchFilterFields();
+        fetchFailMessageTypeGroups();
     }, [])
 
     return (
@@ -267,7 +402,7 @@ let ChartsComponent = () => {
                         </Row>
                         <Row>
                             <Col>
-                                <span className="font-bold">Filters List</span>
+                                <span className="font-bold">Filters List (fields from Reporing Portal)</span>
                             </Col>
                         </Row>
 
@@ -294,6 +429,7 @@ let ChartsComponent = () => {
                                         </Row>
                                     );
                                 })}
+
                             </div>
                         </ScrollPanel>
 
@@ -304,7 +440,31 @@ let ChartsComponent = () => {
                             </Col>
                         </Row>
 
-                        <Divider style={{ height: '5px' }} />
+                        <Row>
+                            <label htmlFor="fail_message_group" className="block font-bold">
+                                <span>Fail message Groups</span>
+                                <Tooltip target=".fail-message-group-info-icon" />
+                                <i className="fail-message-group-info-icon pi pi-info-circle ml-1"
+                                    data-pr-tooltip="wypelnic opis"
+                                    data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
+                            </label>
+                            <MultiSelect value={selectedFailMessageTypeGroups} options={failMessageTypeGroupsList} onChange={handleFailMessageTypeGroupsChange}
+                                optionLabel="name" optionValue="id" filter showClear filterBy="label" id="fail_message_group" className="ml-3 mb-2 mt-1 mr-2"
+                                style={{ marginLeft: "5px", maxWidth: '96%' }} />
+                        </Row>
+
+                        <Row>
+                            <label htmlFor="limit" className="block font-bold">
+                                <span>Limit</span>
+                                <Tooltip target=".limit-info-icon" />
+                                <i className="limit-info-icon pi pi-info-circle ml-1"
+                                    data-pr-tooltip="dodac opis limit"
+                                    data-pr-position="right" style={{ fontSize: '1.1rem', cursor: 'pointer' }} />
+                            </label>
+                            <InputNumber id="limit" value={limit} onValueChange={(e) => setLimit(e.value)} mode="decimal" useGrouping={false} className="mb-2 mt-1" style={{ maxWidth: '30%' }} />
+                        </Row>
+
+                        <Divider style={{ height: '10px', color: 'black' }} />
 
                         <Row>
                             <Col>
@@ -343,7 +503,8 @@ let ChartsComponent = () => {
                         <Row>
                             <Col>
                                 <FilterStesTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
-                                    reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters} />
+                                    reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters}
+                                    clearForm={clearFilterSet} />
                             </Col>
                         </Row>
                     </Container>
@@ -354,7 +515,7 @@ let ChartsComponent = () => {
             <Dialog visible={chartVisible} style={{ width: '99%' }} onHide={() => setChartVisible(false)}>
                 <div className="m-3">
                     <Card>
-                        <GenerateChartComponent selectedFilterSet={selectedFilterSet} filters={filters} datesPeriod={dates} setBlockedPanel={setBlockedPanel} setChartLoaded={setChartLoaded} />
+                        <GenerateChartComponent chartDataTemplate={chartDataTemplate} />
                     </Card>
                 </div>
             </Dialog>

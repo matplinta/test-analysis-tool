@@ -1,65 +1,11 @@
-import { useState, useEffect } from 'react';
 import { Chart } from 'primereact/chart';
 
-import { getChartFromSavedFilterSet, postToGetChartFromTemporaryDefinedFilterSet }
-    from './../../services/test-results-analyzer/statistics.service';
-
-let GenerateChartComponent = ({ selectedFilterSet, filters, datesPeriod, setBlockedPanel, setChartLoaded }) => {
-
-    const [chartData, setChartData] = useState(null);
-
-    const [loading, setLoading] = useState(false);
-
-    let [dataTemplate, setDataTemplate] = useState({
-        "labels": [],
-        "datasets": [{
-            "label": "",
-            "data": []
-        }]
-    })
-
-    const fetchChartFromSavedFilterSet = (filterSetId, dates) => {
-        setBlockedPanel(true);
-        getChartFromSavedFilterSet(filterSetId, dates).then(
-            (results) => {
-                setChartData(results.data);
-                setDataTemplate({
-                    "labels": results.data.labels,
-                    "datasets": [{
-                        "label": results.data.info,
-                        "data": results.data.Occurrences
-                    }]
-                })
-                setBlockedPanel(false);
-                setChartLoaded(true);
-            }, (error) => {
-                setBlockedPanel(false);
-            })
-    }
-
-    const fetchChartFromTemporaryFilterSet = (filtersList, dates) => {
-        setBlockedPanel(true);
-        postToGetChartFromTemporaryDefinedFilterSet(filtersList, dates).then(
-            (results) => {
-                setChartData(results.data);
-
-                setDataTemplate({
-                    "labels": results.data.labels,
-                    "datasets": [{
-                        "label": results.data.info,
-                        "data": results.data.occurrences
-                    }]
-                })
-                setBlockedPanel(false);
-            }, (error) => {
-                setBlockedPanel(false);
-            })
-    }
+let GenerateChartComponent = ({ chartDataTemplate }) => {
 
     let horizontalOptions = {
         indexAxis: 'y',
-        maintainAspectRatio: false,
-        aspectRatio: 0.4,
+        maintainAspectRatio: true,
+        aspectRatio: 3,
         plugins: {
             legend: {
                 labels: {
@@ -68,7 +14,7 @@ let GenerateChartComponent = ({ selectedFilterSet, filters, datesPeriod, setBloc
             },
             title: {
                 display: true,
-                text: 'Failed test runs from RP by error type',
+                text: 'Failed test runs from Reporting Portal by error type',
                 size: 20,
                 padding: {
                     top: 10,
@@ -130,18 +76,9 @@ let GenerateChartComponent = ({ selectedFilterSet, filters, datesPeriod, setBloc
         responsive: true,
     };
 
-    useEffect(() => {
-        if (selectedFilterSet !== null) {
-            fetchChartFromSavedFilterSet(selectedFilterSet.id, datesPeriod);
-        }
-        else {
-            fetchChartFromTemporaryFilterSet(filters, datesPeriod);
-        }
-    }, [])
-
     return (
         <>
-            <Chart type="bar" data={dataTemplate} options={horizontalOptions} className="ml-3 mr-3 mt-2 mb-6" />
+            <Chart type="bar" data={chartDataTemplate} options={horizontalOptions} className="ml-3 mr-3 mt-2 mb-6" />
         </>
     )
 }

@@ -18,7 +18,7 @@ import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
 import { deleteFilterSetsDetail, getFilterSetsDetail, getMyFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
 
-let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTestSetFilters, setReloadTestSetFilters }) => {
+let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTestSetFilters, setReloadTestSetFilters, clearForm }) => {
 
     const [filterSets, setFilterSets] = useState(null);
 
@@ -58,6 +58,7 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
             (response) => {
                 Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.success);
                 fetchFilterSets();
+                clearForm();
             },
             (error) => {
                 Notify.sendNotification(Errors.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.error);
