@@ -15,9 +15,11 @@
   display: flex;
   justify-content: right;
   color: #004c9a;
-  position: absolute;
+  background: rgb(239, 239, 239);
+  position: fixed;
   bottom: 0;
   width: 100%;
+  height: 25px;
 }
 
 .App-logo {

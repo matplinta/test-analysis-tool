@@ -43,7 +43,9 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     } 
 
     useEffect(() => {
-        fetchUserMessages();
+        if (isUserLoggedIn === true) {
+            fetchUserMessages();
+        }
     }, [])
 
     useEffect(() => {
@@ -101,11 +103,12 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     const end = (
         <>
         <div style={{ display: 'flex' }}>
+            {isUserLoggedIn && 
             <Button  className="p-button-sm p-button-primary" onClick={(e) => op.current.toggle(e)}>
                 <i className="pi pi-bell p-overlay-badge" style={{fontSize: '1.5rem'}}>
                     {unreadMsgs === null || unreadMsgs === 0 ? null : <Badge value={unreadMsgs} severity="danger" ></Badge>}
                 </i>
-            </Button>
+            </Button>}
             <GoToAdminComponent />
             {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
             {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
@@ -162,7 +165,7 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     return (
         <>
 
-            <Menubar model={items} start={start} end={end} className="menu" style={{ height: '55px' }} />
+            <Menubar model={isUserLoggedIn ? items : null} start={start} end={end} className="menu" style={{ height: '55px' }} />
             <Outlet />
             <OverlayPanel ref={op} style={{width: '500px'}} className="">
                 

@@ -17,6 +17,7 @@ import MenuComponent from './test-results-analyzer/MenuComponent';
 import TestInstancesComponent from './test-results-analyzer/TestInstancesComponent';
 import SummaryComponent from './test-results-analyzer/SummaryComponent';
 import MessagesComponent from './test-results-analyzer/MessagesComponent';
+import WelcomeComponent from './test-results-analyzer/WelcomeComponent';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 import { UserMessagesProvider } from '../services/UserMessagesContext';
@@ -46,9 +47,9 @@ const App = () => {
           <section>
             <Routes>
               <Route path="" element={<MenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />} >
-                <Route path="" element={<SummaryComponent />} />
-                <Route index path="regression-test-runs" element={<RegressionTestRuns />} />
-                <Route index path="test-instances" element={<TestInstancesComponent />} />
+                <Route index element={isUserLoggedIn ? <SummaryComponent /> : <WelcomeComponent setIsUserLoggedIn={setIsUserLoggedIn}/>} />
+                <Route path="regression-test-runs" element={<RegressionTestRuns />} />
+                <Route path="test-instances" element={<TestInstancesComponent />} />
                 <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
                 <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
                 <Route path="owned-test-set-filters" element={<TestSetFiltersComponent type={'owned'} />} />

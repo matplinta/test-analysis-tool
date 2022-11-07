@@ -72,6 +72,7 @@ export const AlertTypes = Object.freeze({
 
 export const Successes = {
     'LOGIN': 'User was logged in successfully',
+    'LOGOUT': 'Logout successful!',
     'ADD_TEST_SET_FILTER': 'Test Set Filter added successfully!',
     'EDIT_TEST_SET_FILTER': 'Test Set Filter edited successfully!',
     'REMOVE_GLOBAL_FILTER_SUCCESS': 'Global filter removed successfully!',

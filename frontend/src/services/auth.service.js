@@ -1,5 +1,6 @@
 import axios from "axios";
 import authHeader from "./auth-header";
+import Notify, { AlertTypes, Successes, Errors, Infos } from './Notify';
 
 const getLocalStorageItemName = () => {
     if (window.location.origin === "http://localhost:3000" || window.location.origin === "http://127.0.0.1:3000") {
@@ -21,13 +22,16 @@ const login = async (username, password) => {
     return response.data;
 }
 
-const logout = () => {
-    return axios.post("api-auth/logout/", {}, { headers: authHeader() })
-        .then(response => {
-            if (response.data.key) {
-                localStorage.removeItem(getLocalStorageItemName());
-            }
-        })
+const logout = async () => {
+    await axios.post("api-auth/logout/", {}, { headers: authHeader() }).then(
+        (response) => {
+            Notify.sendNotification(Successes.LOGOUT, AlertTypes.success);
+        },
+        (error) => {
+            // Notify.sendNotification(Errors.LOGOUT, AlertTypes.error);
+        }
+    )
+    localStorage.removeItem(getLocalStorageItemName());
 }
 
 const getCurrentUser = () => {
