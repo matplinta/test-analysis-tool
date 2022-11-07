@@ -18,7 +18,7 @@ class NotificationService {
         // theme: 'colored'
     }
 
-    sendNotification = (message, type) => {
+    sendNotification = (message, type, time = null) => {
         try {
             if (time !== null) {
                 this.configuration.autoClose = time;
@@ -86,7 +86,7 @@ export const Successes = {
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created successfully!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited successfully!',
     'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
-    'ADD_FILTER_SET': 'Filter set was added successfully!',
+    'ADD_FILTER_SET': 'Filter set was saved successfully!',
     'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!',
     'DOWNLOAD_CHART': 'Chart was generated succesfully!'
 }

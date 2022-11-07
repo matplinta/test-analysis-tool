@@ -86,8 +86,6 @@ let ChartsComponent = () => {
     minDate.setFullYear(prevYear);
     let maxDate = new Date();
 
-    const { currentUser, fetchCurrentUser } = useCurrentUser();
-
     const addFilter = () => {
         setFilters([...filters, filterTemplate])
     }
@@ -170,17 +168,17 @@ let ChartsComponent = () => {
         setFilters(filterSetCopy.filters);
     }
 
-    const prepareFiltersListToAdd = () => {
+    const prepareFiltersListToAdd = (filtersToCompare) => {
         let filtersList = [];
-        for (let filter of filters) {
+        for (let filterItem of filtersToCompare) {
             let filterSetTmp = {};
-            if (filter.field !== "" && filter.value !== "") {
-                filterSetTmp.value = filter.value;
-                filterSetTmp.field = filter.field;
+            if (filterItem.field !== "" && filterItem.value !== "") {
+                filterSetTmp.value = filterItem.value;
+                filterSetTmp.field = filterItem.field;
                 filtersList.push(filterSetTmp);
             }
-            return filtersList;
         }
+        return filtersList;
     }
 
     const prepareFiltersListWithLimitAndGroups = () => {
@@ -195,8 +193,8 @@ let ChartsComponent = () => {
     }
 
     const saveFilterSet = () => {
-        let filtersList = prepareFiltersListToAdd();
         if (filtersetName !== "") {
+            let filtersList = prepareFiltersListToAdd(filters);
             if (filtersList.length === filters.length) {
                 let filterSetToSendAll = { "name": filtersetName, "filters": prepareFiltersListWithLimitAndGroups() }
                 postFilterSetsDetail(filterSetToSendAll).then(
@@ -237,22 +235,8 @@ let ChartsComponent = () => {
         link.click();
     }
 
-    // const getExcelFromSavedFilterSetAndSave = () => {
-    //     getExcelFromSavedFilterSet(selectedFilterSet.id, getFullDateRange(dates)).then(
-    //         (response) => {
-    //             saveExcel(response.data);
-    //             setBlockedPanel(false);
-    //             Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
-    //         },
-    //         (error) => {
-    //             Notify.sendNotification(Errors.DOWNLOAD_EXCEL, AlertTypes.error);
-    //             setBlockedPanel(false);
-    //         }
-    //     )
-    // }
-
-    const postExcelFromSavedFilterSetAndSave = () => {
-        postToGetExcelFromTemporaryDefinedFilterSet(filters, getFullDateRange(dates)).then(
+    const postExcelFromSavedFilterSetAndSave = (filtersList, datesRange) => {
+        postToGetExcelFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (response) => {
                 saveExcel(response.data);
                 setBlockedPanel(false);
@@ -268,11 +252,8 @@ let ChartsComponent = () => {
     const downloadFilterSetExcel = () => {
         setBlockedPanel(true);
         Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.info, 12000);
-
-        // if (selectedFilterSet !== null)
-        // getExcelFromSavedFilterSetAndSave();
-        // else
-        postExcelFromSavedFilterSetAndSave();
+        let newFiltersList = prepareFiltersListWithLimitAndGroups();
+        postExcelFromSavedFilterSetAndSave(newFiltersList, dates);
     }
 
     const getFullDateRange = (datesRange) => {
@@ -285,27 +266,8 @@ let ChartsComponent = () => {
         }
     }
 
-    // const fetchChartFromSavedFilterSet = (filterSetId) => {
-    //     getChartFromSavedFilterSet(filterSetId, getFullDateRange(dates)).then(
-    //         (results) => {
-    //             setChartDataTemplate({
-    //                 "labels": results.data.labels,
-    //                 "datasets": [{
-    //                     "label": results.data.info,
-    //                     "data": results.data.Occurrences
-    //                 }]
-    //             })
-    //             setBlockedPanel(false);
-    //             setChartVisible(true);
-    //             Notify.sendNotification(Successes.DOWNLOAD_CHART, AlertTypes.success);
-    //         }, (error) => {
-    //             setBlockedPanel(false);
-    //             Notify.sendNotification(Errors.DOWNLOAD_CHART, AlertTypes.error);
-    //         })
-    // }
-
-    const fetchChartFromTemporaryFilterSet = (filtersList) => {
-        postToGetChartFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(dates)).then(
+    const fetchChartFromTemporaryFilterSet = (filtersList, datesRange) => {
+        postToGetChartFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (results) => {
                 setChartDataTemplate({
                     "labels": results.data.labels,
@@ -333,14 +295,8 @@ let ChartsComponent = () => {
     const generateChart = () => {
         setBlockedPanel(true);
         Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.info, 12000);
-        // if (selectedFilterSet !== null) {
-        // fetchChartFromSavedFilterSet(selectedFilterSet.id, dates);
-        // }
-        // else {
         let newFiltersList = prepareFiltersListWithLimitAndGroups();
-        console.log(newFiltersList)
         fetchChartFromTemporaryFilterSet(newFiltersList, dates);
-        // }
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
@@ -365,7 +321,6 @@ let ChartsComponent = () => {
     }
 
     useEffect(() => {
-        fetchCurrentUser();
         fetchFilterFields();
         fetchFailMessageTypeGroups();
     }, [])
@@ -382,7 +337,7 @@ let ChartsComponent = () => {
                                 </Button>
                                 <Button className="p-button-secondary font-bold mr-1" type="submit" onClick={clearFilterSet}
                                     tooltip="Clear form to create new Filter Set" >
-                                    Clear Filter Set
+                                    Clear Filter Set To Create New
                                 </Button>
                             </Col>
                         </Row>

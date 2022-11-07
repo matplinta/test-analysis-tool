@@ -16,10 +16,6 @@ export const getFilterSets = async () => {
     return (await axios.get('api/tra/stats/filtersets', { headers: authHeader() }));
 }
 
-export const postFilters = async (filters) => {
-    return (await axios.post('api/tra/stats/filters/', filters, { headers: authHeader() }));
-}
-
 export const postFilterSetsDetail = async (filtersets) => {
     return (await axios.post('api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
 }

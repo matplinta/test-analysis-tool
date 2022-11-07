@@ -124,8 +124,8 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
                 selectionMode="single" selection={selectedFilterSet}
                 onSelectionChange={e => selectFilterSetInTable(e.value)}>
 
-                <Column field="name" header="Name" sortable filter filterPlaceholder="Search by name" style={{ width: '70%' }} ></Column >
-                <Column field="author" header="Author" sortable filter filterPlaceholder="Search by author" style={{ width: '30%' }} ></Column>
+                <Column field="name" header="Name" sortable filter showFilterMenuOptions={false} style={{ width: '70%' }} ></Column >
+                <Column field="author" header="Author" sortable filter showFilterMenuOptions={false} style={{ width: '30%' }} ></Column>
                 <Column body={removeButton} header="Remove" style={{ textAlign: "center", minWidth: "60px" }} />
 
             </DataTable >
