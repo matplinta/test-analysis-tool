@@ -10,8 +10,10 @@ import './SummaryComponent.css';
 const SummaryComponent = () => {
 
     const [summary, setSummary] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     let fetchUserSummary = () => {
+        setLoading(true)
         getUserSummary().then(
             (response) => {
                 setSummary(response.data);
@@ -19,7 +21,8 @@ const SummaryComponent = () => {
             (error) => {
                 Notify.sendNotification(Errors.FETCH_SUMMARY, AlertTypes.error);
             }
-        )
+            )
+        setLoading(false)
     }
 
     let generateCard = (title, value, description, size = 6, icon = "pi-shopping-cart", color = "blue", coloredDesc = "") => {
@@ -79,7 +82,7 @@ const SummaryComponent = () => {
 
     return (
         <>
-            {summary !== null ?
+            {summary !== null && loading === false ?
                 <div className="surface-ground summarySurfaceBackground px-4 py-8 md:px-6 lg:px-8">
                     <div className="grid">
                         <div className={`col-12 px-6 pb-4 md:col-12 lg:col-12`}>
@@ -101,7 +104,11 @@ const SummaryComponent = () => {
                         {generateCard('Environment Issues', summary.env_issues.count, summary.env_issues.top, 6, "pi-undo", "purple",
                             `Top (${summary.env_issues.top_count_percent}%): `)}
                     </div>
-                </div> : null}
+                </div> : 
+                <div className="loader-container">
+                    <div className="spinner"></div>
+                </div>
+            }
         </>
     )
 }

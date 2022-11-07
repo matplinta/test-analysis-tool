@@ -11,7 +11,14 @@ class NotificationService {
         theme: 'colored'
     }
 
-    sendNotification = (message, type, time = null) => {
+    configurationSticky = {
+        position: toast.POSITION.TOP_RIGHT,
+        transition: Zoom,
+        autoClose: false,
+        // theme: 'colored'
+    }
+
+    sendNotification = (message, type) => {
         try {
             if (time !== null) {
                 this.configuration.autoClose = time;
@@ -25,6 +32,9 @@ class NotificationService {
                         break;
                     case AlertTypes.info:
                         notifications.next(() => toast.info(msg, this.configuration));
+                        break;
+                    case AlertTypes.sticky:
+                        notifications.next(() => toast.info(msg, this.configurationSticky));
                         break;
                     case AlertTypes.warn:
                         notifications.next(() => toast.warn(msg, this.configuration));
@@ -51,12 +61,14 @@ export default Notify;
 export const AlertTypes = Object.freeze({
     success: Symbol('success'),
     info: Symbol('info'),
+    sticky: Symbol('info'),
     warn: Symbol('warn'),
     error: Symbol('error')
 });
 
 export const Successes = {
     'LOGIN': 'User was logged in successfully',
+    'LOGOUT': 'Logout successful!',
     'ADD_TEST_SET_FILTER': 'Test Set Filter added successfully!',
     'EDIT_TEST_SET_FILTER': 'Test Set Filter edited successfully!',
     'REMOVE_GLOBAL_FILTER_SUCCESS': 'Global filter removed successfully!',
@@ -123,8 +135,9 @@ export const Errors = {
     'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!',
     'DOWNLOAD_EXCEL': 'Error during excel generating!',
     'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!',
-    'DOWNLOAD_CHART': 'Chart cannot be generated for defined filters!'
-
+    'DOWNLOAD_CHART': 'Chart cannot be generated for defined filters!',
+    'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
+    'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!'
 }
 
 export const Warnings = {
@@ -135,6 +148,9 @@ export const Warnings = {
 
 export const Infos = {
     'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!',
-    'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded from Reporting Portal. Excel file with report will be downloaded to your computer!',
-    'DOWNLOAD_CHART': 'Generating chart may take some time, please wait for result, data is loaded from Reporting Portal. Chart with fail runs statistics will be visible in dialog!'
+    'DOWNLOAD_CHART': 'Generating chart may take some time, please wait for result, data is loaded from Reporting Portal. Chart with fail runs statistics will be visible in dialog!',
+    'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded. After that excel file with report will be downloaded to your computer!',
+    'SCHEDULE_PULL': 'Test runs pull for created TestSetFilter was triggered.',
+    'SCHEDULE_PULL_SELECTED': 'Test runs pull for selected TestSetFilters was triggered',
+    'SCHEDULE_PULL_WAIT': 'The pull may take up to ~1 minute. Please refresh the page then'
 }

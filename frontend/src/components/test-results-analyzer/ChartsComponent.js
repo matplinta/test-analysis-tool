@@ -40,7 +40,6 @@ import Notify, { AlertTypes, Errors, Infos, Successes } from '../../services/Not
 
 import './ChartsComponent.css';
 
-
 let ChartsComponent = () => {
 
     const [filtersetName, setFiltersetName] = useState("");
@@ -510,7 +509,6 @@ let ChartsComponent = () => {
                     </Container>
                 </Card>
             </div >
-
 
             <Dialog visible={chartVisible} style={{ width: '99%' }} onHide={() => setChartVisible(false)}>
                 <div className="m-3">

@@ -46,9 +46,7 @@ let LoginComponent = ({ setIsUserLoggedIn }) => {
 
     return (
         <div style={{ display: 'inline' }}>
-            <Button style={{ height: '35px' }} className="p-button-primary" onClick={handleShow}>Login</Button>
-
-
+            <Button className="p-button-primary" onClick={handleShow}>Login</Button>
             <Modal show={show} onHide={handleClose} aria-labelledby="contained-modal-title-vcenter" centered dialogClassName="modal-90w" >
                 <Modal.Header closeButton>
                     <Modal.Title>Log in using LDAP credentials!</Modal.Title>

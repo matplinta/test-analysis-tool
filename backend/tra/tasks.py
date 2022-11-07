@@ -1,20 +1,20 @@
+from datetime import datetime
 from time import sleep
 from typing import List, Union
-from celery.utils.log import get_task_logger
+
 from celery import shared_task
-from celery.schedules import crontab
-from django.contrib.auth.models import User
-from datetime import datetime
-from backend.celery import app
-from django.conf import settings
 from celery.result import AsyncResult
-from .models import *
+from celery.schedules import crontab
+from celery.utils.log import get_task_logger
+from django.conf import settings
+from django.contrib.auth.models import User
 from rep_portal.api import RepPortal, RepPortalError, RepPortalFieldNotFound
-from . import test_runs_processing
+
+from backend.celery import app
+
+from . import test_runs_processing, utils
+from .models import *
 from .storage import get_storage_instance
-from . import utils
-
-
 
 logger = get_task_logger(__name__)
 
@@ -164,10 +164,10 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
         tasks_statuses = [AsyncResult(taskid).status for taskid in tasks]
         for user in User.objects.filter(id__in=user_ids):
             if all([status == "SUCCESS" for status in tasks_statuses]):
-                Notification.objects.create(user=user, message=msg, date=datetime.now())
+                Notification.objects.create(user=user, message=msg, date=datetime.now().replace(microsecond=0))
             else:
                 msg = f"There was a problem with pulling of data from RP for the following TestSetFilters: {str_list_of_tsf_msg}. For details please contact admin."
-                Notification.objects.create(user=user, message=msg, date=datetime.now())
+                Notification.objects.create(user=user, message=msg, date=datetime.now().replace(microsecond=0))
 
         return {"msg": msg, "user_id": user.id}
     return {"msg": msg}

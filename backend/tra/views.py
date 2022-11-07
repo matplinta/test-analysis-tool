@@ -1,76 +1,49 @@
-from dataclasses import fields
-from functools import reduce
-from sre_constants import SUCCESS
-from urllib import response
-from django.shortcuts import render
-from redis import ResponseError
-from rest_framework import permissions, authentication
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
-from rest_framework.decorators import action
-from rest_framework import status
-from django.views.generic import ListView
-from dj_rest_auth.views import LogoutView
-from rest_framework import generics, mixins, views
-from django.conf import settings
-from django.contrib.auth.models import User
-from itertools import chain
-from django.db.models import Q
+import copy
 import distutils
 import distutils.util
-from django.core.serializers import serialize
-from rest_framework import serializers
-from drf_yasg.utils import swagger_auto_schema, no_body
-
-from backend.permissions import IsAuthorOfObject
-from backend.openapi_schemes import *
-from django.db.models import Count
-from .permissions import IsOwnerOfObject, IsSubscribedToObject
-
-from .serializers import (
-    NotificationSerializer,
-    TestInstanceSerializer,
-    TestRunSerializer, 
-    TestlineTypeSerializer, 
-    TestSetFilterSerializer,
-    FailMessageTypeSerializer,
-    FailMessageTypeGroupSerializer,
-    EnvIssueTypeSerializer,
-    TestRunResultSerializer,
-    FeatureBuildSerializer,
-    UserSerializer,
-    BranchSerializer,
-    LastPassingLogsSerializer
-)
-
-from .models import (
-    Branch,
-    FailMessageTypeGroup,
-    FeatureBuild,
-    Notification,
-    Organization, 
-    TestRunResult, 
-    TestlineType, 
-    TestSetFilter, 
-    TestInstance, 
-    TestRun, 
-    EnvIssueType, 
-    FailMessageType,
-    FailMessageTypeGroup,
-    LastPassingLogs
-)
-
-from .filters import TestRunFilter, TestInstanceFilter
-from .pagination import StandardResultsSetPagination
 import json
-import copy
+from dataclasses import fields
+from functools import reduce
+from itertools import chain
+from sre_constants import SUCCESS
+from urllib import response
 
 from celery.result import AsyncResult
-from . import test_runs_processing
+from dj_rest_auth.views import LogoutView
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.serializers import serialize
+from django.db.models import Count, Q
+from django.shortcuts import render
+from django.views.generic import ListView
+from drf_yasg.utils import no_body, swagger_auto_schema
+from redis import ResponseError
+from rest_framework import (authentication, generics, mixins, permissions,
+                            serializers, status, views, viewsets)
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from backend.openapi_schemes import *
+from backend.permissions import IsAuthorOfObject
+
 from . import tasks as celery_tasks
-from . import utils
+from . import test_runs_processing, utils
+from .filters import TestInstanceFilter, TestRunFilter
+from .models import (Branch, EnvIssueType, FailMessageType,
+                     FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
+                     Notification, Organization, TestInstance, TestlineType,
+                     TestRun, TestRunResult, TestSetFilter)
+from .pagination import StandardResultsSetPagination
+from .permissions import IsOwnerOfObject, IsSubscribedToObject
+from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
+                          FailMessageTypeGroupSerializer,
+                          FailMessageTypeSerializer, FeatureBuildSerializer,
+                          LastPassingLogsSerializer, NotificationSerializer,
+                          TestInstanceSerializer, TestlineTypeSerializer,
+                          TestRunResultSerializer, TestRunSerializer,
+                          TestSetFilterSerializer, UserSerializer)
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -420,8 +393,7 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         queryset = TestRun.objects.all()
         tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
         queryset = queryset.filter(
-            reduce(lambda q, reg_filter: q | Q(testline_type=reg_filter.testline_type, 
-                                               test_instance__test_set=reg_filter), tsfilters, Q())
+            reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
         )
         return queryset
 
@@ -435,7 +407,7 @@ class TestInstancesBasedOnQuery(generics.ListAPIView):
         'test_set__test_set_name',
         'test_set__test_lab_path',
         'test_set__branch__name',
-        'test_set__testline_type__name',
+        'testline_type__name',
         'last_passing_logs__utecloud_run_id',
         'test_case_name',
         'organization__name',

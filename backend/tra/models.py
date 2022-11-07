@@ -1,9 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import User
 import re
 from datetime import datetime, timedelta
-from django.conf import settings
+
 import pytz
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models
 
 
 class Organization(models.Model):
@@ -118,6 +119,7 @@ class TestInstance(models.Model):
     rp_id               = models.BigIntegerField(unique=True, blank=True, null=True, help_text="ReportingPortal TestInstance Id")
     test_set            = models.ForeignKey("TestSetFilter", on_delete=models.CASCADE, blank=False, help_text="Test set", related_name="test_instances")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
+    testline_type       = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, null=True, help_text="Testline type")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     last_passing_logs   = models.ForeignKey(LastPassingLogs, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
     organization        = models.ForeignKey(Organization, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
@@ -193,17 +195,19 @@ class TestSetFilter(models.Model):
     test_set_name            = models.TextField(max_length=300, blank=False, null=True, help_text="QC Test Set")
     test_lab_path            = models.TextField(max_length=300, blank=False, null=True, help_text="Test Lab Path")
     branch                   = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, help_text="Branch, field set automatically")
-    testline_type            = models.ForeignKey(TestlineType, on_delete=models.CASCADE, blank=False, help_text="Testline type")
+    testline_types           = models.ManyToManyField(TestlineType, related_name="test_set_filters", blank=False, 
+                                                      help_text="Testline types used for tests in this TestSet")
     owners                   = models.ManyToManyField(User, related_name="owned_testsets", blank=True)
     subscribers              = models.ManyToManyField(User, related_name="subscribed_testsets", blank=True)
     fail_message_type_groups = models.ManyToManyField(FailMessageTypeGroup, blank=True)
     
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["test_set_name", "test_lab_path", "testline_type"], name='test_set_uniq_constr')]
+        constraints = [models.UniqueConstraint(fields=["test_set_name", "test_lab_path"], name='test_set_uniq_constr')]
         ordering = ['id']
 
     def __str__(self):
-        return f"{self.branch} - {self.testline_type} - {self.test_set_name}"
+        part_of_lab_path = "\\".join(self.test_lab_path.split('\\')[2:])
+        return f"{part_of_lab_path} - {self.test_set_name[:30]}"
 
     def is_subscribed_by_anyone(self):
         subs_count = self.subscribers.all().count()
