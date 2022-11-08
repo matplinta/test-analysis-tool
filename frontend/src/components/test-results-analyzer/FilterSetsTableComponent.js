@@ -18,6 +18,8 @@ import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
 import { deleteFilterSetsDetail, getFilterSetsDetail, getMyFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
 
+import './FilterSetsTableComponent.css';
+
 let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTestSetFilters, setReloadTestSetFilters, clearForm }) => {
 
     const [filterSets, setFilterSets] = useState(null);

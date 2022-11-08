@@ -1,0 +1,15 @@
+.select-button-my-all .p-button.p-highlight {
+    background-color: #004c9a;
+    border-color: #004c9a;
+}
+
+.select-button-my-all .p-button.p-highlight:hover {
+
+    background-color: #003870;
+    border-color: #003870;
+}
+
+.select-button-my-all .p-selectbutton .p-button.p-highlight {
+    background-color: #004c9a;
+    border-color: #004c9a;
+}

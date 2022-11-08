@@ -1,3 +1,10 @@
+// Description: File is responsible for chart generation based on filters list
+// HISTORY
+// --------------------------------------------------------------------------
+//   Date                    Author                     Bug                 List of changes
+//  --------------------------------------------------------------------------
+
+
 import { Chart } from 'primereact/chart';
 
 let GenerateChartComponent = ({ chartDataTemplate }) => {
