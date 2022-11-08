@@ -155,7 +155,7 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     let message_short_list = (msgs) => {
         return (
             <> 
-                {msgs.slice(0, 5).map(({ id, message, read, user, date }) => (
+                {msgs.slice(0, 4).map(({ id, message, read, user, date }) => (
                 <div className="shortMsgItem p-2" key={id}> 
                     <div className='msgAndDate'>
                     {messageTemplate(message, read)}
