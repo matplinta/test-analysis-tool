@@ -7,12 +7,14 @@ import LogoutForm from './LogoutForm';
 
 import './LoginComponent.css';
 
-let LogoutComponent = ({ setIsUserLoggedIn }) => {
+let LogoutComponent = ({ setIsUserLoggedIn, parentOverlay }) => {
 
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleShow = (e) => {
+        setShow(true)
+    };
 
     const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -25,6 +27,7 @@ let LogoutComponent = ({ setIsUserLoggedIn }) => {
         setTimeout(
             () => {
                 handleConfirmationClose();
+                parentOverlay.current.hide()
                 setIsUserLoggedIn(false);
             },
             1500

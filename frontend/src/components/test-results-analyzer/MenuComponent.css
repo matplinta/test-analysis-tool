@@ -48,6 +48,10 @@
   background: #f5f7ff;
 }
 
-.p-overlaypanel>.p-overlaypanel-content{
+.userOverlay.p-overlaypanel>.p-overlaypanel-content{
+  padding: 10px;
+}
+
+.msgOverlay.p-overlaypanel>.p-overlaypanel-content{
   padding: 15px;
 }

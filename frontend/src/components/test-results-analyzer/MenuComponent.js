@@ -11,6 +11,7 @@ import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { DataScroller } from 'primereact/datascroller';
 import logo_TRA from './../../assets/logo_TRA.png';
+import AuthService from './../../services/auth.service.js';
 import GoToAdminComponent from './../home/GoToAdminComponent';
 import LogoutComponent from './../home/authorization/LogoutComponent';
 import LoginComponent from './../home/authorization/LoginComponent';
@@ -22,7 +23,9 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     const navigate = useNavigate();
     const op = useRef(null)
+    const opUser = useRef(null)
 
+    const [username, setUsername] = useState(null);
     const [unreadMsgs, setUnreadMsgs] = useState(null);
     const { messages, fetchUserMessages, updateUserMessages } = useUserMessages();
 
@@ -45,8 +48,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     useEffect(() => {
         if (isUserLoggedIn === true) {
             fetchUserMessages();
+            setUsername(AuthService.getCurrentUser().username);
+
         }
-    }, [])
+    }, [isUserLoggedIn])
 
     useEffect(() => {
         setUnreadMsgs(computeUnreadMsgs(messages))
@@ -110,7 +115,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
                 </i>
             </Button>}
             <GoToAdminComponent />
-            {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
+            {/* {isUserLoggedIn && <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} username={username} />} */}
+            {isUserLoggedIn && 
+            <Button  icon="pi pi-user" label={username} className="p-button-primary" onClick={(e) => opUser.current.toggle(e)}>
+            </Button>}
             {!isUserLoggedIn && <LoginComponent setIsUserLoggedIn={setIsUserLoggedIn} />}
         </div>
         </>
@@ -167,7 +175,7 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
             <Menubar model={isUserLoggedIn ? items : null} start={start} end={end} className="menu" style={{ height: '55px' }} />
             <Outlet />
-            <OverlayPanel ref={op} style={{width: '500px'}} className="">
+            <OverlayPanel ref={op} style={{width: '500px'}} className="msgOverlay">
                 
                 {messages !== null ? message_short_list(messages) : null}
                 <Button label="Show all messages" className="p-button-sm p-button-primary" style={{width: '100%'}} onClick={(e) => {
@@ -175,6 +183,9 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
                     navigate("messages")
                 }}>
                 </Button>
+            </OverlayPanel>
+            <OverlayPanel ref={opUser}  className="userOverlay">
+                 <LogoutComponent setIsUserLoggedIn={setIsUserLoggedIn} parentOverlay={opUser}/>
             </OverlayPanel>
         </>
     )

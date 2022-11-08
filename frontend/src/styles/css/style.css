@@ -55,6 +55,8 @@
 
 .p-dialog .p-dialog-content {
   padding-top: 30px;
+  /* background-color: rgb(232, 239, 247) !important; */
+  background-color: var(--surface-ground);
 }
 
 .p-dialog .p-dialog-footer .p-button {
