@@ -18,15 +18,11 @@ class NotificationService {
         // theme: 'colored'
     }
 
-    configurationLonger = {
-        position: toast.POSITION.TOP_RIGHT,
-        transition: Zoom,
-        theme: 'colored',
-        autoClose: 6000
-    }
-
-    sendNotification = (message, type) => {
+    sendNotification = (message, type, time = null) => {
         try {
+            if (time !== null) {
+                this.configuration.autoClose = time;
+            }
             if (message) {
                 const msg = message instanceof String ? message : message.toString();
 
@@ -35,7 +31,7 @@ class NotificationService {
                         notifications.next(() => toast.success(msg, this.configuration));
                         break;
                     case AlertTypes.info:
-                        notifications.next(() => toast.info(msg, this.configurationLonger));
+                        notifications.next(() => toast.info(msg, this.configuration));
                         break;
                     case AlertTypes.sticky:
                         notifications.next(() => toast.info(msg, this.configurationSticky));
@@ -90,9 +86,9 @@ export const Successes = {
     'ADD_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group created successfully!',
     'EDIT_FAIL_MESSAGE_REGEX_GROUP': 'Fail Message Regex Group edited successfully!',
     'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
-    'ADD_FILTER_SET': 'Filter set was added successfully!',
-    'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!'
-    
+    'ADD_FILTER_SET': 'Filter set was saved successfully!',
+    'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!',
+    'DOWNLOAD_CHART': 'Chart was generated succesfully!'
 }
 
 export const Errors = {
@@ -104,7 +100,8 @@ export const Errors = {
     'FETCH_EDIT_TEST_SET_FILTER': 'Error during fetching Test Set Filter to edit!',
     'GET_TEST_RUNS': "Cannot get test runs!",
     'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!",
-    'EMPTY_FIELDS': "Cannot send due to empty fields. Please fulfil form.",
+    'EMPTY_FIELDS_FILTERS_LIST': "Cannot send due to empty fields in filters list. Please fulfil form.",
+    'EMPTY_FIELDS_FILTERSET_NAME': "Cannot send due to empty fields in filters list. Please fulfil form.",
     'TEST_SET_FILTERS_SUBSCRIBED': 'Test set filters were not subscribed!',
     'TEST_SET_FILTERS_UNSUBSCRIBED': 'Test set filters were not subscribed!',
     'TEST_SET_FILTER_SUBSCRIBED': 'Test set filter were not subscribed!',
@@ -138,9 +135,9 @@ export const Errors = {
     'UPDATE_USER_MESSAGE': 'Error during updating of user\'s message!',
     'DOWNLOAD_EXCEL': 'Error during excel generating!',
     'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!',
+    'DOWNLOAD_CHART': 'Chart cannot be generated for defined filters!',
     'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
     'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!'
-
 }
 
 export const Warnings = {
@@ -151,6 +148,7 @@ export const Warnings = {
 
 export const Infos = {
     'RP_URL_COPIED': 'Generated RP URL was copied to clipboard!',
+    'DOWNLOAD_CHART': 'Generating chart may take some time, please wait for result, data is loaded from Reporting Portal. Chart with fail runs statistics will be visible in dialog!',
     'DOWNLOAD_EXCEL': 'Generating report may take some time, please wait for result, data is loaded. After that excel file with report will be downloaded to your computer!',
     'SCHEDULE_PULL': 'Test runs pull for created TestSetFilter was triggered.',
     'SCHEDULE_PULL_SELECTED': 'Test runs pull for selected TestSetFilters was triggered',

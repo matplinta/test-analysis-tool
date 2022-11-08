@@ -16,16 +16,16 @@ export const getFilterSets = async () => {
     return (await axios.get('api/tra/stats/filtersets', { headers: authHeader() }));
 }
 
-export const postFilters = async (filters) => {
-    return (await axios.post('api/tra/stats/filters/', filters, { headers: authHeader() }));
-}
-
 export const postFilterSetsDetail = async (filtersets) => {
     return (await axios.post('api/tra/stats/filtersets_detailed/', filtersets, { headers: authHeader() }));
 }
 
 export const getFilterSetsDetail = async () => {
     return (await axios.get('api/tra/stats/filtersets_detailed', { headers: authHeader() }));
+}
+
+export const getMyFilterSetsDetail = async () => {
+    return (await axios.get('api/tra/stats/filtersets_detailed/my/', { headers: authHeader() }));
 }
 
 export const getUserSummary = async () => {
@@ -59,6 +59,7 @@ export const postToGetExcelFromTemporaryDefinedFilterSet = async (filterSet, dat
 }
 
 export const getChartFromSavedFilterSet = async (filterSetId, dates) => {
+    console.log(dates)
     let dateFilter = null;
     dates !== null ? dateFilter = `&date_start=${formatDate(dates[0])}&date_end=${formatDate(dates[1])}` : dateFilter = "";
     return (await axios.get('api/tra/stats/fail_barchart' + '?filterset=' + filterSetId + dateFilter, { headers: authHeader() }));

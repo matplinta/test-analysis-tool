@@ -80,7 +80,8 @@ const BranchOffModal = ({ selectedTestSetFilters, showForm, handleFormClose, old
             <Dialog header="Perform Branch Off" visible={showForm} className="dialog-style" onHide={handleFormCloseAndRefresh}>
                 <div className="form-item">
                     <label htmlFor="newBranchName" className="block">Select new branch</label>
-                    <SelectButton optionLabel="name" optionValue="value" value={selectedBranch} options={branches} onChange={(e) => setSelectedBranch(e.value)}></SelectButton>
+                    <SelectButton optionLabel="name" optionValue="value" value={selectedBranch} options={branches} 
+                    onChange={(e) => setSelectedBranch(e.value)} className="select-button-branch-off"></SelectButton>
                 </div>
                 <div className="form-item">
                     <Checkbox inputId="isRemoveOldFiltersSet" onChange={e => setIsRemoveOldFiltersSet(e.checked)} checked={isRemoveOldFiltersSet}></Checkbox>

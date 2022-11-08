@@ -15,7 +15,7 @@
   display: flex;
   justify-content: right;
   color: #004c9a;
-  background: rgb(239, 239, 239);
+  background-color: var(--surface-ground);
   position: fixed;
   bottom: 0;
   width: 100%;
