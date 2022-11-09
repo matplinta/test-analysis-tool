@@ -254,8 +254,6 @@ let ChartsComponent = () => {
     const saveFilterSet = () => {
         if (filtersetName !== "") {
             let filtersList = prepareFiltersListWithoutEmpty(filters);
-            console.log(filtersList)
-            console.log(filters)
             if (filtersList.length === filters.length) {
                 let filterSetToSendAll = { "name": filtersetName, "filters": prepareFiltersListWithLimitAndGroups() }
                 postFilterSetsDetail(filterSetToSendAll).then(
@@ -288,7 +286,7 @@ let ChartsComponent = () => {
     const saveExcel = (data) => {
         let date = new Date();
         let dateFormated = date.toLocaleDateString() + '-' + date.toLocaleTimeString().replaceAll(':', '/').replaceAll(' ', '/');
-        const outputFilename = `report_${dateFormated}.xls`;
+        const outputFilename = `report_${dateFormated}.xlsx`;
         const url = URL.createObjectURL(new Blob([data]));
         const link = document.createElement('a');
         link.href = url;
@@ -298,6 +296,7 @@ let ChartsComponent = () => {
     }
 
     const postExcelFromSavedFilterSetAndSave = (filtersList, datesRange) => {
+        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.sticky);
         postToGetExcelFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (response) => {
                 saveExcel(response.data);
@@ -313,11 +312,8 @@ let ChartsComponent = () => {
 
     const downloadFilterSetExcel = () => {
         let filtersList = prepareFiltersListWithoutEmpty(filters);
-        console.log(filtersList)
-        console.log(filters)
         if (filtersList.length === filters.length && filterFields.length > 0) {
             setBlockedPanel(true);
-            Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.sticky);
             let newFiltersList = prepareFiltersListWithLimitAndGroups();
             postExcelFromSavedFilterSetAndSave(newFiltersList, dates);
         } else {
@@ -336,16 +332,10 @@ let ChartsComponent = () => {
     }
 
     const fetchChartFromTemporaryFilterSet = (filtersList, datesRange) => {
+        Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.sticky);
         postToGetChartFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (results) => {
                 setChartDataTemplate({
-                    "labels": results.data.labels,
-                    "datasets": [{
-                        "label": results.data.info,
-                        "data": results.data.Occurrences
-                    }]
-                })
-                console.log({
                     "labels": results.data.labels,
                     "datasets": [{
                         "label": results.data.info,
@@ -365,7 +355,6 @@ let ChartsComponent = () => {
         let filtersList = prepareFiltersListWithoutEmpty(filters);
         if (filtersList.length === filters.length && filterFields.length > 0) {
             setBlockedPanel(true);
-            Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.sticky);
             let newFiltersList = prepareFiltersListWithLimitAndGroups();
             fetchChartFromTemporaryFilterSet(newFiltersList, dates);
         } else {
@@ -406,7 +395,7 @@ let ChartsComponent = () => {
     return (
         <>
             <div className="ml-2 mr-2 mt-3 mb-5 flex">
-                <Card style={{ width: '55%' }}>
+                <Card style={{ width: '55%' }} >
                     <Container className="pl-2">
                         <Row>
                             <Col>
