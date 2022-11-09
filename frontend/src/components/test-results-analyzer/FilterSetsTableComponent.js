@@ -16,7 +16,7 @@ import { SelectButton } from 'primereact/selectbutton';
 
 import { useCurrentUser } from '../../services/CurrentUserContext';
 import Notify, { AlertTypes, Errors, Successes } from '../../services/Notify.js';
-import { deleteFilterSetsDetail, getFilterSetsDetail, getMyFilterSetsDetail } from './../../services/test-results-analyzer/statistics.service';
+import { deleteFilterSetsDetail, getFilterSetsDetail, getMyFilterSetsDetail, generateSubsFilterSet } from './../../services/test-results-analyzer/statistics.service';
 
 import './FilterSetsTableComponent.css';
 
@@ -52,6 +52,17 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
             }, (error) => {
                 setLoading(false);
                 Notify.sendNotification(Errors.FETCH_FILTER_SETS, AlertTypes.error);
+            })
+    }
+
+    const fetchGenerateSubsFilterSet = () => {
+        generateSubsFilterSet().then(
+            (results) => {
+                setLoading(true);
+                setReloadTestSetFilters(true);
+                Notify.sendNotification(Successes.SUBS_FILTERSET_GEN, AlertTypes.success);
+            }, (error) => {
+                Notify.sendNotification(Errors.SUBS_FILTERSET_GEN, AlertTypes.error);
             })
     }
 
@@ -114,8 +125,16 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
 
     return (
         <>
-            <SelectButton value={toggleValue} options={toggleOptions} onChange={(e) => onToggleValueChange(e.value)}
-                className="select-button-my-all ml-1 mb-3" />
+            <div style={{display: 'block ruby'}}>
+                <SelectButton value={toggleValue} options={toggleOptions} onChange={(e) => onToggleValueChange(e.value)}
+                    className="select-button-my-all ml-1 mb-3" />
+                <Button className="p-button-secondary font-bold" type="submit" style={{float: 'right'}} onClick={fetchGenerateSubsFilterSet}
+                        tooltip="Generate FilterSet based on subscribed TestSetFilters" >
+                        Generate FS based on subscribed TSFilters
+                </Button>
+            </div>
+            
+            
             <DataTable value={filterSets} stripedRows responsiveLayout="scroll" showGridlines dataKey="id"
                 size="small" className="fail-message-table"
                 filterDisplay="row" loading={loading}

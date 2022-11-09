@@ -113,6 +113,7 @@ class Analyzer():
             return data
 
         size = len(df.index)
+        print(size)
         earliest_record, oldest_record = self.get_data_dates_range_info(df)
         df_temp = self.add_normalized_exception_data_column(df)
         df_temp = self.get_data_indexed_by_exception_type(df_temp)
