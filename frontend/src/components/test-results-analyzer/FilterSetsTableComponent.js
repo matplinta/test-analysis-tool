@@ -129,7 +129,7 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
                 <SelectButton value={toggleValue} options={toggleOptions} onChange={(e) => onToggleValueChange(e.value)}
                     className="select-button-my-all ml-1 mb-3" />
                 <Button className="p-button-info font-bold genSubsBtn" type="submit" style={{float: 'right'}} onClick={fetchGenerateSubsFilterSet}
-                        tooltip="Generate FilterSet based on subscribed TestSetFilters" >
+                        tooltip="Generate FilterSet based on subscribed TestSetFilters" tooltipOptions={{position: 'top'}}>
                         Generate FS based on subscribed TSFilters
                 </Button>
             </div>
