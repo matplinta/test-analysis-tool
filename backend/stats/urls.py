@@ -14,9 +14,7 @@ router.register(r'filters', views.FilterView)
 urlpatterns = [
     path('', include(router.urls)),
     path('filter_fields', views.FilterFieldView.as_view(), name="filterfields"),
-    # path('filtersets_detailed/', views.FilterSetDetailView.as_view(), name="filterset_detailed"),
-    # path('filtersets_detailed/<int:filterset_id>', views.FilterSetDetailView.as_view(), name="filterset_detailed_pk"),
-    # path('filters/by_filterset/<int:filterset_id>', views.ListFiltersWithFilterSetView.as_view(), name="filters_by_filterset"),
+    path('gen_subs_filterset', views.CreateUsersAllSubsFilterSet.as_view(), name="gen_subs_filterset"),
     path('fail_barchart', views.GetChartByExceptionType.as_view(), name="failbarchart"),
     path('fail_barchart/subs_regfilters', views.GetChartByExceptionTypeForAllSubscribedTestSetFilters.as_view(), name="failbarchart_subs_regfilters"),
     path('get_excel', views.GetExcelData.as_view(), name="excel_data"),

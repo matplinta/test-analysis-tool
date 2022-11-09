@@ -88,7 +88,8 @@ export const Successes = {
     'ANALYSE_TEST_RUN': 'Test runs were analyzed successfully!',
     'ADD_FILTER_SET': 'Filter set was saved successfully!',
     'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!',
-    'DOWNLOAD_CHART': 'Chart was generated succesfully!'
+    'DOWNLOAD_CHART': 'Chart was generated succesfully!',
+    'SUBS_FILTERSET_GEN': 'Subscription FilterSet generated successfully!'
 }
 
 export const Errors = {
@@ -137,7 +138,8 @@ export const Errors = {
     'FETCH_FILTER_SETS': 'Error during Filter Sets fetching!',
     'DOWNLOAD_CHART': 'Chart cannot be generated for defined filters!',
     'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
-    'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!'
+    'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!',
+    'SUBS_FILTERSET_GEN': 'Failure during subscription filterset generation!'
 }
 
 export const Warnings = {

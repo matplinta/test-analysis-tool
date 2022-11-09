@@ -24,6 +24,10 @@ export const getFilterSetsDetail = async () => {
     return (await axios.get('api/tra/stats/filtersets_detailed', { headers: authHeader() }));
 }
 
+export const generateSubsFilterSet = async () => {
+    return (await axios.get('api/tra/stats/gen_subs_filterset', { headers: authHeader() }));
+}
+
 export const getMyFilterSetsDetail = async () => {
     return (await axios.get('api/tra/stats/filtersets_detailed/my/', { headers: authHeader() }));
 }
