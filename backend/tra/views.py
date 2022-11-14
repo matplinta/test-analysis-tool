@@ -274,6 +274,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
             new_tsfilter.owners.add(*old_tsfilter.owners.all()) 
             new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all()) 
             new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all()) 
+            new_tsfilter.testline_types.add(*old_tsfilter.testline_types.all()) 
             new_tsfilters.append(new_tsfilter)
 
         if should_delete:
