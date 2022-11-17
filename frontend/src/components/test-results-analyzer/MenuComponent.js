@@ -86,7 +86,7 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         {
             label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages</span>,
             items: [{
-                label: <span>Fail Message Regex</span>,
+                label: <span>Fail Message Regexes</span>,
                 command: () => { navigate('fail-regex') }
             }, {
                 label: <span>Fail Message Groups</span>,

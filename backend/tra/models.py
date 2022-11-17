@@ -62,7 +62,7 @@ class FailMessageType(models.Model):
     id              = models.BigAutoField(primary_key=True)
     author          = models.ForeignKey(User, on_delete=models.CASCADE)
     name            = models.TextField(max_length=300, blank=False, null=False, help_text="Shortened name of failure message")
-    regex           = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex", unique=True)
+    regex           = models.TextField(max_length=500, blank=False, null=False, help_text="Failure message regex")
     description     = models.TextField(max_length=500, blank=True, null=False, help_text="Description")
     env_issue_type  = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Environment issue type to set during analysis")
 

@@ -20,10 +20,6 @@ class FailMessageTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FailMessageType
         fields = ('id', 'name', 'regex', 'author', 'description', 'env_issue_type')
-        extra_kwargs = {
-            'name': {'validators': []},
-            'regex': {'validators': []},
-        }
 
 
 class FailMessageTypeGroupROSerializer(serializers.ModelSerializer):

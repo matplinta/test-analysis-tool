@@ -32,7 +32,12 @@ const FailMessageGroupAddModal = ({ failMessageGroupToEdit, failMessageGroupToCo
                 handleFormClose();
             },
             (error) => {
-                Notify.sendNotification(Successes.ADD_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.error);
+                if (error.response.status === 400) {
+                    Notify.sendNotification(error.response.data[0], AlertTypes.error)
+                }
+                else {
+                    Notify.sendNotification(Errors.ADD_FAIL_MESSAGE_REGEX_GROUP, AlertTypes.error);
+                }
             })
     }
 

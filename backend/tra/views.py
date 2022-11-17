@@ -14,16 +14,17 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.serializers import serialize
 from django.db.models import Count, Q
+from django.db import IntegrityError
 from django.shortcuts import render
 from django.views.generic import ListView
 from drf_yasg.utils import no_body, swagger_auto_schema
-from redis import ResponseError
 from rest_framework import (authentication, generics, mixins, permissions,
                             serializers, status, views, viewsets)
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 
 from backend.openapi_schemes import *
 from backend.permissions import IsAuthorOfObject
@@ -59,7 +60,11 @@ class FailMessageTypeView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        try:
+            serializer.save(author=self.request.user)
+        except IntegrityError as e:
+            if 'unique constraint "regex_author_uniq"' in e.args[0]: 
+                raise ValidationError("This user already has FailMessageType with such regex.")
 
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]
@@ -80,7 +85,11 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        try:
+            serializer.save(author=self.request.user)
+        except IntegrityError as e:
+            if 'unique constraint "fmtg_name_author_uniq"' in e.args[0]: 
+                raise ValidationError("This user already has FailMessageTypeGroup with such name.")
 
     def get_permissions(self):
         permissions = [permission() for permission in self.permission_classes]
