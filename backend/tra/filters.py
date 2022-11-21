@@ -50,7 +50,7 @@ class TestInstanceFilter(filters.FilterSet):
             'test_set__test_lab_path': ['icontains'],
             'test_set__branch__name': ['icontains'],
             'testline_type__name': ['icontains'],
-            'last_passing_logs__utecloud_run_id': ['exact'],
+            # 'last_passing_logs__utecloud_run_id': ['exact'],
             'test_case_name': ['icontains'],
             'organization__name': ['icontains'],
             'execution_suspended': ['exact'],
