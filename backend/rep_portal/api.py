@@ -123,7 +123,7 @@ class RepPortal():
         return f"{base_url}{rest_url}"
 
 
-    def _get_testinstances_url(self, ids=None, test_lab_path=None, organization=None, limit=100):
+    def _get_testinstances_url(self, ids=None, test_lab_path=None, organization=None, limit=2000):
         url = RepPortal.TEST_INSTANCE_LIST_URL.format(limit) 
         if ids:
             if isinstance(ids, list):
@@ -234,7 +234,7 @@ class RepPortal():
 
 
     @api_get_wrapper(retry=5)
-    def get_data_from_testinstances(self, ids: Union[list, str]=None, test_lab_path=None, organization=None, limit=100, *args, **kwargs):            
+    def get_data_from_testinstances(self, ids: Union[list, str]=None, test_lab_path=None, organization=None, limit=2000, *args, **kwargs):            
         url = self._get_testinstances_url(ids=ids, test_lab_path=test_lab_path, organization=organization, limit=limit)
         resp = kwargs["api"].get(url, params=None)
         return resp, url
