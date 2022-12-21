@@ -34,19 +34,29 @@ def get_fb_info_based_on_date(test_datetime):
     fb_start = datetime.datetime(2022, 1, 5, 0, 0, 0, tzinfo=tz.gettz(settings.TIME_ZONE))
     if test_datetime.year < 2022:
         return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
-    while fb_start.year != test_datetime.year:
-        fb_start = fb_start + datetime.timedelta(days=14)
-
     fb_no = 1
-    while True:
-        fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
-        if fb_start < test_datetime < fb_end:
-            break
+    while test_datetime - fb_start > datetime.timedelta(days=14):
+        fb_start_prev = fb_start
+        fb_start = fb_start + datetime.timedelta(days=14)
+        if fb_start_prev.year != fb_start.year:
+            fb_no = 1
         else:
             fb_no += 1
+
+    while True:
+        fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
+        if fb_start <= test_datetime <= fb_end:
+            break
+        else:
+            fb_start_prev = fb_start
             fb_start = fb_start + datetime.timedelta(days=14)
-    name = f"FB{str(test_datetime.year)[-2:]}{fb_no:02d}"
+            if fb_start_prev.year != fb_start.year:
+                fb_no = 1
+            else:
+                fb_no += 1
+    name = f"FB{str(fb_start.year)[-2:]}{fb_no:02d}"
     return name, fb_start, fb_end
+    
 
 def check_if_testrun_is_older_than_3_fbs(rp_id: int, end: datetime.datetime, exception: Exception):
     if len(FeatureBuild.objects.all()) >= 3:
