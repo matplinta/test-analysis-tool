@@ -8,7 +8,7 @@ from urllib.parse import urljoin, urlparse
 import pytz
 from dateutil import tz
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.serializers import serialize
 from django.db.models import Q
 
@@ -145,3 +145,10 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
         test_set_distinct_values = tsfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
         fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
         return fields_dict
+
+
+def get_common_users_group():
+    instance, created = Group.objects.get_or_create(name='Common Users')
+    # if created:
+
+    return instance
