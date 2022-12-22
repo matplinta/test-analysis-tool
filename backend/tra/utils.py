@@ -35,14 +35,7 @@ def get_fb_info_based_on_date(test_datetime):
     if test_datetime.year < 2022:
         return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
     fb_no = 1
-    while test_datetime - fb_start > datetime.timedelta(days=14):
-        fb_start_prev = fb_start
-        fb_start = fb_start + datetime.timedelta(days=14)
-        if fb_start_prev.year != fb_start.year:
-            fb_no = 1
-        else:
-            fb_no += 1
-
+    
     while True:
         fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
         if fb_start <= test_datetime <= fb_end:
@@ -54,6 +47,7 @@ def get_fb_info_based_on_date(test_datetime):
                 fb_no = 1
             else:
                 fb_no += 1
+    
     name = f"FB{str(fb_start.year)[-2:]}{fb_no:02d}"
     return name, fb_start, fb_end
     
