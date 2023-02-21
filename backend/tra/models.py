@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timedelta
+from django.forms import ValidationError
 
 import pytz
 from django.conf import settings
@@ -218,7 +219,7 @@ class TestSetFilter(models.Model):
         if match:
             branch = match.group(1)
         else:
-            branch = None
+            raise ValidationError("The branch could not have been parsed correctly from specified TestLabPath. Make sure that the TestLabPath is written correctly.")
         branch_instance, _ = Branch.objects.all().get_or_create(name=branch)
         self.branch = branch_instance
         self.test_lab_path = self.test_lab_path.replace('\\\\', '\\')
