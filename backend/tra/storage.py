@@ -128,3 +128,16 @@ class UTECloudLogsStorage(Storage):
 
     def get_modified_time(self, name):
         return self._datetime_from_timestamp(os.path.getmtime(self.path(name)))
+
+
+class LogsHTMLStorage(UTECloudLogsStorage):
+    def _save(self, directory, url, timeout):
+        path = self.path(directory)
+        url_path = urlparse(url).path
+        if url_path.endswith('/'):
+            url_path = url_path[:-1]
+        wget_cmd = f"wget -r -np -nH -nd -A log.html {url}"
+        os.makedirs(path, exist_ok=True)
+        proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
+        proc.communicate(timeout=timeout)
+        return proc.returncode 
