@@ -68,8 +68,8 @@ class BranchAdmin(admin.ModelAdmin):
 
 @admin.register(TestInstance)
 class TestInstanceAdmin(admin.ModelAdmin):
-    list_display = ['rp_id', 'test_case_name', 'id', 'test_set', 'testline_type', 'last_passing_logs', 'organization', 'execution_suspended', 'no_run_in_rp']
-    list_filter = ['execution_suspended', 'organization', 'no_run_in_rp', 'testline_type']
+    list_display = ['rp_id', 'test_case_name', 'id', 'test_set', 'testline_type', 'last_passing_logs', 'organization', 'execution_suspended', 'no_run_in_rp', 'test_entity']
+    list_filter = ['execution_suspended', 'organization', 'no_run_in_rp', 'testline_type', 'test_entity',]
     search_fields = ['test_set__test_set_name', 'test_case_name', 'rp_id']
 
 
@@ -96,10 +96,11 @@ class TestRunAdmin(admin.ModelAdmin):
         'log_file_url',  
         'log_file_url_ext', 
         'start_time', 
-        'end_time'
+        'end_time',
+        'exec_trigger',
     ]
-    list_filter = ['result', 'fb', 'testline_type', 'analyzed_by', 'test_suite', 'test_instance']
-    search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id']
+    list_filter = ['result', 'fb', 'testline_type', 'exec_trigger', 'analyzed_by', 'test_suite',]
+    search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id', 'exec_trigger',]
 
 
 @admin.register(RepPortalUserToken)

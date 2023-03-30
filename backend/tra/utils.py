@@ -126,9 +126,11 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
             reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
         )
 
-        fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
+        # fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
         fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
-        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer, order_by_param="test_instance_id")
+        fields_dict['exec_trigger'] = queryset.order_by('exec_trigger').distinct('exec_trigger').values_list("exec_trigger", flat=True)
+        fields_dict['exec_trigger'] = sorted(["null" if elem is None else elem for elem in fields_dict['exec_trigger']])
+        # get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer, order_by_param="test_instance_id")
         get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
         get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
@@ -146,3 +148,18 @@ def get_common_users_group():
     # if created:
 
     return instance
+
+
+def establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result):
+    if test_entity == "CRT":
+        if param1 == "CDRT" and cit_cdrt_result == "CDRT":
+            return "CDRT"
+        else:
+            return "CRT"
+    elif test_entity == "CIT":
+        if param1 == "CDRT":
+            return "CDRT" if "CDRT" in cit_cdrt_result else "CIT"
+        else:
+            return "CIT"
+    else:
+        return cit_cdrt_result if cit_cdrt_result else "Other"

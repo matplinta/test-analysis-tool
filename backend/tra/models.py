@@ -123,6 +123,7 @@ class TestInstance(models.Model):
     last_passing_logs   = models.ForeignKey(LastPassingLogs, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
     organization        = models.ForeignKey(Organization, default=None, on_delete=models.SET_NULL, blank=True, null=True, related_name="test_instances")
     test_case_name      = models.CharField(max_length=200, blank=False, null=True, help_text="Testcase name")
+    test_entity         = models.CharField(max_length=30, blank=True, null=True, help_text="Test Entity")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     no_run_in_rp        = models.BooleanField(blank=True, default=False, null=True, help_text="No run status in ReportingPortal for the current Feature Build")
     
@@ -153,6 +154,7 @@ class TestRun(models.Model):
     env_issue_type   = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Env issue type")
     fb               = models.ForeignKey(FeatureBuild, on_delete=models.CASCADE, blank=True, help_text="Feature Build")
 
+    exec_trigger     = models.CharField(max_length=30, blank=True, null=True, help_text="Execution trigger (test entity) CIT/CDRT/CRT")
     fail_message     = models.TextField(max_length=1000, blank=True, null=True, help_text="Fail message")
     comment          = models.TextField(max_length=1000, blank=True, null=True, help_text="Comment")
     test_line        = models.TextField(max_length=100, blank=True, null=True, help_text="Testline")

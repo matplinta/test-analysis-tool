@@ -392,6 +392,7 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         'start_time', 
         'end_time', 
         'analyzed',
+        'exec_trigger',
 
         "test_instance__test_case_name", 
         "test_instance__test_set__test_set_name",
