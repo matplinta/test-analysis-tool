@@ -14,7 +14,6 @@ import Notify, { AlertTypes, Infos, Errors, Warnings } from '../../services/Noti
 
 import './TestRunTableComponent.css';
 
-
 let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) => {
 
     const [testRuns, setTestRuns] = useState([]);
@@ -26,7 +25,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const [pagesCount, setPagesCount] = useState(null);
 
     const columns = [
-        { field: 'test_instance.test_set.name', header: 'Test Set Name' },
+        { field: 'test_instance.test_set.test_set_name', header: 'Test Set' },
         { field: 'test_instance.test_set.test_lab_path', header: 'Test Lab Path' },
         { field: 'test_line', header: 'Testline' },
         { field: 'test_suite', header: 'Test Suite' },
@@ -34,7 +33,11 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         { field: 'start_time', header: 'Start time' },
         { field: 'end_time', header: 'End time' },
         { field: 'analyzed_by', header: 'Analyzed by' },
-        { field: 'fb', header: 'FB' }
+        { field: 'fb', header: 'FB' },
+        { field: 'airphone', header: 'AirPhone' },
+        { field: 'comment', header: 'Comment' },
+        { field: 'env_issue_type', header: 'Env issue type' },
+        { field: 'log_file_url_ext', header: 'Logs mirror' }
     ];
 
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -136,16 +139,22 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     let logLinkBodyTemplate = (rowData) => {
-        return (
-            <a href={rowData.log_file_url} style={{ fontSize: '11px' }}>Logs</a>
-        )
+        return rowData.log_file_url !== null ? (
+            <a href={rowData.log_file_url} target="_blank" style={{ fontSize: '11px' }}>Logs</a>
+        ) : null
+    }
+
+    let logExtLinkBodyTemplate = (rowData) => {
+        return rowData.log_file_url_ext !== null ? (
+            <a href={rowData.log_file_url_ext} target="_blank" style={{ fontSize: '11px' }}>Logs mirror</a>
+        ) : null
     }
 
     let rpLinkBodyTemplate = (rowData) => {
         const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
         const rpLink = rpUrl + rowData.rp_id;
         return (
-            <a href={rpLink} style={{ fontSize: '11px' }}> {rowData.rp_id} </a>
+            <a href={rpLink} style={{ fontSize: '11px' }} target="_blank"> {rowData.rp_id} </a>
         )
     }
 
@@ -192,7 +201,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
     const header = (
         <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
-            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={false} style={{ width: '70%', marginRight: '2px' }}
+            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={true} style={{ width: '70%', marginRight: '2px' }}
                 placeholder="Select additional columns to show" />
             <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={handleGenerateRPUrl}>
                 Generate RP URL
@@ -212,11 +221,20 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const columnComponents = selectedColumns.map(col => {
         if (col.field === 'start_time') {
             return <Column key={col.field} body={startDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
-        } else if (col.field === 'end_time') {
+        } 
+        else if (col.field === 'end_time') {
             return <Column key={col.field} body={endDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
-        } else if (col.field === 'fail_message') {
+        } 
+        else if (col.field === 'fail_message') {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '450px' }} />;
-        } else {
+        } 
+        else if (col.field === 'airphone') {
+            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '50px' }} />;
+        } 
+        else if (col.field === 'log_file_url_ext') {
+            return <Column key={col.field} body={logExtLinkBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
+        } 
+        else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '150px' }} />;
         }
     });
@@ -263,8 +281,6 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
                 <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
                 <Column field="fail_message" header="Fail message" style={{ fontSize: '11px', minWidth: "120px" }} />
-                <Column field="env_issue_type" header="Env issue type" sortable style={{ fontSize: '11px' }} />
-                <Column field="comment" header="Comment" sortable style={{ fontSize: '11px', minWidth: '150px' }} />
                 {columnComponents}
             </DataTable>
 

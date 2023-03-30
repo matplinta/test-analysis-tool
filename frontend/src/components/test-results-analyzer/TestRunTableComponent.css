@@ -63,3 +63,9 @@
     border-color: #004c9a;
     background-color: #004c9a;
 }
+
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+    padding: 0.3rem 1.25rem
+}
+
+/* html body div.p-multiselect-panel.p-component.p-connected-overlay-enter-done div.p-multiselect-items-wrapper ul.p-multiselect-items.p-component li.p-multiselect-item */

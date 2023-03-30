@@ -43,6 +43,7 @@ class RepPortal():
         'airphone', 
         'qc_test_set', 
         'qc_test_instance', 
+        'qc_test_instance__test_entity', 
         'organization', 
         'hyperlink_set', 
         'test_suite', 
@@ -55,7 +56,12 @@ class RepPortal():
         'builds',
         'fail_message', 
         'start',
-        'end'
+        'end',
+        'rerun_in_cloud',
+        'cit_cdrt_result',
+        'tc_execution_id',
+        'qc_test_instance__param1'
+
     ]
 
     TEST_RUN_FILTER_DICT =  {

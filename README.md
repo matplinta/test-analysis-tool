@@ -1,8 +1,5 @@
-# Web Tools
-Repository created by team RAN_L2_SW_KRK_2_SG02 for the purposes of the following tools:
-- Testline Reservation Scheduler
-- Test Results Analyzer
-- Testline Manager
+# Test Results Analyzer
+## notes
 __________
 
 ## Directory structure

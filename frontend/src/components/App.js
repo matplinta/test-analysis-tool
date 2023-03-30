@@ -65,7 +65,7 @@ const App = () => {
             <ToastContainer autoClose={2500} />
           </section>
           <footer className="App-footer">
-            <span style={{ marginRight: '10px', fontSize: 'small' }}>© 2022 </span>
+            <span style={{ marginRight: '10px', fontSize: 'small' }}>© {new Date().getFullYear()} </span>
           </footer>
         </BrowserRouter>
       </UserMessagesProvider>
