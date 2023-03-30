@@ -128,7 +128,7 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
 
         fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
         fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
-        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer)
+        get_distinct_values_and_serialize('test_instance', TestInstance, TestInstanceSerializer, order_by_param="test_instance_id")
         get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
         get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
         get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
