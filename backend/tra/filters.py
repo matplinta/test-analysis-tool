@@ -1,5 +1,6 @@
 from functools import reduce
 
+from django import forms
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django_filters import rest_framework as filters
@@ -9,6 +10,13 @@ from .models import (Branch, EnvIssueType, FailMessageType,
                      TestInstance, TestlineType, TestRun, TestRunResult,
                      TestSetFilter)
 
+
+# class NonValidatingMultipleChoiceField(forms.MultipleChoiceField):
+#     def validate(self, value):
+#         pass
+
+# class NonValidatingMultipleChoiceFilter(filters.MultipleChoiceFilter):
+#     field_class = NonValidatingMultipleChoiceField
 
 class TestRunFilter(filters.FilterSet):
     reg_filters = filters.ModelMultipleChoiceFilter(
@@ -32,12 +40,16 @@ class TestRunFilter(filters.FilterSet):
     testline_type = filters.ModelMultipleChoiceFilter(field_name='testline_type', queryset=TestlineType.objects.all())
     env_issue_type = filters.ModelMultipleChoiceFilter(field_name='env_issue_type', queryset=EnvIssueType.objects.all())
     analyzed_by = filters.ModelMultipleChoiceFilter(field_name='analyzed_by__username', to_field_name="username", queryset=User.objects.all())
+
+    # exec_trigger = NonValidatingMultipleChoiceFilter(field_name="exec_trigger", lookup_expr='exact')
+    choices = (('CIT', 'CIT'), ('CRT', 'CRT'), ('CDRT', 'CDRT'),)
+    exec_trigger = filters.MultipleChoiceFilter(field_name="exec_trigger", choices=choices)
     analyzed = filters.BooleanFilter()
 
     class Meta:
         model = TestRun
         fields = ["test_instance", "fb", "result", "testline_type", "env_issue_type", "analyzed", "analyzed_by",
-            'test_set_name', 'branch', 
+            'test_set_name', 'branch', 'exec_trigger'
         ] 
 
 
@@ -55,4 +67,5 @@ class TestInstanceFilter(filters.FilterSet):
             'organization__name': ['icontains'],
             'execution_suspended': ['exact'],
             'no_run_in_rp': ['exact'],
+            'test_entity': ['exact'],
         }

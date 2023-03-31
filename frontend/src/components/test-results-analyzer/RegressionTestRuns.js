@@ -12,6 +12,10 @@ import './RegressionTestRuns.css'
 
 let RegressionTestRuns = () => {
 
+    const [execTriggerFiltersNodes, setExecTriggerFiltersNodes] = useState([]);
+    const [expandedExecTriggerKeys, setExpandedExecTriggerKeys] = useState({});
+    const [selectedExecTriggerKeys, setSelectedExecTriggerKeys] = useState(null);
+
     const [testSetFiltersNodes, setTestSetFiltersNodes] = useState([]);
     const [expandedTestSetKeys, setExpandedTestSetKeys] = useState({});
     const [selectedTestSetKeys, setSelectedTestSetKeys] = useState(null);
@@ -81,6 +85,32 @@ let RegressionTestRuns = () => {
             selectedFilters[filterName] = { "checked": false, "parialChecked": true }
         }
         setSelectedNodesKeys(selectedFilters)
+    }
+
+    const fetchExecTrigger = (data) => {
+        if (execTriggerFiltersNodes.length === 0) {
+            let filters = {
+                key: 'exec_trigger',
+                label: 'Execution Trigger',
+                data: 'Execution Trigger',
+                children: []
+            }
+
+            const filterChildren = data.map((item, index) => {
+                return { key: item, label: item, data: item, children: [] }
+            })
+            filters.children = filterChildren;
+
+            let nodesTmp = [...execTriggerFiltersNodes];
+            nodesTmp.push(filters);
+            expandAll(nodesTmp, setExpandedExecTriggerKeys)
+
+            if (Object.keys(searchParamsEntry).length !== 0 && searchParamsEntry[filters.key] !== undefined) {
+                selectCheckboxesUsingUrlParams(nodesTmp, searchParamsEntry, setSelectedExecTriggerKeys);
+            }
+
+            setExecTriggerFiltersNodes(nodesTmp);
+        }
     }
 
     const fetchTestSetNames = (data) => {
@@ -165,8 +195,8 @@ let RegressionTestRuns = () => {
         if (statusFilterNodes.length === 0) {
             let filters = {
                 key: 'result',
-                label: 'Result filters',
-                data: 'Result Filters',
+                label: 'Result',
+                data: 'Result',
                 children: []
             }
 
@@ -243,6 +273,7 @@ let RegressionTestRuns = () => {
         getTestRunsFilters().then(
             (response) => {
                 const data = response.data;
+                fetchExecTrigger(data['exec_trigger']);
                 fetchTestSetNames(data['test_set_name']);
                 fetchTestLineType(data['testline_type']);
                 fetchBranch(data['branch']);
@@ -281,6 +312,7 @@ let RegressionTestRuns = () => {
 
     const defineApiUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
+        filterUrl += defineApiUrlFromSelectedFilter(selectedExecTriggerKeys, "exec_trigger");
         filterUrl += defineApiUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
         filterUrl += defineApiUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
         filterUrl += defineApiUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
@@ -332,6 +364,14 @@ let RegressionTestRuns = () => {
             </>
         )
     }
+
+    const execTriggerCheckboxList = (
+        <div>
+            <Tree nodeTemplate={nodeTemplate} value={execTriggerFiltersNodes} expandedKeys={expandedExecTriggerKeys} selectionMode="checkbox"
+                selectionKeys={selectedExecTriggerKeys} onSelectionChange={e => setSelectedExecTriggerKeys(e.value)}
+                onToggle={e => setExpandedExecTriggerKeys(e.value)} loading={loading} className="regression-filters-tree" />
+        </div>
+    )
 
     const testSetCheckboxList = (
         <div>
@@ -439,8 +479,10 @@ let RegressionTestRuns = () => {
             {showFilters ?
                 <div className="p-col-fixed" style={{ width: '16%' }}>
                     <Button label="Hide" onClick={() => setShowFilters(false)} icon="pi pi-angle-double-left" className="p-button-text p-button-sm p-button-plain" />
+                    <Button onClick={searchTestRuns} className="p-button-info" style={{ marginTop: '5px', width: "100%", display: 'inline', fontWeight: 'bold' }}>Search</Button>
                     {testSetCheckboxList}
                     {testLineTypeCheckboxList}
+                    {execTriggerCheckboxList}
                     {branchCheckboxList}
                     {statusCheckboxList}
                     {fbCheckboxList}

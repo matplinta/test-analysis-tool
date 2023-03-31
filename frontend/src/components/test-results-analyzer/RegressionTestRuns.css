@@ -100,3 +100,7 @@
     border: 1px solid #dee2e6;
     box-shadow: none !important;
 }
+
+.p-button {
+    letter-spacing: 0.02em;
+}

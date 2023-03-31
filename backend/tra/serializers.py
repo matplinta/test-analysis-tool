@@ -115,7 +115,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended')
+        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended', 'test_entity',)
         read_only_fields = ('last_passing_logs',)
         extra_kwargs = {
             'test_set': {'validators': []},
@@ -143,7 +143,7 @@ class TestRunSerializer(serializers.ModelSerializer):
         model = TestRun
         fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
                   'result', 'env_issue_type', 'comment', 'builds', 'airphone', 'fail_message', 'ute_exec_url', 'log_file_url', 
-                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by')
+                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by', 'exec_trigger',)
         read_only_fields = ('analyzed', )
 
 

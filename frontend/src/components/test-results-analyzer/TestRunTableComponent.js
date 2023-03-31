@@ -37,6 +37,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         { field: 'airphone', header: 'AirPhone' },
         { field: 'comment', header: 'Comment' },
         { field: 'env_issue_type', header: 'Env issue type' },
+        { field: 'exec_trigger', header: 'Execution Trigger' },
         { field: 'log_file_url_ext', header: 'Logs mirror' }
     ];
 
@@ -233,6 +234,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         } 
         else if (col.field === 'log_file_url_ext') {
             return <Column key={col.field} body={logExtLinkBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
+        } 
+        else if (col.field === 'exec_trigger') {
+            return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '80px' }} />;
         } 
         else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '150px' }} />;
