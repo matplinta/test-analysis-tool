@@ -195,8 +195,8 @@ let RegressionTestRuns = () => {
         if (statusFilterNodes.length === 0) {
             let filters = {
                 key: 'result',
-                label: 'Result filters',
-                data: 'Result Filters',
+                label: 'Result',
+                data: 'Result',
                 children: []
             }
 
