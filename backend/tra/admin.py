@@ -98,9 +98,10 @@ class TestRunAdmin(admin.ModelAdmin):
         'start_time', 
         'end_time',
         'exec_trigger',
+        'execution_id',
     ]
     list_filter = ['result', 'fb', 'testline_type', 'exec_trigger', 'analyzed_by', 'test_suite',]
-    search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id', 'exec_trigger',]
+    search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id', 'exec_trigger', 'execution_id',]
 
 
 @admin.register(RepPortalUserToken)

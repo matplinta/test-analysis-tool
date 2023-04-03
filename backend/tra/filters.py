@@ -42,7 +42,7 @@ class TestRunFilter(filters.FilterSet):
     analyzed_by = filters.ModelMultipleChoiceFilter(field_name='analyzed_by__username', to_field_name="username", queryset=User.objects.all())
 
     # exec_trigger = NonValidatingMultipleChoiceFilter(field_name="exec_trigger", lookup_expr='exact')
-    choices = (('CIT', 'CIT'), ('CRT', 'CRT'), ('CDRT', 'CDRT'),)
+    choices = (('CIT', 'CIT'), ('CRT', 'CRT'), ('CDRT', 'CDRT'), ('null', 'null'),)
     exec_trigger = filters.MultipleChoiceFilter(field_name="exec_trigger", choices=choices)
     analyzed = filters.BooleanFilter()
 
