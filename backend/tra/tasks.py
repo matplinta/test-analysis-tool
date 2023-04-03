@@ -14,7 +14,7 @@ from backend.celery import app
 
 from . import test_runs_processing, utils
 from .models import *
-from .storage import get_storage_instance
+from .storage import get_storage_instance, get_loghtml_storage_instance
 
 logger = get_task_logger(__name__)
 
@@ -32,6 +32,9 @@ if settings.DEBUG is False:
         sender.add_periodic_task(crontab(minute=0, hour="21"), 
                                  celery_download_latest_passed_logs_to_storage.s(), 
                                  name='celery_download_latest_passed_logs_to_storage')
+        sender.add_periodic_task(crontab(minute=0, hour="23"), 
+                                 celery_download_testrun_logs_to_mirror_storage.s(), 
+                                 name='celery_download_testrun_logs_to_mirror_storage')
         sender.add_periodic_task(crontab(minute=50, hour="*/4"), 
                                  celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
                                  name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
@@ -41,6 +44,9 @@ if settings.DEBUG is False:
         sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
                                  celery_remove_old_passed_logs_from_log_storage.s(), 
                                  name='celery_remove_old_passed_logs_from_log_storage')
+        sender.add_periodic_task(crontab(minute=30, hour="6", day_of_week=1), 
+                                 celery_remove_mirrored_logs.s(), 
+                                 name='celery_remove_mirrored_logs')
 
 
 @app.task()
@@ -60,6 +66,19 @@ def celery_remove_old_passed_logs_from_log_storage():
     for lpl in last_passing_logs: 
         if not lpl.test_instances.all().exists():
             lpl.delete()
+
+
+@app.task()
+def celery_remove_mirrored_logs():
+    """Removes logs from logs_html_mirror storage when none test run with matching execution_id is present in the DB"""
+    storage = get_loghtml_storage_instance()
+    removed = []
+    dirs, files = storage.listdir('')
+    for exec_id in dirs:
+        if exec_id and not TestRun.objects.filter(execution_id=exec_id).exists():
+            storage.delete(exec_id)
+            removed.append(exec_id)
+    return {"removed": removed}
 
 
 @app.task()
@@ -123,6 +142,11 @@ def celery_sync_norun_data_of_all_test_instances():
 @app.task()
 def celery_download_latest_passed_logs_to_storage():
     return test_runs_processing.download_latest_passed_logs_to_storage()
+
+
+@app.task()
+def celery_download_testrun_logs_to_mirror_storage():
+    return test_runs_processing.download_testrun_logs_to_mirror_storage()
 
 
 @shared_task(name="celery_pull_and_analyze_notanalyzed_testruns_by_testset_filter")
@@ -203,6 +227,15 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
             TestInstance.objects.filter(id__in=test_instance_ids).update(last_passing_logs=logs_instance)
        
     return {"resp": resp, "test_instance_ids": test_instance_ids}
+
+
+@shared_task(name="download_logs_to_mirror_storage")
+def celery_download_logs_to_mirror_storage(directory, url):
+    storage = get_loghtml_storage_instance()
+    resp = storage.save(name=directory, url=url)
+    info = "Logs downloaded"
+    TestRun.objects.filter(execution_id=directory).update(log_file_url_ext=storage.url(directory))
+    return {"resp": resp, "info": info}
 
 
 @shared_task(name="sync_norun_data_per_organization_and_branch")

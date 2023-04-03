@@ -591,6 +591,21 @@ class DownloadLatestPassedLogsToStorage(APIView):
     def get(self, request):
         celery_tasks.celery_download_latest_passed_logs_to_storage.delay()
         return Response("OK")
+    
+
+class DownloadLogsToMirrorStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger download of logs to mirror storage",
+        operation_description="Trigger download of logs to mirror storage",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_download_testrun_logs_to_mirror_storage.delay()
+        return Response("OK")
 
 
 class RemoveOldPassedLogsFromLogStorage(APIView):
@@ -605,6 +620,21 @@ class RemoveOldPassedLogsFromLogStorage(APIView):
     )
     def get(self, request):
         celery_tasks.celery_remove_old_passed_logs_from_log_storage.delay()
+        return Response("OK")
+
+
+class RemoveOldMirroredLogsFromLogStorage(APIView):
+    @swagger_auto_schema(
+        description="Trigger removal of old mirrored logs",
+        operation_description="Trigger removal of old mirrored logs",
+        request_body=no_body,
+        responses={
+            200: "",
+        },
+        tags=["celery"]
+    )
+    def get(self, request):
+        celery_tasks.celery_remove_mirrored_logs.delay()
         return Response("OK")
 
 
