@@ -114,7 +114,8 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     test_entity = rp_test_run['qc_test_instance']["test_entity"]
     param1 = rp_test_run['qc_test_instance']["param1"]
     cit_cdrt_result = rp_test_run['cit_cdrt_result']
-    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result)
+    user_name = rp_test_run['user_name']
+    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result, user_name, hyperlink_set)
 
     this_testrun_in_db = TestRun.objects.filter(rp_id=rp_id)
     _major_fields =  {

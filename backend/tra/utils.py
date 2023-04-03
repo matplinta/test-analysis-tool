@@ -155,16 +155,22 @@ def get_common_users_group():
     return instance
 
 
-def establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result):
-    if test_entity == "CRT":
-        if param1 == "CDRT" and cit_cdrt_result == "CDRT":
-            return "CDRT"
+def establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result, user_name, hyperlink_set):
+    if user_name == "app_cloud_regression":
+        if test_entity == "CRT":
+            if param1 == "CDRT" and cit_cdrt_result == "CDRT":
+                return "CDRT"
+            else:
+                return "CRT"
+        elif test_entity == "CIT":
+            if param1 == "CDRT":
+                return "CDRT" if "CDRT" in cit_cdrt_result else "CIT"
+            else:
+                return "CIT"
         else:
-            return "CRT"
-    elif test_entity == "CIT":
-        if param1 == "CDRT":
-            return "CDRT" if "CDRT" in cit_cdrt_result else "CIT"
-        else:
-            return "CIT"
+            return cit_cdrt_result if cit_cdrt_result else "Other"
     else:
-        return cit_cdrt_result if cit_cdrt_result else "Other"
+        if hyperlink_set:
+            return "SingleRun"
+        else:
+            return "ManualRun"

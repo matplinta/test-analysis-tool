@@ -60,7 +60,8 @@ class RepPortal():
         'rerun_in_cloud',
         'cit_cdrt_result',
         'tc_execution_id',
-        'qc_test_instance__param1'
+        'qc_test_instance__param1',
+        'user_name',
 
     ]
 
