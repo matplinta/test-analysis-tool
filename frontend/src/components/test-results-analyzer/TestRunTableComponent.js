@@ -140,13 +140,13 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     let logLinkBodyTemplate = (rowData) => {
-        return rowData.log_file_url !== null ? (
+        return rowData.log_file_url ? (
             <a href={rowData.log_file_url} target="_blank" style={{ fontSize: '11px' }}>Logs</a>
         ) : null
     }
 
     let logExtLinkBodyTemplate = (rowData) => {
-        return rowData.log_file_url_ext !== null ? (
+        return rowData.log_file_url_ext ? (
             <a href={rowData.log_file_url_ext} target="_blank" style={{ fontSize: '11px' }}>Logs mirror</a>
         ) : null
     }

@@ -154,6 +154,7 @@ class TestRun(models.Model):
     env_issue_type   = models.ForeignKey(EnvIssueType, on_delete=models.CASCADE, blank=True, help_text="Env issue type")
     fb               = models.ForeignKey(FeatureBuild, on_delete=models.CASCADE, blank=True, help_text="Feature Build")
 
+    execution_id     = models.CharField(max_length=100, blank=True, null=True, help_text="UTE Cloud execution id")
     exec_trigger     = models.CharField(max_length=30, blank=True, null=True, help_text="Execution trigger (test entity) CIT/CDRT/CRT")
     fail_message     = models.TextField(max_length=1000, blank=True, null=True, help_text="Fail message")
     comment          = models.TextField(max_length=1000, blank=True, null=True, help_text="Comment")

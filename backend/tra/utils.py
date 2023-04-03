@@ -77,6 +77,11 @@ def get_autoanalyzer_user() -> User:
     return autoanalyzer
 
 
+def get_external_analyzer_user() -> User:
+    extanalyzer, _ =  User.objects.get_or_create(username="external")
+    return extanalyzer
+
+
 def get_filters_for_rp_api(testrun_result: str, testset_filter: TestSetFilter):
     return {
         "result": testrun_result,

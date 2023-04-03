@@ -20,6 +20,9 @@ from .models import (EnvIssueType, FailMessageType, FailMessageTypeGroup,
                      TestlineType, TestRun, TestRunResult, TestSetFilter)
 
 
+class TestRunUpdated(Exception):
+    pass
+
 class TestRunWithSuchRPIDAlreadyExists(Exception):
     pass
 
@@ -74,16 +77,66 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     def _strip_time(value: str):
         return datetime.strptime(value.split(".")[0], '%Y-%m-%dT%H:%M:%S')
 
-    rp_id = rp_test_run["id"]
-    if TestRun.objects.filter(rp_id=rp_id).exists():
-        raise TestRunWithSuchRPIDAlreadyExists(rp_id)
+    def _has_any_major_fields_changed(trdb: TestRun, result: TestRunResult, env_issue_type: EnvIssueType, comment: str, execution_id: str, exec_trigger: str):
+        if (trdb.result != result or 
+            trdb.env_issue_type != env_issue_type or 
+            trdb.comment != comment or
+            trdb.execution_id != execution_id or 
+            trdb.exec_trigger != exec_trigger
+            ):
+            return True
+        else:
+            return False
 
+    rp_id = rp_test_run["id"]
+    comment = rp_test_run["comment"]
     start = utils.get_timezone_aware_datetime(_strip_time(rp_test_run["start"]))
     end = utils.get_timezone_aware_datetime(_strip_time(rp_test_run["end"]))
-    
     fb_name, fb_start, fb_end = utils.get_fb_info_based_on_date(end)
     if ignore_old_testruns:
         utils.check_if_testrun_is_older_than_3_fbs(rp_id, end, exception=TestRunFBOlderThan3ConsecFBs)
+
+    env_issue_type, _ = EnvIssueType.objects.get_or_create(
+        name=return_empty_if_none(rp_test_run["env_issue_type"])
+    )
+    result, _ = TestRunResult.objects.get_or_create(name=rp_test_run["result"])
+    analyzed_by = utils.get_external_analyzer_user() if result == utils.get_env_issue_result_instance() else None
+
+    hyperlink_set = rp_test_run.get("hyperlink_set", "")
+    if hyperlink_set:
+        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", [""])[0]
+        log_file_url=rp_test_run["hyperlink_set"].get("log_file_url", "")
+    else:
+        ute_exec_url, log_file_url = "", ""
+
+    _match = re.search(r"(.*)-\d+", rp_test_run.get('tc_execution_id') or "")
+    execution_id = _match.group(1) if _match else None
+    test_entity = rp_test_run['qc_test_instance']["test_entity"]
+    param1 = rp_test_run['qc_test_instance']["param1"]
+    cit_cdrt_result = rp_test_run['cit_cdrt_result']
+    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result)
+
+    this_testrun_in_db = TestRun.objects.filter(rp_id=rp_id)
+    _major_fields =  {
+        "result": result,
+        "env_issue_type": env_issue_type,
+        "comment": comment,
+        "execution_id": execution_id,
+        "exec_trigger": exec_trigger
+    }
+    if this_testrun_in_db.exists():
+        testrun_db = this_testrun_in_db.first()
+        if _has_any_major_fields_changed(trdb=testrun_db, **_major_fields):
+            for attribute, value in _major_fields.items():
+                if getattr(testrun_db, attribute) != value:
+                    if getattr(testrun_db, attribute) == utils.get_not_analyzed_result_instance() and value == utils.get_env_issue_result_instance():
+                        setattr(testrun_db, "analyzed_by", utils.get_external_analyzer_user())
+                    setattr(testrun_db, attribute, value)
+            testrun_db.save()
+            raise TestRunUpdated(rp_id)
+        else:
+            raise TestRunWithSuchRPIDAlreadyExists(rp_id)
+        
         
     fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
     
@@ -98,10 +151,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     testline_type, _ = TestlineType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
-    test_entity = rp_test_run['qc_test_instance']["test_entity"]
-    param1 = rp_test_run['qc_test_instance']["param1"]
-    cit_cdrt_result = rp_test_run['cit_cdrt_result']
-    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result)
+    
 
     if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
         test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
@@ -113,8 +163,6 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             test_instance.testline_type = testline_type
         if test_instance.test_entity != test_entity: 
             test_instance.test_entity = test_entity
-        # if test_instance.organization != organization:
-        #     test_instance.organization = organization
         test_instance.save()
     else:
         test_instance = TestInstance.objects.create(
@@ -124,17 +172,8 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             organization=organization,
             testline_type=testline_type
         )
-    env_issue_type, _ = EnvIssueType.objects.get_or_create(
-        name=return_empty_if_none(rp_test_run["env_issue_type"])
-    )
-    result, _ = TestRunResult.objects.get_or_create(name=rp_test_run["result"])
-    hyperlink_set = rp_test_run.get("hyperlink_set", "")
-    if hyperlink_set:
-        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", [""])[0]
-        log_file_url=rp_test_run["hyperlink_set"].get("log_file_url", "")
-    else:
-        ute_exec_url, log_file_url = "", ""
-    tr = TestRun(
+    
+    test_run = TestRun(
         rp_id=rp_id,
         fb=fb,
         test_instance=test_instance,
@@ -154,8 +193,10 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         start_time=start,
         end_time=end,
         exec_trigger=exec_trigger,
+        execution_id=execution_id,
+        analyzed_by=analyzed_by,
     )
-    return tr
+    return test_run
 
 
 def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: int, try_to_analyze: bool=True, query_limit: int=None):
@@ -173,6 +214,10 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
             skipped_runs.append(str(exc_rp_id))
             utils.log_exception_info(exc_rp_id)
 
+        except TestRunUpdated as exc_rp_id:
+            updated.append(str(exc_rp_id))
+            utils.log_exception_info(exc_rp_id)
+
         except TestRunFBOlderThan3ConsecFBs as e:
             utils.log_exception_info(e)
 
@@ -186,7 +231,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
     if not query_limit:
         query_limit = testset_filter.limit
 
-    new_runs, skipped_runs, errored = [], [], []
+    new_runs, skipped_runs, updated, errored = [], [], [], []
 
     if try_to_analyze and testset_filter:
         fail_message_types = get_fail_message_types_from_testset_filter(testset_filter)
@@ -195,7 +240,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
     test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
-    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "errored": errored}
+    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "updated": updated, "errored": errored}
 
 
 def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: int=None):
@@ -212,6 +257,10 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
             skipped_runs.append(str(exc_rp_id))
             utils.log_exception_info(exc_rp_id)
 
+        except TestRunUpdated as exc_rp_id:
+            updated.append(str(exc_rp_id))
+            utils.log_exception_info(exc_rp_id)
+
         except TestRunFBOlderThan3ConsecFBs as e:
             utils.log_exception_info(e)
 
@@ -226,13 +275,13 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
     if not query_limit:
         query_limit = testset_filter.limit
 
-    new_runs, skipped_runs, errored = [], [], []
+    new_runs, skipped_runs, updated, errored = [], [], [], []
 
     auth_params = utils.get_rp_api_auth_params(testset_filter)
     test_runs_data, _ = RepPortal(**auth_params).get_data_from_testruns(limit=query_limit, filters=filters)
     for test_run in test_runs_data:
         _create_testrun_and_handle_its_actions_based_on_its_result(test_run)
-    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "errored": errored}
+    return {'new_runs': new_runs, 'skipped_runs': skipped_runs, "updated": updated, "errored": errored}
 
 
 def download_latest_passed_logs_to_storage():
