@@ -386,9 +386,10 @@ def download_testrun_logs_to_mirror_storage():
 
     dirs, files = storage.listdir('')
     for testrun in trs_queryset:
-        if testrun['execution_id'] not in dirs:
+        exec_id = testrun['execution_id'] if testrun['execution_id'] else utils.get_testrun_ute_cloud_sr_execution_id(testrun['ute_exec_url'])
+        if exec_id not in dirs:
             task = celery_tasks.celery_download_logs_to_mirror_storage.delay(
-                directory=testrun['execution_id'], 
+                directory=exec_id, 
                 url=testrun['ute_exec_url']
             )
             tasks.append(task.id)
