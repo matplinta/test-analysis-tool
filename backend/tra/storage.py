@@ -16,6 +16,13 @@ def get_storage_instance():
     return UTECloudLogsStorage()
 
 
+def get_loghtml_storage_instance():
+    if settings.DEBUG:
+        http_server = f"{settings.LOGS_STORAGE_HTTP_SERVER_DEBUG}:{settings.LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT}"
+        return LogsHTMLStorage(storage_local_path=settings.LOGS_STORAGE_DOCKER_PATH_DEBUG, storage_http_server=http_server)
+    return LogsHTMLStorage()
+
+
 class UTECloudLogsStorage(Storage):
     def __init__(self, storage_local_path=None, storage_http_server=None):
         if not storage_local_path:
@@ -25,10 +32,11 @@ class UTECloudLogsStorage(Storage):
 
         self._storage_local_path  = storage_local_path
         self._storage_http_server = storage_http_server
+        self._storage_relative_directory="last_passing_logs"
 
 
     def path(self, name):
-        return os.path.join(self._storage_local_path, name)
+        return os.path.join(self._storage_local_path, self._storage_relative_directory, name)
 
     def _save(self, directory, url, timeout):
         path = self.path(directory)
@@ -110,7 +118,7 @@ class UTECloudLogsStorage(Storage):
         Return an absolute URL where the file's contents can be accessed
         directly by a web browser.
         """
-        return "/".join(map(lambda x: str(x).rstrip('/'), [self._storage_http_server, name]))
+        return "/".join(map(lambda x: str(x).rstrip('/'), [self._storage_http_server, self._storage_relative_directory, name]))
 
     def _datetime_from_timestamp(self, ts):
         """
@@ -131,12 +139,13 @@ class UTECloudLogsStorage(Storage):
 
 
 class LogsHTMLStorage(UTECloudLogsStorage):
+    def __init__(self, storage_local_path=None, storage_http_server=None):
+        super().__init__(storage_local_path, storage_http_server)
+        self._storage_relative_directory="logs_html_mirror"
+
     def _save(self, directory, url, timeout):
         path = self.path(directory)
-        url_path = urlparse(url).path
-        if url_path.endswith('/'):
-            url_path = url_path[:-1]
-        wget_cmd = f"wget -r -np -nH -nd -A log.html {url}"
+        wget_cmd = f"wget -r -np -nH -nd -A log.html,report.html {url}"
         os.makedirs(path, exist_ok=True)
         proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
         proc.communicate(timeout=timeout)

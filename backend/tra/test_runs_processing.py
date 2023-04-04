@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from rep_portal.api import RepPortal, RepPortalError
 
+from .storage import get_loghtml_storage_instance
 from . import tasks as celery_tasks
 from . import utils
 from .models import (EnvIssueType, FailMessageType, FailMessageTypeGroup,
@@ -341,7 +342,7 @@ def download_latest_passed_logs_to_storage():
             task = celery_tasks.celery_download_resursively_contents_to_storage.delay(
                 lpl_id=logs_instance_id, 
                 test_instance_ids=info["test_instance_ids"], 
-                directory=os.path.join(settings.LOGS_STORAGE_PASSED_TESTRUNS_LOGS_RELATIVE_PATH, utecloud_run_id), 
+                directory=utecloud_run_id, 
                 url=info["ute_exec_url_exact"]
             )
             tasks[logs_instance_id] = task.id
@@ -358,6 +359,38 @@ def download_latest_passed_logs_to_storage():
     
     async_tasks = schedule_download_of_logs(log_inst_info_dict)
     return {"celery_tasks": async_tasks, "log_inst_info_dict": log_inst_info_dict}
+
+
+def download_testrun_logs_to_mirror_storage():
+    def get_all_testruns_with_logs_available(test_instance):
+        trs_with_logs = []
+        for test_run in test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).order_by('-end_time'):
+            if test_run.has_ute_logs_available():
+                trs_with_logs.append(test_run.id)
+        return trs_with_logs
+
+    eligible_trs = []
+    for testset_filter in TestSetFilter.objects.all():
+        if testset_filter.is_subscribed_by_anyone(): 
+            test_instances = testset_filter.test_instances.all()
+            for test_instance in test_instances:
+                eligible_trs_per_ti = get_all_testruns_with_logs_available(test_instance)
+                if eligible_trs_per_ti:
+                    eligible_trs.extend(eligible_trs_per_ti)
+
+    trs_queryset = TestRun.objects.filter(id__in=eligible_trs).order_by('ute_exec_url').values('ute_exec_url', 'execution_id').distinct()
+    tasks = []
+    storage = get_loghtml_storage_instance()
+    dirs, files = storage.listdir('')
+    for testrun in trs_queryset:
+        if testrun['execution_id'] not in dirs:
+            task = celery_tasks.celery_download_logs_to_mirror_storage.delay(
+                directory=testrun['execution_id'], 
+                url=testrun['ute_exec_url']
+            )
+            tasks.append(task.id)
+
+    return {"celery_tasks": tasks}
 
 
 def sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id: int, limit=None):
