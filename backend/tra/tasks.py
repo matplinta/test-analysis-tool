@@ -75,10 +75,10 @@ def celery_remove_mirrored_logs():
     removed = []
     if storage.exists(''):
         dirs, files = storage.listdir('')
-        for exec_id in dirs:
-            if exec_id and not TestRun.objects.filter(execution_id=exec_id).exists():
-                storage.delete(exec_id)
-                removed.append(exec_id)
+        for directory in dirs:
+            if directory and not TestRun.objects.filter(log_file_url_ext__contains=directory).exists():
+                storage.delete(directory)
+                removed.append(directory)
     
     return {"removed": removed}
 
@@ -238,7 +238,7 @@ def celery_download_logs_to_mirror_storage(directory, url):
     storage = get_loghtml_storage_instance()
     resp = storage.save(name=directory, url=url)
     info = "Logs downloaded"
-    TestRun.objects.filter(execution_id=directory).update(log_file_url_ext=storage.url(directory))
+    TestRun.objects.filter(execution_id=directory).update(log_file_url_ext=storage.url(resp.get('name', directory)))
     return {"resp": resp, "info": info}
 
 
