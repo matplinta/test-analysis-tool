@@ -381,15 +381,17 @@ def download_testrun_logs_to_mirror_storage():
     trs_queryset = TestRun.objects.filter(id__in=eligible_trs).order_by('ute_exec_url').values('ute_exec_url', 'execution_id').distinct()
     tasks = []
     storage = get_loghtml_storage_instance()
-    if storage.exists(''):
-        dirs, files = storage.listdir('')
-        for testrun in trs_queryset:
-            if testrun['execution_id'] not in dirs:
-                task = celery_tasks.celery_download_logs_to_mirror_storage.delay(
-                    directory=testrun['execution_id'], 
-                    url=testrun['ute_exec_url']
-                )
-                tasks.append(task.id)
+    if not storage.exists(''):
+        os.makedirs(storage.path(''), exist_ok=True)
+        
+    dirs, files = storage.listdir('')
+    for testrun in trs_queryset:
+        if testrun['execution_id'] not in dirs:
+            task = celery_tasks.celery_download_logs_to_mirror_storage.delay(
+                directory=testrun['execution_id'], 
+                url=testrun['ute_exec_url']
+            )
+            tasks.append(task.id)
 
     return {"celery_tasks": tasks}
 
