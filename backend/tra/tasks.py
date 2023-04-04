@@ -238,7 +238,9 @@ def celery_download_logs_to_mirror_storage(directory, url):
     storage = get_loghtml_storage_instance()
     resp = storage.save(name=directory, url=url)
     info = "Logs downloaded"
-    TestRun.objects.filter(execution_id=directory).update(log_file_url_ext=storage.url(resp.get('name', directory)))
+    saved_dirname = resp.get('name', directory)
+    if saved_dirname and saved_dirname != "None":
+        TestRun.objects.filter(execution_id=saved_dirname).update(log_file_url_ext=storage.url(saved_dirname))
     return {"resp": resp, "info": info}
 
 

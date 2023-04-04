@@ -364,7 +364,7 @@ def download_latest_passed_logs_to_storage():
 def download_testrun_logs_to_mirror_storage():
     def get_all_testruns_with_logs_available(test_instance):
         trs_with_logs = []
-        for test_run in test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).order_by('-end_time'):
+        for test_run in test_instance.test_runs.all().exclude(ute_exec_url='').exclude(ute_exec_url=None).order_by('-end_time'):
             if test_run.has_ute_logs_available():
                 trs_with_logs.append(test_run.id)
         return trs_with_logs
