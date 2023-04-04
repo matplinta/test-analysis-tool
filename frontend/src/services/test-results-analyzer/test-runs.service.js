@@ -13,6 +13,10 @@ export const schedulePullOfTestRunsDataByTestSetFilters = async (testsetfilter_i
     return (await axios.get(`api/tra/celery/pull_testruns_by_testsetfilters?testsetfilters=${testsetfilter_ids}`, { headers: authHeader() }));
 }
 
+export const getTestRunsByTestInstance = async (testInstanceId, filter, page, pageSize) => {
+    return (await axios.get(`api/tra/test_runs/by_test_instance/${testInstanceId}/` + '?page=' + page + "&page_size=" + pageSize + "&" + filter, { headers: authHeader() }));
+}
+
 export const getTestRunsFilters = async () => {
     return (await axios.get('api/tra/test_runs/dist_fields_values/', { headers: authHeader() }));
 }

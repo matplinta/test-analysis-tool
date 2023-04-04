@@ -111,6 +111,7 @@ export const Errors = {
     'TEST_SET_FILTER_EDITED': 'Test set filter was not edited!',
     'GET_TEST_SET_FILTER': 'Test set filters were not loaded successfully!',
     'GET_BRANCHES': 'Error during fetching branches!',
+    'GET_TEST_ENTITIES': 'Error during fetching test entites!',
     'BRANCH_OFF': 'Error during peerforming Branch Off!',
     'FETCH_USERS_LIST': 'Error during users fetching!',
     'FETCH_FAIL_MESSAGE_GROUPS_LIST': 'Error during Fail Messages Type Groups fetching!',

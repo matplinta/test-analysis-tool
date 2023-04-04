@@ -28,7 +28,9 @@ router.register(r'notifications', views.NotificationView, 'notifications')
 
 urlpatterns = [
     path('test_runs/by_query/', views.TestRunsBasedOnQuery.as_view(), name='tr_byquery'),
+    path('test_runs/by_test_instance/<int:ti>/', views.TestRunsByTestInstance.as_view(), name='tr_byti'),
     path('test_instances/by_query/', views.TestInstancesBasedOnQuery.as_view(), name='ti_byquery'),
+    path('test_instances/test_entity_dist_fields_values/', views.TestEntityDistinctValuesByTestInstancesOfUser.as_view(), name='ti_test_entity_dist_fields'),
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
     path('summary/', views.SummaryStatisticsView.as_view(), name='summary_view'),

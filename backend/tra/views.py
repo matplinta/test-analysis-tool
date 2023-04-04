@@ -368,6 +368,15 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         return Response(fields_dict)
 
 
+class TestEntityDistinctValuesByTestInstancesOfUser(APIView):
+    def get(self, request):
+        tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
+        queryset = TestInstance.objects.filter(
+            reduce(lambda q, tsfilter: q | Q(test_set=tsfilter), tsfilters, Q())
+        )
+        return Response(queryset.order_by('test_entity').values_list('test_entity', flat=True).distinct())
+
+
 class TestRunsBasedOnQuery(generics.ListAPIView):
     serializer_class = TestRunSerializer
     filterset_class = TestRunFilter
@@ -408,6 +417,17 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
         )
         return queryset
 
+class TestRunsByTestInstance(generics.ListAPIView):
+    serializer_class = TestRunSerializer
+    filterset_class = TestRunFilter
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        # test_instance = self.request.query_params.get("ti", None)
+        # if not test_instance:
+        #     raise ValidationError(detail="Query parameter 'ti' is required.")
+        return TestRun.objects.filter(test_instance=self.kwargs['ti'])
+
 
 class TestInstancesBasedOnQuery(generics.ListAPIView):
     serializer_class = TestInstanceSerializer
@@ -424,6 +444,7 @@ class TestInstancesBasedOnQuery(generics.ListAPIView):
         'organization__name',
         'execution_suspended',
         'no_run_in_rp',
+        'test_entity',
     )
 
     def get_queryset(self):

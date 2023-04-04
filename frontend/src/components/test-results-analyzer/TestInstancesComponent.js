@@ -13,7 +13,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import { MdPauseCircle, MdPlayCircle } from 'react-icons/md';
 import { getTestInstancesByQuery } from './../../services/test-results-analyzer/test-instances.service';
-import { getBranches, getTestLineTypes } from './../../services/test-results-analyzer/test-filters.service';
+import { getBranches, getTestLineTypes, getTestEntities } from './../../services/test-results-analyzer/test-filters.service';
 import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
 
 
@@ -23,6 +23,7 @@ let TestInstancesComponent = () => {
 
     const [testInstances, setTestInstances] = useState([]);
     const [branches, setBranches] = useState([]);
+    const [testEntities, setTestEntities] = useState([]);
     const [testLinesTypes, setTestLinesTypes] = useState([]);
 
     const [totalRecords, setTotalRecords] = useState(0);
@@ -50,7 +51,8 @@ let TestInstancesComponent = () => {
             'last_passing_logs__utecloud_run_id': { value: null, matchMode: 'contains' },
             'organization__name__icontains': { value: null, matchMode: 'contains' },
             'execution_suspended': { value: null, matchMode: 'equal' },
-            'no_run_in_rp': { value: null, matchMode: 'equal' }
+            'no_run_in_rp': { value: null, matchMode: 'equal' },
+            'test_entity': { value: null, matchMode: 'equal' }
         }
     });
 
@@ -88,6 +90,20 @@ let TestInstancesComponent = () => {
             },
             (error) => {
                 Notify.sendNotification(Errors.GET_BRANCHES, AlertTypes.error);
+            }
+        )
+    }
+
+    let fetchTestEntities = () => {
+        getTestEntities().then(
+            (response) => {
+                if (response.data.length > 0) {
+                    let testEntities = response.data
+                    setTestEntities(testEntities);
+                }
+            },
+            (error) => {
+                Notify.sendNotification(Errors.GET_TEST_ENTITIES, AlertTypes.error);
             }
         )
     }
@@ -196,6 +212,12 @@ let TestInstancesComponent = () => {
             value={options.value} options={branches} onChange={(e) => options.filterApplyCallback(e.value)} />
     }
 
+    const testEntityTypeFilter = (options) => {
+        return <Dropdown showClear
+            style={{ maxWidth: '120px', fontSize: '5px' }} panelClassName="panel-style"
+            value={options.value} options={testEntities} onChange={(e) => options.filterApplyCallback(e.value)} />
+    }
+
     let saveFiltersFromState = () => {
         if (state !== null) {
             setStateLoading(true);
@@ -208,6 +230,7 @@ let TestInstancesComponent = () => {
     useEffect(() => {
         fetchBranches();
         fetchTestLines();
+        fetchTestEntities();
         saveFiltersFromState();
     }, [])
 
@@ -271,13 +294,20 @@ let TestInstancesComponent = () => {
                         filterElement={branchTypeFilter}
                         style={{ fontSize: '11px', textAlign: 'center', width: '5%' }} />
 
-                    <Column field="last_passing_logs.build" columnKey="last_passing_logs.build" header="Passed gNB"
+                    <Column field="test_entity" header="Test Entity"
+                        sortable sortField="test_entity"
+                        filterField="test_entity"
+                        filter showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        filterElement={testEntityTypeFilter}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '5%' }} />
+
+                    <Column field="last_passing_logs.build" columnKey="last_passing_logs.build" header="Last passing gNB"
                         style={{ fontSize: '11px', width: '10%' }} />
 
-                    <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Passed AP"
+                    <Column field="last_passing_logs.airphone" columnKey="last_passing_logs.airphone" header="Last passing AP"
                         style={{ fontSize: '11px', width: '4%' }} />
 
-                    <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Passed Logs"
+                    <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Last Passing Logs"
                         sortable sortField="last_passing_logs__utecloud_run_id"
                         filter filterField="last_passing_logs__utecloud_run_id"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}

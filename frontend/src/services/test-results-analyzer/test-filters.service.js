@@ -61,6 +61,10 @@ export const getBranches = async () => {
     return (await axios.get('/api/tra/branches/', { headers: authHeader() }));
 }
 
+export const getTestEntities = async () => {
+    return (await axios.get('/api/tra/test_instances/test_entity_dist_fields_values/', { headers: authHeader() }));
+}
+
 export const postBranchOff = async (branchOffData) => {
     return (await axios.post('/api/tra/test_set_filters/branchoff/', branchOffData, { headers: authHeader() }));
 }
