@@ -305,7 +305,7 @@ def download_latest_passed_logs_to_storage():
             log_inst_info_dict[None]["test_instance_ids"].append(test_instance.id)
             return 
 
-        ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_passed_test_run)
+        ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_passed_test_run.ute_exec_url)
         
         if test_instance.has_last_passing_logs_set():
             if test_instance.last_passing_logs.utecloud_run_id == ute_cloud_sr_id:
@@ -383,7 +383,7 @@ def download_testrun_logs_to_mirror_storage():
     storage = get_loghtml_storage_instance()
     if not storage.exists(''):
         os.makedirs(storage.path(''), exist_ok=True)
-        
+
     dirs, files = storage.listdir('')
     for testrun in trs_queryset:
         if testrun['execution_id'] not in dirs:

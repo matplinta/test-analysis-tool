@@ -73,11 +73,13 @@ def celery_remove_mirrored_logs():
     """Removes logs from logs_html_mirror storage when none test run with matching execution_id is present in the DB"""
     storage = get_loghtml_storage_instance()
     removed = []
-    dirs, files = storage.listdir('')
-    for exec_id in dirs:
-        if exec_id and not TestRun.objects.filter(execution_id=exec_id).exists():
-            storage.delete(exec_id)
-            removed.append(exec_id)
+    if storage.exists(''):
+        dirs, files = storage.listdir('')
+        for exec_id in dirs:
+            if exec_id and not TestRun.objects.filter(execution_id=exec_id).exists():
+                storage.delete(exec_id)
+                removed.append(exec_id)
+    
     return {"removed": removed}
 
 
@@ -231,6 +233,8 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
 
 @shared_task(name="download_logs_to_mirror_storage")
 def celery_download_logs_to_mirror_storage(directory, url):
+    if not directory:
+        directory = utils.get_testrun_ute_cloud_sr_execution_id(url)
     storage = get_loghtml_storage_instance()
     resp = storage.save(name=directory, url=url)
     info = "Logs downloaded"

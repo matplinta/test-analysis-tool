@@ -111,8 +111,8 @@ def log_exception_info(exception: Exception):
     logging.info(f"{type(exception).__name__} was raised for rp_id={exception}")
 
 
-def get_testrun_ute_cloud_sr_execution_id(test_run: TestRun):
-    return os.path.basename(os.path.normpath(urlparse(test_run.ute_exec_url).path))
+def get_testrun_ute_cloud_sr_execution_id(ute_exec_url: str):
+    return os.path.basename(os.path.normpath(urlparse(ute_exec_url).path))
 
 
 def get_distinct_values_based_on_subscribed_regfilters(user: User):
