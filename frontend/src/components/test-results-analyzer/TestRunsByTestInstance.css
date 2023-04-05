@@ -1,0 +1,92 @@
+.regression-filters-tree .p-checkbox {
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+}
+
+.p-field-checkbox>label,
+.p-field-radiobutton>label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+.regression-filters-tree .p-checkbox .p-checkbox-box {
+    width: 15px;
+    height: 15px;
+}
+
+.regression-filters-tree .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #004c9a;
+    background: #004c9a;
+    width: 15px;
+    height: 15px;
+    font-size: 9px;
+}
+
+.regression-filters-tree .p-checkbox .p-checkbox-box .p-checkbox-icon {
+    transition-duration: 0.2s;
+    color: #ffffff;
+    font-size: 9px;
+}
+
+.regression-filters-tree .p-treenode-label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.p-tree .p-tree-container {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content {
+    padding: 0;
+}
+
+.p-tree {
+    padding: 0;
+}
+
+.p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler {
+    margin-right: 0;
+}
+
+.p-tree .p-tree-container .p-treenode {
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.p-tree .p-tree-container .p-treenode {
+    overflow: hidden;
+    margin-right: 5px;
+}
+
+.might-overflow {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.might-overflow:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-all;
+}
+
+.p-button.p-button-text.p-button-plain {
+    width: 100%;
+    margin-bottom: 1px;
+    text-align: left;
+    color: #495057;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    box-shadow: none !important;
+}
+
+.p-button {
+    letter-spacing: 0.02em;
+}

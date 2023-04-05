@@ -148,6 +148,28 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
         return fields_dict
 
 
+def get_distinct_values_based_on_test_instance(test_instance: TestInstance):
+        fields_dict = {}
+        def get_distinct_values_and_serialize(field, model, serializer=None, order_by_param=None, key_override=None):
+            order_by_param = order_by_param if order_by_param else field
+            distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
+            objects = model.objects.filter(pk__in=distinct_values)
+            data = serialize("json", objects)
+            key = field if not key_override else key_override
+            fields_dict[key] = json.loads(data)
+
+        queryset = TestRun.objects.filter(test_instance=test_instance)
+        fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
+        fields_dict['exec_trigger'] = queryset.order_by('exec_trigger').distinct('exec_trigger').values_list("exec_trigger", flat=True)
+        fields_dict['exec_trigger'] = sorted(["null" if elem is None else elem for elem in fields_dict['exec_trigger']])
+        get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
+        get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
+        get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
+        get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
+        get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
+        return fields_dict
+
+
 def get_common_users_group():
     instance, created = Group.objects.get_or_create(name='Common Users')
     # if created:

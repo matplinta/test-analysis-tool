@@ -61,41 +61,50 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
     const items = [
         {
             label: <span><HiOutlineDatabase size='20' style={{ marginBottom: '3px' }} /> Regression Test Runs</span>,
-            command: () => { navigate('regression-test-runs') }
+            command: () => { navigate('regression-test-runs') },
+            // url: 'regression-test-runs'
         },
         {
             label: <span><BiLayer size='20' style={{ marginBottom: '3px' }} /> Test Instances</span>,
-            command: () => { navigate('test-instances') }
+            command: () => { navigate('test-instances') },
+            // url: 'test-instances'
         },
         {
             label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Test Set Filters</span>,
             items: [{
                 label: "All",
                 command: () => { navigate('test-set-filters') },
+                // url: 'test-set-filters',
             }, {
                 label: "Subscribed",
                 command: () => { navigate('subscribed-test-set-filters') },
+                // url: 'subscribed-test-set-filters',
             }, {
                 label: "Owned",
                 command: () => { navigate('owned-test-set-filters') },
+                // url: 'owned-test-set-filters',
             }, {
                 label: "Prapare to branch off",
                 command: () => { navigate('test-set-filters-branch-off') },
+                // url: 'test-set-filters-branch-off',
             }]
         },
         {
             label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages</span>,
             items: [{
                 label: <span>Fail Message Regexes</span>,
-                command: () => { navigate('fail-regex') }
+                command: () => { navigate('fail-regex') },
+                // url: 'fail-regex',
             }, {
                 label: <span>Fail Message Groups</span>,
-                command: () => { navigate('fail-regex-groups') }
+                command: () => { navigate('fail-regex-groups') },
+                // url: 'fail-regex-groups',
             }]
         },
         {
             label: <span><AiOutlineBarChart size='20' style={{ marginBottom: '3px' }} /> Statistics</span>,
-            command: () => { navigate('statistics') }
+            command: () => { navigate('statistics') },
+            // url: 'statistics'
         }
     ]
 
