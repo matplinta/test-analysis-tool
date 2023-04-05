@@ -209,9 +209,9 @@ class GetDataForFailChartBase(APIView):
         date_start = request.query_params.get("date_start", None)
         date_end = request.query_params.get("date_end", None)
         if date_start:
-            date_start= datetime.strptime(date_start, "%Y-%m-%d").date()
+            date_start = datetime.strptime(date_start, "%Y-%m-%d").date()
         if date_end:
-            date_end= datetime.strptime(date_end, "%Y-%m-%d").date()
+            date_end = datetime.strptime(date_end, "%Y-%m-%d").date()
         return date_start, date_end
 
     def parse_filters_and_fmtgs(self, filterset_id):
@@ -244,6 +244,8 @@ class GetDataForFailChartBase(APIView):
 
     def init_analyzer(self, fail_message_dict, filters):
         date_start, date_end = self._handle_dates_in_request(self.request)
+        # if date_start and date_end:
+        #     filters["end_ft"] =           # 2023-01-01%2000:00:00,2023-04-05%2023:59:59
         analyzer = Analyzer(fail_message_dict, filters)
         analyzer.get_data_from_rp()
         analyzer.get_data_filtered_by_date_ranges(date_start, date_end)

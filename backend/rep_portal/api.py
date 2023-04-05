@@ -115,11 +115,13 @@ class RepPortal():
         return "&".join(filters_list)
             
             
-    def _get_testruns_url(self, limit, filters=None, fields=None, ordering=None):
+    def _get_testruns_url(self, limit, filters=None, fields=None, ordering=None, offset=None):
         limit = f"limit={limit}"
         url_components = [limit]
         filters = self._get_filters_to_testruns_url(filters)
         fields = self._get_fields_to_testruns_url(fields)
+        if offset:
+            url_components.append(f"offset={offset}")
         if ordering:
             url_components.append(f"ordering={ordering}")
         if filters:
@@ -235,7 +237,7 @@ class RepPortal():
 
     @api_get_wrapper(retry=5)
     def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None, *args, **kwargs):            
-        url = self._get_testruns_url(limit, filters, fields, ordering)
+        url = self._get_testruns_url(limit, filters, fields, ordering, offset)
         resp = kwargs["api"].get(url, params=None)
         return resp, url
 
