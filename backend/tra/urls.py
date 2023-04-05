@@ -33,6 +33,7 @@ urlpatterns = [
     path('test_instances/test_entity_dist_fields_values/', views.TestEntityDistinctValuesByTestInstancesOfUser.as_view(), name='ti_test_entity_dist_fields'),
     path('test_runs/analyze_to_rp/', views.TestRunsAnalyzeToRP.as_view(), name='analyze_to_rp'),
     path('test_runs/dist_fields_values/', views.TestRunsBasedOnQueryDictinctValues.as_view(), name='distinct_fields_values'),
+    path('test_runs/dist_fields_values/by_testinstance/<int:ti>/', views.TestRunsByTestInstanceDictinctValues.as_view(), name='distinct_fields_values_by_ti'),
     path('summary/', views.SummaryStatisticsView.as_view(), name='summary_view'),
 
     path('test_runs/pull_notpassed_testruns_by_testset_filter/<int:tsfid>/', views.PullNotPassedTestrunsByTestSetFilter.as_view(), 

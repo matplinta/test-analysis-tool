@@ -6,7 +6,7 @@
 
 
 import React, { useEffect, useState } from "react";
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
@@ -167,6 +167,16 @@ let TestInstancesComponent = () => {
         }
     }
 
+    let testRunsBodyTemplate = (rowData) => {
+        if (rowData.id !== null) {
+            return (
+                <Link to={`/test-runs-by-test-instance?test_instance=${rowData.id}`}>
+                    <span className="block text-lg">Link</span>
+                </Link>
+            )
+        }
+    }
+
     let noRunInRpBodyTemplate = (rowData) => {
         if (rowData.no_run_in_rp)
             return <span style={{ color: 'red', fontWeight: 'bold', fontSize: '15px' }}>NO RUN</span>
@@ -260,7 +270,7 @@ let TestInstancesComponent = () => {
                         sortable sortField="rp_id"
                         filterField="rp_id__in" filter
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
-                        style={{ fontSize: '11px', width: '3%' }} />
+                        style={{ fontSize: '11px', width: '4%' }} />
 
                     <Column field="test_case_name" columnKey="test_case_name" header="Test Case"
                         sortable
@@ -312,6 +322,10 @@ let TestInstancesComponent = () => {
                         filter filterField="last_passing_logs__utecloud_run_id"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
+
+                    <Column body={testRunsBodyTemplate} columnKey="id" header="Test Runs"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '4%' }} />
 
                     <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="RUN in RP in FB"
                         sortable sortField="no_run_in_rp"
