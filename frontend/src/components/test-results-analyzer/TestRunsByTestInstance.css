@@ -1,17 +1,3 @@
-/* .scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-wrapper {
-    border-right: 10px solid var(--surface-b);
-}
-
-.scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-bar {
-    background-color: var(--primary-color);
-    opacity: 1;
-    transition: background-color .2s;
-}
-
-.scrollpanel-demo .p-scrollpanel.custombar1 .p-scrollpanel-bar:hover {
-    background-color: #007ad9;
-} */
-
 .regression-filters-tree .p-checkbox {
     width: 16px;
     height: 16px;
