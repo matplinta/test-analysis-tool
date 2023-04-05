@@ -11,6 +11,7 @@ import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { DataScroller } from 'primereact/datascroller';
 import logo_TRA from './../../assets/logo_TRA.png';
+import analyze_icon from './../../assets/analyze_icon.png';
 import AuthService from './../../services/auth.service.js';
 import GoToAdminComponent from './../home/GoToAdminComponent';
 import LogoutComponent from './../home/authorization/LogoutComponent';
@@ -110,7 +111,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     const start =
         <Link to='/'>
-            <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>
+            <div>
+                <img alt="TRA" src={analyze_icon} style={{ height: '40px', marginBottom: '3px' }}></img>
+                <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>
+            </div>
         </Link>;
 
 
