@@ -171,7 +171,7 @@ let TestInstancesComponent = () => {
         if (rowData.id !== null) {
             return (
                 <Link to={`/test-runs-by-test-instance?test_instance=${rowData.id}`}>
-                    <span className="block text-lg font-light mb-3">Link</span>
+                    <span className="block text-lg">Link</span>
                 </Link>
             )
         }
