@@ -7,6 +7,7 @@ import Notify from './../services/Notify';
 import AuthService from './../services/auth.service.js';
 
 import RegressionTestRuns from './test-results-analyzer/RegressionTestRuns';
+import TestRunsByTestInstance from './test-results-analyzer/TestRunsByTestInstance';
 import TestSetFiltersComponent from './test-results-analyzer/TestSetFiltersComponent';
 import FailRegexTypesComponent from './test-results-analyzer/FailRegexTypesComponent';
 import FailMessageTypeGroupNewComponent from './test-results-analyzer/FailMessageTypeGroupNewComponent';
@@ -18,6 +19,7 @@ import TestInstancesComponent from './test-results-analyzer/TestInstancesCompone
 import SummaryComponent from './test-results-analyzer/SummaryComponent';
 import MessagesComponent from './test-results-analyzer/MessagesComponent';
 import WelcomeComponent from './test-results-analyzer/WelcomeComponent';
+import NotFound from './test-results-analyzer/NotFound';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
 import { UserMessagesProvider } from '../services/UserMessagesContext';
@@ -49,6 +51,7 @@ const App = () => {
               <Route path="" element={<MenuComponent isUserLoggedIn={isUserLoggedIn} setIsUserLoggedIn={setIsUserLoggedIn} />} >
                 <Route index element={isUserLoggedIn ? <SummaryComponent /> : <WelcomeComponent setIsUserLoggedIn={setIsUserLoggedIn}/>} />
                 <Route path="regression-test-runs" element={<RegressionTestRuns />} />
+                <Route path="test-runs-by-test-instance" element={<TestRunsByTestInstance />} />
                 <Route path="test-instances" element={<TestInstancesComponent />} />
                 <Route path="test-set-filters" element={<TestSetFiltersComponent type={'all'} />} />
                 <Route path="subscribed-test-set-filters" element={<TestSetFiltersComponent type={'subscribed'} />} />
@@ -60,6 +63,7 @@ const App = () => {
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupNewComponent />} />
                 <Route path="statistics" element={<ChartsComponent />} />
                 <Route path="messages" element={<MessagesComponent />} />
+                <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
             <ToastContainer autoClose={2500} />

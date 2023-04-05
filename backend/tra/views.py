@@ -368,6 +368,11 @@ class TestRunsBasedOnQueryDictinctValues(APIView):
         return Response(fields_dict)
 
 
+class TestRunsByTestInstanceDictinctValues(APIView):
+    def get(self, request, ti):
+        return Response(utils.get_distinct_values_based_on_test_instance(test_instance=ti))
+
+
 class TestEntityDistinctValuesByTestInstancesOfUser(APIView):
     def get(self, request):
         tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)

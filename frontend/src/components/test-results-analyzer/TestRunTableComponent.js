@@ -265,7 +265,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     return (
         <>
             <DataTable value={testRuns} lazy paginator size="small" stripedRows
-                pageCount={pagesCount} rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
+                rows={rowsPerPage} first={first} totalRecords={testRunsCount} onPage={(e) => onPageChange(e)}
                 paginatorTemplate={templateCurrentPageReport} header={header} showGridlines
                 dataKey="id" rowHover loading={loading}
                 rowsPerPageOptions={[10, 30, 50, 100]}
@@ -278,7 +278,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
 
                 <Column selectionMode="multiple" headerStyle={{ textAlign: 'center' }}></Column>
                 <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id" sortField='rp_id' sortable style={{ fontSize: '11px', minWidth: '80px' }} />
-                <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px' }} />
+                <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px', maxWidth: 'px' }} />
                 <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
                 <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
                 <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
