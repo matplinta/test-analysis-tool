@@ -12,7 +12,7 @@ let GenerateChartComponent = ({ chartDataTemplate }) => {
     let horizontalOptions = {
         indexAxis: 'y',
         maintainAspectRatio: true,
-        aspectRatio: 3,
+        aspectRatio: 2,
         plugins: {
             legend: {
                 labels: {
@@ -21,7 +21,7 @@ let GenerateChartComponent = ({ chartDataTemplate }) => {
             },
             title: {
                 display: true,
-                text: 'Failed test runs from Reporting Portal by error type',
+                text: 'Test runs from RP by error type',
                 size: 20,
                 padding: {
                     top: 10,

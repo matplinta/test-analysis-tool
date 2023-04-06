@@ -10,12 +10,15 @@ import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { DataScroller } from 'primereact/datascroller';
-import logo_TRA from './../../assets/logo_TRA.png';
 import AuthService from './../../services/auth.service.js';
 import GoToAdminComponent from './../home/GoToAdminComponent';
 import LogoutComponent from './../home/authorization/LogoutComponent';
 import LoginComponent from './../home/authorization/LoginComponent';
 import { useUserMessages } from '../../services/UserMessagesContext';
+
+import logo_TRA from './../../assets/logo_TRA.png';
+import searching_outline from './../../assets/searching_outline.png';
+
 import './MenuComponent.css';
 
 
@@ -110,7 +113,10 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     const start =
         <Link to='/'>
-            <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '10px', marginBottom: '5px' }}></img>
+            <div>
+                <img alt="TRA" src={searching_outline} style={{ height: '30px', marginBottom: '3px', marginRight: '5px', filter: 'brightness(0) invert(1)' }}></img>
+                <img alt="TRA" src={logo_TRA} style={{ height: '20px', marginRight: '5px', marginBottom: '5px' }}></img>
+            </div>
         </Link>;
 
 

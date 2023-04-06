@@ -48,3 +48,7 @@
     background-color: #003870;
     border-color: #003870;
 }
+
+#fail_message_group {
+    display: flex;
+}
