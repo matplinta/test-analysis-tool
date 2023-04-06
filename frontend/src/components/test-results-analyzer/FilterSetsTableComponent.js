@@ -28,8 +28,8 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
 
     const { currentUser, fetchCurrentUser } = useCurrentUser();
 
-    const toggleOptions = ['My Filter Sets', 'All Filter Sets'];
-    const [toggleValue, setToggleValue] = useState('My Filter Sets');
+    const toggleOptions = ['My', 'All'];
+    const [toggleValue, setToggleValue] = useState('My');
 
     const fetchFilterSets = () => {
         getFilterSetsDetail().then(
@@ -70,7 +70,7 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
         deleteFilterSetsDetail(id).then(
             (response) => {
                 Notify.sendNotification(Successes.REMOVE_FAIL_MESSAGE_REGEX, AlertTypes.success);
-                fetchFilterSets();
+                fetchFilterSetsWrapper(toggleValue)
                 clearForm();
             },
             (error) => {
@@ -102,7 +102,7 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
     }
 
     let fetchFilterSetsWrapper = (value) => {
-        if (value === 'My Filter Sets') {
+        if (value === 'My') {
             fetchMyFilterSets();
         } else {
             fetchFilterSets();
@@ -126,11 +126,12 @@ let FilterSetsTableComponent = ({ selectedFilterSet, selectFilterSet, reloadTest
     return (
         <>
             <div style={{display: 'block ruby'}}>
+            <div style={{paddingRight: '70px'}} className="text-5xl" >Filter Sets</div>
                 <SelectButton value={toggleValue} options={toggleOptions} onChange={(e) => onToggleValueChange(e.value)}
                     className="select-button-my-all ml-1 mb-3" />
                 <Button className="p-button-info font-bold genSubsBtn" type="submit" style={{float: 'right'}} onClick={fetchGenerateSubsFilterSet}
                         tooltip="Generate FilterSet based on subscribed TestSetFilters" tooltipOptions={{position: 'top'}}>
-                        Generate FS based on subscribed TSFilters
+                        Generate from subscribed Test Sets
                 </Button>
             </div>
             

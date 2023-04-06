@@ -29,20 +29,25 @@ class Analyzer():
         self.rp_auth_params = rp_auth_params
         self.fail_message_dict = fail_message_dict if fail_message_dict else {}
         self.filters = filters if filters else {}
-        self.limit = self.filters.pop('limit', 1000)
+        self.limit = self.filters.pop('limit', 5000)
     
     
     def get_data_from_rp(self, url=None):
         if url:
             df = self._get_normalized_json_from_url(url)
         else:
-            datajson, _ = RepPortal(**self.rp_auth_params).get_data_from_testruns(limit=self.limit, filters=self.filters)
+            datajson = RepPortal(**self.rp_auth_params).pull_testruns_data_untill_last_page(limit=self.limit, filters=self.filters)
             df = json_normalize(datajson)
-        df = self._drop_empty_fail_msg_rows(df)
+        df = self._set_passed_runs(df)
         df = self._convert_datetime_columns_to_datetime(df)
         self.df = df
         return self.df
     
+
+    def _set_passed_runs(self, df):
+        df.loc[df['result'] == 'passed', 'fail_message'] = "PASSED"
+        return df
+
 
     def _drop_empty_fail_msg_rows(self, df):
         return df[(df['fail_message'] != '') & (df['fail_message'].notnull())]
@@ -77,7 +82,7 @@ class Analyzer():
         if df is None:
             df = self.df
         df_temp = df.copy()
-        df_temp['exception_type'] = df_temp.apply(lambda value: self._establish_exception_type(value.fail_message), axis=1)
+        df_temp['exception_type'] = df_temp.apply(lambda value: self._establish_exception_type(value.fail_message or ""), axis=1)
         self.df = df_temp
         return df_temp
 
@@ -113,12 +118,11 @@ class Analyzer():
             return data
 
         size = len(df.index)
-        print(size)
         earliest_record, oldest_record = self.get_data_dates_range_info(df)
         df_temp = self.add_normalized_exception_data_column(df)
         df_temp = self.get_data_indexed_by_exception_type(df_temp)
         df_temp.sort_values(by=list(df_temp.columns), inplace=True)
-        return parse_data_to_dict(df_temp, info=f"Records: {size}; From {earliest_record} to {oldest_record}")
+        return parse_data_to_dict(df_temp, info=f'Records: {size}; From {earliest_record.strftime("%d-%m-%Y")} to {oldest_record.strftime("%d-%m-%Y")}')
 
 
     def get_excel_file_binary_data_from_dataframe(self, df=None):

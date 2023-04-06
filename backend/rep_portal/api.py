@@ -75,7 +75,9 @@ class RepPortal():
         "fail_message": "fail_message__pos_neg",
         "result": "result__name__pos_neg",
         "env_issue_type": "envIssueType",
-        "comment": "comment"
+        "comment": "comment",
+        "end__gte": "end__gte",
+        "end__lt": "end__lt"
     }
 
     def __init__(self, token=None, user=None, passwd=None, debug=False):
@@ -116,6 +118,8 @@ class RepPortal():
             
             
     def _get_testruns_url(self, limit, filters=None, fields=None, ordering=None, offset=None):
+        if not limit:
+            limit = 5000
         limit = f"limit={limit}"
         url_components = [limit]
         filters = self._get_filters_to_testruns_url(filters)
@@ -237,9 +241,33 @@ class RepPortal():
 
     @api_get_wrapper(retry=5)
     def get_data_from_testruns(self, limit, filters=None, fields=None, ordering=None, *args, **kwargs):            
-        url = self._get_testruns_url(limit, filters, fields, ordering, offset)
+        url = self._get_testruns_url(limit, filters, fields, ordering)
         resp = kwargs["api"].get(url, params=None)
         return resp, url
+
+
+    @api_get_wrapper(retry=5, unpack_results=False)
+    def get_data_from_testruns_packed_results(self, limit, filters=None, fields=None, ordering=None, url=None, *args, **kwargs):            
+        url = self._get_testruns_url(limit, filters, fields, ordering) if not url else url
+        resp = kwargs["api"].get(url, params=None)
+        return resp, url
+    
+
+    def pull_testruns_data_untill_last_page(self, limit, filters=None, fields=None, ordering=None, *args, **kwargs):
+        url = None
+        results_all = []
+        timeout = 300
+        timeout_start = time.time()
+        while time.time() < timeout_start + timeout:
+            resp, _ = self.get_data_from_testruns_packed_results(limit, filters, fields, ordering, url, *args, **kwargs)
+            results = resp.json().get('results', None)
+            results_all.extend(results)
+            next = resp.json().get('next', None)
+            url = next
+            if not next:
+                break
+
+        return results_all
 
 
     @api_get_wrapper(retry=5)

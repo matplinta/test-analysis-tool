@@ -102,6 +102,7 @@ export const Errors = {
     'GET_TEST_RUNS': "Cannot get test runs!",
     'GET_TEST_RUNS_FILTERS': "Cannot get test runs filters!",
     'EMPTY_FIELDS_FILTERS_LIST': "Cannot send due to empty fields in filters list. Please fulfil form.",
+    'EMPTY_DATES': "Cannot send due to empty dates. Please specify the time range",
     'EMPTY_FIELDS_FILTERSET_NAME': "Cannot send due to empty fields in filters list. Please fulfil form.",
     'TEST_SET_FILTERS_SUBSCRIBED': 'Test set filters were not subscribed!',
     'TEST_SET_FILTERS_UNSUBSCRIBED': 'Test set filters were not subscribed!',
@@ -140,7 +141,8 @@ export const Errors = {
     'DOWNLOAD_CHART': 'Chart cannot be generated for defined filters!',
     'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
     'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!',
-    'SUBS_FILTERSET_GEN': 'Failure during subscription filterset generation!'
+    'SUBS_FILTERSET_GEN': 'Failure during subscription filterset generation!',
+    'NO_TESTRUNS_FOUND': 'No test runs found with specified filters!'
 }
 
 export const Warnings = {

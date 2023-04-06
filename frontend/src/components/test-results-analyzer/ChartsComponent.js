@@ -24,7 +24,7 @@ import { InputNumber } from 'primereact/inputnumber';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-import FilterStesTableComponent from "./FilterSetsTableComponent";
+import FilterSetsTableComponent from "./FilterSetsTableComponent";
 import GenerateChartComponent from "./GenerateChartComponent";
 import FilterListFormComponent from "./FilterListFormComponent";
 
@@ -44,8 +44,6 @@ let ChartsComponent = () => {
 
     const [selectedFilterFields, setSelectedFilterFields] = useState([]);
     const [unselectedFilterFields, setUnselectedFilterFields] = useState([]);
-
-    const [limit, setLimit] = useState(1000);
 
     const [reloadTestSetFilters, setReloadTestSetFilters] = useState(false);
 
@@ -132,6 +130,11 @@ let ChartsComponent = () => {
             "field_name": "comment",
             "description": "Comment in RP",
             "example": "[Env Issue Type: iphy] Analyzed by user autoanalyzer: PDU session setup failure"
+        },
+        {
+            "field_name": "limit",
+            "description": "Max test runs that the RP API will collect in a single request",
+            "example": "500"
         }
     ]
 
@@ -152,7 +155,7 @@ let ChartsComponent = () => {
     const fetchFilterFields = () => {
         getFilterFields().then(
             (results) => {
-                let filterFields = results.data.filter(field => field.name !== "fail_message_type_groups" && field.name !== "limit");
+                let filterFields = results.data.filter(field => field.name !== "fail_message_type_groups");
                 setFilterFields(filterFields.map(item => item.name));
                 setUnselectedFilterFields(results.data);
             }, (error) => {
@@ -205,13 +208,6 @@ let ChartsComponent = () => {
 
         let filterSetCopy = Object.assign({}, filterSet);
 
-        let limitObject = filterSetCopy.filters.filter(item => item.field === "limit");
-        if (limitObject.length > 0) {
-            setLimit(limitObject[0].value);
-        } else {
-            setLimit(1000);
-        }
-
         let failMessagesGroups = filterSetCopy.filters.filter(item => item.field === "fail_message_type_groups");
         if (failMessagesGroups.length > 0) {
             let failMessagesGroupsIdsArray = failMessagesGroups[0].value.split(',')
@@ -221,7 +217,7 @@ let ChartsComponent = () => {
             setSelectedFailMessageTypeGroups([]);
         }
 
-        filterSetCopy.filters = filterSetCopy.filters.filter(item => item.field !== "limit" && item.field !== "fail_message_type_groups")
+        filterSetCopy.filters = filterSetCopy.filters.filter(item => item.field !== "fail_message_type_groups")
         setSelectedFilterSet(filterSetCopy);
 
         setFilters(filterSetCopy.filters);
@@ -242,7 +238,6 @@ let ChartsComponent = () => {
 
     const prepareFiltersListWithLimitAndGroups = () => {
         let filtersListWithLimitAndGroups = [...filters];
-        filtersListWithLimitAndGroups.push({ "field": "limit", "value": limit });
         if (selectedFailMessageTypeGroups !== null && selectedFailMessageTypeGroups !== []) {
             filtersListWithLimitAndGroups.push(
                 { "field": "fail_message_type_groups", "value": selectedFailMessageTypeGroups.join(',') }
@@ -272,15 +267,14 @@ let ChartsComponent = () => {
     }
 
 
-
     const clearFilterSet = () => {
         setSelectedFilterSet(null);
         setFiltersetName("");
         setFilters([filterTemplate]);
         setSelectedFilterFields([]);
         setUnselectedFilterFields(filterFields);
-        setLimit(1000);
         setSelectedFailMessageTypeGroups([]);
+        setDates(null);
     }
 
     const saveExcel = (data) => {
@@ -296,7 +290,7 @@ let ChartsComponent = () => {
     }
 
     const postExcelFromSavedFilterSetAndSave = (filtersList, datesRange) => {
-        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.sticky);
+        Notify.sendNotification(Infos.DOWNLOAD_EXCEL, AlertTypes.info, 10000);
         postToGetExcelFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (response) => {
                 saveExcel(response.data);
@@ -304,7 +298,12 @@ let ChartsComponent = () => {
                 Notify.sendNotification(Successes.DOWNLOAD_EXCEL, AlertTypes.success);
             },
             (error) => {
-                Notify.sendNotification(Errors.DOWNLOAD_EXCEL, AlertTypes.error);
+                if (error.response && error.response.status === 404) {
+                    Notify.sendNotification(Errors.NO_TESTRUNS_FOUND, AlertTypes.error);
+                }
+                else {
+                    Notify.sendNotification(Errors.DOWNLOAD_EXCEL, AlertTypes.error);
+                }
                 setBlockedPanel(false);
             }
         )
@@ -312,7 +311,9 @@ let ChartsComponent = () => {
 
     const downloadFilterSetExcel = () => {
         let filtersList = prepareFiltersListWithoutEmpty(filters);
-        if (filtersList.length === filters.length && filterFields.length > 0) {
+        if (!dates || dates.length == 0) {
+            Notify.sendNotification(Errors.EMPTY_DATES, AlertTypes.error);
+        } else if (filtersList.length === filters.length && filterFields.length > 0) {
             setBlockedPanel(true);
             let newFiltersList = prepareFiltersListWithLimitAndGroups();
             postExcelFromSavedFilterSetAndSave(newFiltersList, dates);
@@ -332,7 +333,7 @@ let ChartsComponent = () => {
     }
 
     const fetchChartFromTemporaryFilterSet = (filtersList, datesRange) => {
-        Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.sticky);
+        Notify.sendNotification(Infos.DOWNLOAD_CHART, AlertTypes.info, 10000);
         postToGetChartFromTemporaryDefinedFilterSet(filtersList, getFullDateRange(datesRange)).then(
             (results) => {
                 setChartDataTemplate({
@@ -347,19 +348,27 @@ let ChartsComponent = () => {
                 Notify.sendNotification(Successes.DOWNLOAD_CHART, AlertTypes.success);
             }, (error) => {
                 setBlockedPanel(false);
-                Notify.sendNotification(Errors.DOWNLOAD_CHART, AlertTypes.error);
+                if (error.response && error.response.status === 404) {
+                    Notify.sendNotification(error.response.data.message, AlertTypes.error);
+                }
+                else {
+                    Notify.sendNotification(Errors.DOWNLOAD_CHART, AlertTypes.error);
+                }
             })
     }
 
     const generateChart = () => {
         let filtersList = prepareFiltersListWithoutEmpty(filters);
-        if (filtersList.length === filters.length && filterFields.length > 0) {
+        if (!dates || dates.length == 0) {
+            Notify.sendNotification(Errors.EMPTY_DATES, AlertTypes.error);
+        } else if (filtersList.length === filters.length && filterFields.length > 0) {
             setBlockedPanel(true);
             let newFiltersList = prepareFiltersListWithLimitAndGroups();
             fetchChartFromTemporaryFilterSet(newFiltersList, dates);
         } else {
             Notify.sendNotification(Errors.EMPTY_FIELDS_FILTERS_LIST, AlertTypes.error);
         }
+
     }
 
     let handleFailMessageTypeGroupsChange = (e) => {
@@ -451,7 +460,8 @@ let ChartsComponent = () => {
                         </Row>
 
                         <Row>
-                            <label htmlFor="fail_message_group" className="font-bold pl-2">
+                            <Col>
+                            <label htmlFor="fail_message_group" className="block font-bold pl-2">
                                 <span>Fail message Groups</span>
                                 <Tooltip target=".fail-message-group-info-icon" />
                                 <i className="fail-message-group-info-icon pi pi-info-circle ml-1"
@@ -459,24 +469,9 @@ let ChartsComponent = () => {
                                     data-pr-position="right" style={{ fontSize: '1.0rem', cursor: 'pointer' }} />
                             </label>
                             <MultiSelect value={selectedFailMessageTypeGroups} options={failMessageTypeGroupsList} onChange={handleFailMessageTypeGroupsChange}
-                                optionLabel="name" optionValue="id" filter showClear id="fail_message_group" className="ml-2 mb-2 mt-1 mr-2"
+                                optionLabel="name" optionValue="id" filter showClear id="fail_message_group" className="ml-2 mb-2 mt-1 mr-2" maxSelectedLabels={1}
                                 style={{ maxWidth: '96%' }} />
-                        </Row>
-
-                        <Row>
-                            <label htmlFor="limit" className="font-bold pl-2">
-                                <span>Limit</span>
-                                <Tooltip target=".limit-info-icon" />
-                                <i className="limit-info-icon pi pi-info-circle ml-1"
-                                    data-pr-tooltip="Max test runs that the API will collect from Reporting Portal. If you specify date ranges, this number has to be big enough to collect test runs from these dates. Date filtering happenes after collection of data from API, so the quantity of this parameter has to take them into account."
-                                    data-pr-position="right" style={{ fontSize: '1.0rem', cursor: 'pointer' }} />
-                            </label>
-                            <InputNumber id="limit" value={limit} onValueChange={(e) => setLimit(e.value)} mode="decimal" useGrouping={false} className="mb-2 mt-1 pl-2" style={{ maxWidth: '30%' }} />
-                        </Row>
-
-                        <Divider style={{ height: '10px', color: 'black' }} />
-
-                        <Row>
+                            </Col>
                             <Col>
                                 <label htmlFor="range" className="block font-bold">Select Time Range
                                     <Tooltip target=".time-range-info-icon" />
@@ -512,7 +507,7 @@ let ChartsComponent = () => {
                     <Container className="pl-2">
                         <Row>
                             <Col>
-                                <FilterStesTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
+                                <FilterSetsTableComponent selectedFilterSet={selectedFilterSet} selectFilterSet={selectFilterSet}
                                     reloadTestSetFilters={reloadTestSetFilters} setReloadTestSetFilters={setReloadTestSetFilters}
                                     clearForm={clearFilterSet} />
                             </Col>
