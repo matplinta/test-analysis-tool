@@ -163,7 +163,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             test_instance.test_case_name = rp_test_run["test_case"]["name"]
         if test_instance.testline_type != testline_type: 
             test_instance.testline_type = testline_type
-        if test_instance.test_entity != test_entity: 
+        if test_entity and test_instance.test_entity != test_entity: 
             test_instance.test_entity = test_entity
         test_instance.save()
     else:
