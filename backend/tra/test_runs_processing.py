@@ -78,12 +78,14 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     def _strip_time(value: str):
         return datetime.strptime(value.split(".")[0], '%Y-%m-%dT%H:%M:%S')
 
-    def _has_any_major_fields_changed(trdb: TestRun, result: TestRunResult, env_issue_type: EnvIssueType, comment: str, execution_id: str, exec_trigger: str):
+    def _has_any_major_fields_changed(trdb: TestRun, result: TestRunResult, env_issue_type: EnvIssueType, 
+                                      comment: str, execution_id: str, exec_trigger: str, test_entity: str):
         if (trdb.result != result or 
             trdb.env_issue_type != env_issue_type or 
             trdb.comment != comment or
             trdb.execution_id != execution_id or 
-            trdb.exec_trigger != exec_trigger
+            trdb.exec_trigger != exec_trigger or
+            (trdb.test_instance.test_entity != test_entity and test_entity)
             ):
             return True
         else:
@@ -124,13 +126,17 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         "env_issue_type": env_issue_type,
         "comment": comment,
         "execution_id": execution_id,
-        "exec_trigger": exec_trigger
+        "exec_trigger": exec_trigger,
+        "test_entity": test_entity
     }
     if this_testrun_in_db.exists():
         testrun_db = this_testrun_in_db.first()
         if _has_any_major_fields_changed(trdb=testrun_db, **_major_fields):
             for attribute, value in _major_fields.items():
                 if getattr(testrun_db, attribute) != value:
+                    if attribute == "test_entity" and value:
+                        setattr(testrun_db.test_instance, attribute, value)
+                        testrun_db.test_instance.save()
                     if getattr(testrun_db, attribute) == utils.get_not_analyzed_result_instance() and value == utils.get_env_issue_result_instance():
                         setattr(testrun_db, "analyzed_by", utils.get_external_analyzer_user())
                     setattr(testrun_db, attribute, value)
