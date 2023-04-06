@@ -39,6 +39,7 @@ class Analyzer():
             datajson = RepPortal(**self.rp_auth_params).pull_testruns_data_untill_last_page(limit=self.limit, filters=self.filters)
             df = json_normalize(datajson)
         df = self._set_passed_runs(df)
+        df = self._drop_empty_fail_msg_rows(df)
         df = self._convert_datetime_columns_to_datetime(df)
         self.df = df
         return self.df
