@@ -133,10 +133,12 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         testrun_db = this_testrun_in_db.first()
         if _has_any_major_fields_changed(trdb=testrun_db, **_major_fields):
             for attribute, value in _major_fields.items():
-                if getattr(testrun_db, attribute) != value:
-                    if attribute == "test_entity" and value:
+                if attribute == "test_entity" and value:
+                    if not getattr(testrun_db.test_instance, attribute):
                         setattr(testrun_db.test_instance, attribute, value)
                         testrun_db.test_instance.save()
+                    continue
+                if getattr(testrun_db, attribute) != value:
                     if getattr(testrun_db, attribute) == utils.get_not_analyzed_result_instance() and value == utils.get_env_issue_result_instance():
                         setattr(testrun_db, "analyzed_by", utils.get_external_analyzer_user())
                     setattr(testrun_db, attribute, value)
