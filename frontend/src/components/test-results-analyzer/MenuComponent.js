@@ -6,6 +6,7 @@ import { AiOutlineBarChart } from 'react-icons/ai';
 import { FiFilter } from 'react-icons/fi';
 import { HiOutlineDatabase } from 'react-icons/hi';
 import { BiLayer } from 'react-icons/bi';
+import { MdOutlineHelpOutline } from 'react-icons/md';
 import { Badge } from 'primereact/badge';
 import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
@@ -108,6 +109,11 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
             label: <span><AiOutlineBarChart size='20' style={{ marginBottom: '3px' }} /> Statistics</span>,
             command: () => { navigate('statistics') },
             // url: 'statistics'
+        },
+        {
+            label: <span><MdOutlineHelpOutline size='20' style={{ marginBottom: '3px' }} /> About</span>,
+            command: () => { navigate('about') },
+            // url: 'about'
         }
     ]
 

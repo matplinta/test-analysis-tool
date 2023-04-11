@@ -19,6 +19,7 @@ import TestInstancesComponent from './test-results-analyzer/TestInstancesCompone
 import SummaryComponent from './test-results-analyzer/SummaryComponent';
 import MessagesComponent from './test-results-analyzer/MessagesComponent';
 import WelcomeComponent from './test-results-analyzer/WelcomeComponent';
+import AboutComponent from './test-results-analyzer/AboutComponent';
 import NotFound from './test-results-analyzer/NotFound';
 
 import { CurrentUserProvider } from '../services/CurrentUserContext';
@@ -63,6 +64,7 @@ const App = () => {
                 <Route path="fail-regex-groups/:group" element={<FailMessageTypeGroupNewComponent />} />
                 <Route path="statistics" element={<ChartsComponent />} />
                 <Route path="messages" element={<MessagesComponent />} />
+                <Route path="about" element={<AboutComponent />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
