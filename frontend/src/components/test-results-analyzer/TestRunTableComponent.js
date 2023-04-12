@@ -201,15 +201,21 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     }
 
     const header = (
-        <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }}>
-            <MultiSelect value={selectedColumns} options={columns} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={true} style={{ width: '70%', marginRight: '2px' }}
-                placeholder="Select additional columns to show" />
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={handleGenerateRPUrl}>
-                Generate RP URL
-            </Button>
-            <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-help p-button-sm" onClick={handleAnalizeTestRuns}>
-                Analyze Test Runs As Env Issue
-            </Button>
+        <div style={{ textAlign: 'left', alignContent: 'center', display: 'flex' }} className="flex flex-row">
+            <div className='flex-grow-1 flex'>
+                <MultiSelect value={selectedColumns} options={columns} maxSelectedLabels={8} display="chip" optionLabel="header" onChange={onColumnToggle} showSelectAll={true} style={{ width: '100%', marginRight: '2px' }}
+                    placeholder="Select additional columns to show" />
+            </div>
+            <div className='flex-none flex'>
+                <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-info p-button-sm" onClick={handleGenerateRPUrl}>
+                    Generate RP URL
+                </Button>
+            </div>
+            <div className='flex-none flex'>
+                <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-help p-button-sm" onClick={handleAnalizeTestRuns}>
+                    Analyze Test Runs As Env Issue
+                </Button>
+            </div>
 
         </div>
 

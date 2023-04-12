@@ -216,8 +216,6 @@ class RepPortal():
         def rewrap(func):
             @wraps(func)
             def wrap(self, *args, **kwargs):
-                if self.debug:
-                    return func(self, *args, **kwargs)
                 api = self._get_logged_in_repapi_instance()
                 _retry = retry
                 try:
@@ -321,6 +319,8 @@ class RepPortal():
 
     @api_post_wrapper(retry=3)
     def set_suspension_status_for_test_instances(self, ti_ids: List[int], suspend_status: bool=False, *args, **kwargs):
+        # if self.debug:
+        #     return None, None, "DEBUG is set to True, will skip sending data to RP"
         url = RepPortal.TEST_INSTANCE_SUSPEND_URL
         payload = {
             "id": ti_ids,

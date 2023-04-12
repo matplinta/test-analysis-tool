@@ -426,6 +426,25 @@ def sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id
     return {"not_updated": not_found}
 
 
+def sync_suspension_status_of_test_instances_by_ids(ti_ids: List[int], auth_params=None):
+    def get_ti_suspended_status_from_results(ti_id: int):
+        return next((item["suspended"] for item in results if item["id"] == ti_id), None)
+
+    not_found, updated = [], []
+    if auth_params is None:
+        auth_params = utils.get_rp_api_auth_params()
+    results, _ = RepPortal(**auth_params).get_data_from_testinstances(ids=ti_ids)
+    for test_instance in TestInstance.objects.filter(rp_id__in=ti_ids):
+        suspended_status = get_ti_suspended_status_from_results(test_instance.rp_id)
+        if suspended_status is None:
+            not_found.append(test_instance.rp_id)
+        else:
+            updated.append(test_instance.rp_id)
+        test_instance.execution_suspended = suspended_status
+        test_instance.save()
+    return {"not_found": not_found, "updated": updated}
+
+
 
 ######################################################################
 ###########            FOR DEV PURPOSES USES ONLY          ###########

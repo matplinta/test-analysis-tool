@@ -167,21 +167,42 @@ excel_response_scheme = openapi.Schema(
     type=openapi.FORMAT_BINARY,
 )
 
+rp_ids_scheme = openapi.Schema(
+    type=openapi.TYPE_ARRAY, 
+    description="List of ids of test_instances from reporting portal",
+    items=openapi.Schema(
+        type=openapi.TYPE_INTEGER, 
+        description="Id of test_instance from reporting portal")
+)
+
 
 testrun_analyze_schema = openapi.Schema(
     title="AnalyzeToRP",
     type=openapi.TYPE_OBJECT,
     properties ={
-        "rp_ids": openapi.Schema(
-            type=openapi.TYPE_ARRAY, 
-            description="List of ids of test_runs from reporting portal",
-            items=openapi.Schema(
-                type=openapi.TYPE_INTEGER, 
-                description="Id of test_run from reporting portal")
-        ),
+        "rp_ids": rp_ids_scheme,
         "comment": openapi.Schema(type=openapi.TYPE_STRING, description="Comment"),
         "result": openapi.Schema(type=openapi.TYPE_STRING, description="Result: passed or failed"),
         "env_issue_type": openapi.Schema(type=openapi.TYPE_STRING, description="EnvIssueType name")
+    }
+)
+
+
+testinstance_suspend_schema = openapi.Schema(
+    title="SuspendTestInstanceToRP",
+    type=openapi.TYPE_OBJECT,
+    properties ={
+        "rp_ids": rp_ids_scheme,
+        "suspend": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Suspend status (true or false)")
+    }
+)
+
+
+testinstance_sync_by_ids_schema = openapi.Schema(
+    title="SyncSuspendInfoFromRPByTestInstanceIds",
+    type=openapi.TYPE_OBJECT,
+    properties ={
+        "rp_ids": rp_ids_scheme
     }
 )
 

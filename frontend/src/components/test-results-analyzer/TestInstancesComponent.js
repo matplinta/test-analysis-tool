@@ -10,11 +10,18 @@ import { Link, useLocation } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { ToggleButton } from 'primereact/togglebutton';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
+import { Card } from 'primereact/card';
+import { BsStopwatch } from 'react-icons/bs';
+import { GoSync } from 'react-icons/go';
+
 import { MdPauseCircle, MdPlayCircle } from 'react-icons/md';
-import { getTestInstancesByQuery } from './../../services/test-results-analyzer/test-instances.service';
+import { getTestInstancesByQuery, postSetSuspensionStatusOnTestInstances, triggerSyncTestInstancesSuspendData, postSyncSuspensionStatusFromRP } from './../../services/test-results-analyzer/test-instances.service';
 import { getBranches, getTestLineTypes, getTestEntities } from './../../services/test-results-analyzer/test-filters.service';
-import Notify, { AlertTypes, Errors } from '../../services/Notify.js';
+import Notify, { Successes, AlertTypes, Errors } from '../../services/Notify.js';
 
 
 import './TestInstanceComponent.css';
@@ -25,10 +32,16 @@ let TestInstancesComponent = () => {
     const [branches, setBranches] = useState([]);
     const [testEntities, setTestEntities] = useState([]);
     const [testLinesTypes, setTestLinesTypes] = useState([]);
+    const [selectedTestInstances, setSelectedTestInstances] = useState([]);
+
 
     const [totalRecords, setTotalRecords] = useState(0);
 
     const [loading, setLoading] = useState(true);
+    const [sendSuspendButtonState, setSendSuspendButtonState] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
+    const handleDialogClose = () => setShowDialog(false);
+    const handleDialogShow = () => setShowDialog(true);
 
     const location = useLocation();
     const state = location.state;
@@ -237,6 +250,42 @@ let TestInstancesComponent = () => {
         }
     }
 
+    const selectSelectedTestInstances = (selectedTestInstancesValue) => {
+        setSelectedTestInstances(selectedTestInstancesValue);
+    }
+
+    const setSuspensionStatusForSelectedTIs = () => {
+        let rp_ids = selectedTestInstances.map((testInstance) => testInstance.rp_id)
+        postSetSuspensionStatusOnTestInstances(rp_ids, sendSuspendButtonState).then(
+            (response) => {
+                Notify.sendNotification(Successes.TEST_INSTANCES_SUSPEND_STATE_SET, AlertTypes.success);
+                fetchTestInstancesByFilter(lazyParams);
+                handleDialogClose();
+            }, (error) => {
+                Notify.sendNotification(Errors.TEST_INSTANCES_SUSPEND_STATE_SET, AlertTypes.error);
+            }
+        )
+    }
+
+    const syncSuspensionStatusFromSelectedTIs = () => {
+        let rp_ids = selectedTestInstances.map((testInstance) => testInstance.rp_id)
+        postSyncSuspensionStatusFromRP(rp_ids).then(
+            (response) => {
+                Notify.sendNotification(Successes.TEST_INSTANCES_SYNC_SUSPEND_STATE, AlertTypes.success);
+                fetchTestInstancesByFilter(lazyParams);
+            }, (error) => {
+                Notify.sendNotification(Errors.TEST_INSTANCES_SYNC_SUSPEND_STATE, AlertTypes.error);
+            }
+        )
+    }
+
+    const footer = (
+        <div className="flex flex-wrap justify-content-end gap-2 ">
+            <Button label="Send" icon="pi pi-check" className="p-button-success" onClick={setSuspensionStatusForSelectedTIs} />
+            <Button label="Cancel" icon="pi pi-times" className="p-button-outlined p-button-secondary" onClick={handleDialogClose} />
+        </div>
+    );
+
     useEffect(() => {
         fetchBranches();
         fetchTestLines();
@@ -245,11 +294,25 @@ let TestInstancesComponent = () => {
     }, [])
 
     useEffect(() => {
+        setSelectedTestInstances([]);
+    }, [testInstances])
+
+    useEffect(() => {
         fetchTestInstancesByFilter(lazyParams);
     }, [lazyParams])
 
     return (
-        <>
+        <>  
+            <Button style={{ margin: '5px', fontWeight: 'bold', fontSize: '1rem' }} className="p-button-warning p-button-sm"
+                onClick={handleDialogShow} disabled={selectedTestInstances.length === 0}>
+                <BsStopwatch size='20' />
+                <span style={{ marginLeft: '5px' }}>Set suspension status</span>
+            </Button>
+            <Button style={{ margin: '5px', fontWeight: 'bold', fontSize: '1rem' }} className="p-button-success p-button-sm"
+                onClick={syncSuspensionStatusFromSelectedTIs} disabled={selectedTestInstances.length === 0}>
+                <GoSync size='20' />
+                <span style={{ marginLeft: '5px' }}>Sync suspension status from RP</span>
+            </Button>
             {stateLoading === false ?
                 <DataTable value={testInstances} paginator size="small"
                     lazy first={lazyParams.first} rows={lazyParams.rows} totalRecords={totalRecords} onPage={onPage}
@@ -259,12 +322,14 @@ let TestInstancesComponent = () => {
                     paginatorTemplate={templateCurrentPageReport}
                     dataKey="id"
                     rowsPerPageOptions={[10, 30, 50, 100]}
-                    responsiveLayout="scroll" scrollHeight="calc(100vh - 175px)"
+                    responsiveLayout="scroll" scrollHeight="calc(100vh - 210px)"
                     emptyMessage="No test instances found!"
                     className="test-instances-table"
                     filterDisplay="row"
                     resizableColumns
+                    selectionMode="checkbox" selection={selectedTestInstances} onSelectionChange={e => selectSelectedTestInstances(e.value)}
                 >
+                    <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
 
                     <Column body={rpLinkBodyTemplate} columnKey="rp_id" header="RP id"
                         sortable sortField="rp_id"
@@ -341,6 +406,26 @@ let TestInstancesComponent = () => {
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
                 </DataTable > : null}
+                <Dialog header="Suspend/Unsuspend test instances" visible={showDialog} className="ti-suspend-dialog" onHide={handleDialogClose}>
+                        <Card title={"Selected Test Instances: " + selectedTestInstances.length} footer={footer} className="md:w-25rem px-2">
+                            <div className="flex flex-column px-3">
+                                <div className="flex ">
+                                    <div className="flex flex-row flex-wrap">
+                                        {selectedTestInstances.map((ti) => <div className="align-items-center justify-content-center" key={ti.id}> {rpLinkBodyTemplate(ti)}<span style={{fontSize: '11px'}}>, </span></div>)}
+                                    </div>
+                                </div>
+                                <div className="flex flex-row align-items-center justify-content-center flex-wrap mt-3">
+                                    <div className="flex-1 flex">
+                                        <span style={{fontSize: '20px'}}>Suspension status</span>
+                                    </div>
+                                    <div className="flex-1 flex justify-content-end ">
+                                        <ToggleButton onLabel="Suspend" offLabel="Unsuspend" onIcon="pi pi-stop-circle" offIcon="pi pi-step-forward" 
+                                            checked={sendSuspendButtonState} onChange={(e) => setSendSuspendButtonState(e.value)} className="mr-2" />
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                </Dialog>
         </>
     )
 }

@@ -383,7 +383,6 @@ let TestRunsByTestInstance = () => {
     useEffect(() => {
         if (Object.hasOwn(searchParamsEntry, 'test_instance')){
             setTestInstanceId(searchParamsEntry.test_instance)
-            console.log(testInstanceId)
         } else {
             navigate('/not-found')
         }
