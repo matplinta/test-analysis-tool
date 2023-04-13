@@ -285,7 +285,7 @@ let TestSetFiltersComponent = ({ type }) => {
                 showGridlines dataKey="id"
                 filters={filters} filterDisplay="row" loading={loading}
                 emptyMessage="No fail message types found."
-                scrollHeight="calc(100vh - 150px)"
+                scrollHeight="calc(100vh - 140px)"
                 resizableColumns columnResizeMode="fit"
                 selectionMode="checkbox" selection={selectedTestFilters} onSelectionChange={e => selectSelectedTestFilters(e.value)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>

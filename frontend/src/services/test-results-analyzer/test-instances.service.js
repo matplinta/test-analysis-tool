@@ -12,6 +12,10 @@ export const getTestInstances = async () => {
     return (await axios.get('/api/tra/test_instances/', { headers: authHeader() }));
 }
 
+export const triggerSyncTestInstancesSuspendData = async () => {
+    return (await axios.get('/api/tra/celery/sync_suspension_status_of_test_instances_by_all_testset_filters/', { headers: authHeader() }));
+}
+
 export const getTestInstancesByQuery = async (lazyParams) => {
 
     let page = "page=" + lazyParams.page;
@@ -30,4 +34,13 @@ export const getTestInstancesByQuery = async (lazyParams) => {
     }
 
     return (await axios.get('/api/tra/test_instances/by_query/?' + page + page_size + sortParams + filterParams, { headers: authHeader() }));
+}
+
+
+export const postSetSuspensionStatusOnTestInstances = async (testInstances, suspendStatus) => {
+    return (await axios.post('api/tra/test_instances/set_suspension_status/', {rp_ids: testInstances, suspend: suspendStatus}, { headers: authHeader() }));
+}
+
+export const postSyncSuspensionStatusFromRP = async (testInstances) => {
+    return (await axios.post('api/tra/test_instances/sync_suspension_status_by_ti_ids/', {rp_ids: testInstances}, { headers: authHeader() }));
 }

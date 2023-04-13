@@ -322,12 +322,12 @@ let RegressionTestRuns = () => {
 
         if (sortOrderValue === 1) filterUrl += "ordering=" + sortFieldValue;
         else if (sortOrderValue === -1) filterUrl += "ordering=-" + sortFieldValue;
-
         return filterUrl;
     }
 
     const defineWebUrl = (sortFieldValue = null, sortOrderValue = null) => {
         let filterUrl = "";
+        filterUrl += defineApiUrlFromSelectedFilter(selectedExecTriggerKeys, "exec_trigger");
         filterUrl += defineWebUrlFromSelectedFilter(selectedTestSetKeys, "test_set_name");
         filterUrl += defineWebUrlFromSelectedFilter(selectedTestLineTypeKeys, "testline_type");
         filterUrl += defineWebUrlFromSelectedFilter(selectedBranchTypeKeys, "branch");
@@ -446,8 +446,16 @@ let RegressionTestRuns = () => {
     }
 
     const onSortColumn = (e) => {
-        let sortFieldValue = e.sortField.replaceAll('.', '__');
-        let orderFieldValue = e.sortOrder;
+        let sortFieldValue;
+        let orderFieldValue;
+
+        if (e.sortField === null) {
+            sortFieldValue = null;
+            orderFieldValue = null;
+        } else {
+            sortFieldValue = e.sortField.replaceAll('.', '__');
+            orderFieldValue = e.sortOrder;
+        }
 
         setSortField(sortFieldValue);
         setSortOrder(orderFieldValue);

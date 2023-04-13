@@ -89,7 +89,9 @@ export const Successes = {
     'ADD_FILTER_SET': 'Filter set was saved successfully!',
     'DOWNLOAD_EXCEL': 'Excel report was downloaded successfully!',
     'DOWNLOAD_CHART': 'Chart was generated succesfully!',
-    'SUBS_FILTERSET_GEN': 'Subscription FilterSet generated successfully!'
+    'SUBS_FILTERSET_GEN': 'Subscription FilterSet generated successfully!',
+    'TEST_INSTANCES_SUSPEND_STATE_SET': 'Test Instances suspend state change triggered!',
+    'TEST_INSTANCES_SYNC_SUSPEND_STATE': 'Suspend state synced successfully!'
 }
 
 export const Errors = {
@@ -142,7 +144,9 @@ export const Errors = {
     'SCHEDULE_PULL': 'Error during TestSetFilter test runs pull!',
     'SCHEDULE_PULL_SELECTED': 'Error during TestSetFilter test runs pull for the selected TestSetFilters!',
     'SUBS_FILTERSET_GEN': 'Failure during subscription filterset generation!',
-    'NO_TESTRUNS_FOUND': 'No test runs found with specified filters!'
+    'NO_TESTRUNS_FOUND': 'No test runs found with specified filters!',
+    'TEST_INSTANCES_SUSPEND_STATE_SET': 'Test Instances suspend state change failed!',
+    'TEST_INSTANCES_SYNC_SUSPEND_STATE': 'Suspend state sync failed!'
 }
 
 export const Warnings = {

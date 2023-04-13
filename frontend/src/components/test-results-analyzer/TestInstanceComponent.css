@@ -1,6 +1,7 @@
 .test-instances-table {
-    margin: 5px;
-    max-width: 99%;
+    /* margin: 5px; */
+    /* max-width: 99%; */
+    max-height: 60%;
 }
 
 .p-datatable.test-instances-table .p-datatable-header {
@@ -36,4 +37,8 @@
 .p-datatable.test-instances-table .p-filter-column .p-dropdown .p-dropdown-trigger-icon {
     font-size: 13px;
     padding: 9px;
+}
+
+.ti-suspend-dialog .p-dialog-content {
+    padding: 0.7rem;
 }

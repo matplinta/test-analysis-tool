@@ -207,6 +207,18 @@ def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue
     if resp is None:
         return {"status": "failed", "url": url}
     return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
+    
+
+@shared_task(name="celery_suspend_testinstances", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
+def celery_suspend_testinstances(self, test_instances, suspend_status, auth_params=None):
+    if not auth_params:
+        auth_params = utils.get_rp_api_auth_params()
+    resp, url, data =  RepPortal(**auth_params).set_suspension_status_for_test_instances(ti_ids=test_instances, suspend_status=suspend_status)
+    if resp is None:
+        return {"status": "failed", "url": url}
+    
+    TestInstance.objects.filter(rp_id__in=test_instances).update(execution_suspended=suspend_status)
+    return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
 
 
 @shared_task(name="download_resursively_contents_to_storage")

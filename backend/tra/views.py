@@ -104,7 +104,10 @@ class NotificationView(viewsets.ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
+        if self.request.user.is_anonymous:
+            return Notification.objects.none()
+        else:
+            return Notification.objects.filter(user=self.request.user)
 
 
 class TestlineTypeView(viewsets.ModelViewSet):
@@ -495,6 +498,54 @@ class TestRunsAnalyzeToRP(APIView):
         test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
 
         return Response(status=200)
+
+
+class TestInstancesSuspendActionToRP(APIView):
+    @swagger_auto_schema(
+        description="Method to trigger suspension status of TestInstances to ReportingPortal",
+        operation_description="Method to trigger suspension status of TestInstances to ReportingPortal",
+        request_body=testinstance_suspend_schema,
+        responses={200: ""},
+        tags=["api"]
+    )
+    def post(self, request):
+        data = self.request.data
+        rp_ids = data["rp_ids"] 
+        suspend = data["suspend"]
+        
+        user = self.request.user
+        token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
+        auth_params = utils.get_rp_api_auth_params(token=token)
+
+        celery_tasks.celery_suspend_testinstances.delay(
+            test_instances=rp_ids,
+            suspend_status=suspend,
+            auth_params=auth_params
+        )
+
+        return Response(status=200)
+
+
+class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
+    @swagger_auto_schema(
+        description="Method to sync suspend info of TestInstances from ReportingPortal",
+        operation_description="Method to sync suspend info of TestInstances from ReportingPortal",
+        request_body=testinstance_sync_by_ids_schema,
+        responses={200: "", 400: ""},
+        tags=["api"]
+    )
+    def post(self, request):
+        data = self.request.data
+        rp_ids = data["rp_ids"] 
+        user = self.request.user
+        token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
+        auth_params = utils.get_rp_api_auth_params(token=token)
+        result = test_runs_processing.sync_suspension_status_of_test_instances_by_ids(ti_ids=rp_ids, auth_params=auth_params)
+        if len(result["updated"]) > 0:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 class PullNotPassedTestrunsByTestSetFilter(APIView):
