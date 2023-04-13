@@ -276,9 +276,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 dataKey="id" rowHover loading={loading}
                 rowsPerPageOptions={[10, 30, 50, 100]}
                 reorderableColumns={true}
-                resizableColumns columnResizeMode="expand"
+                resizableColumns columnResizeMode="expand" 
                 emptyMessage="No test runs found! Please change your selected filters."
-                sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn}
+                sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} removableSort 
                 selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}
                 className="test-runs-table">
 

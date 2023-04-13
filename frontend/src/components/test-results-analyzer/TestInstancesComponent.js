@@ -303,12 +303,12 @@ let TestInstancesComponent = () => {
 
     return (
         <>  
-            <Button style={{ margin: '5px', fontWeight: 'bold', fontSize: '1rem' }} className="p-button-warning p-button-sm"
+            <Button style={{ margin: '5px', fontWeight: 'bold', letterSpacing: '0' }} className="p-button-warning p-button-sm"
                 onClick={handleDialogShow} disabled={selectedTestInstances.length === 0}>
                 <BsStopwatch size='20' />
                 <span style={{ marginLeft: '5px' }}>Set suspension status</span>
             </Button>
-            <Button style={{ margin: '5px', fontWeight: 'bold', fontSize: '1rem' }} className="p-button-success p-button-sm"
+            <Button style={{ margin: '5px', fontWeight: 'bold', letterSpacing: '0' }} className="p-button-success p-button-sm"
                 onClick={syncSuspensionStatusFromSelectedTIs} disabled={selectedTestInstances.length === 0}>
                 <GoSync size='20' />
                 <span style={{ marginLeft: '5px' }}>Sync suspension status from RP</span>
@@ -322,11 +322,11 @@ let TestInstancesComponent = () => {
                     paginatorTemplate={templateCurrentPageReport}
                     dataKey="id"
                     rowsPerPageOptions={[10, 30, 50, 100]}
+                    resizableColumns columnResizeMode="fit"
                     responsiveLayout="scroll" scrollHeight="calc(100vh - 210px)"
                     emptyMessage="No test instances found!"
                     className="test-instances-table"
                     filterDisplay="row"
-                    resizableColumns
                     selectionMode="checkbox" selection={selectedTestInstances} onSelectionChange={e => selectSelectedTestInstances(e.value)}
                 >
                     <Column selectionMode="multiple" headerStyle={{ width: '3em' }}></Column>
