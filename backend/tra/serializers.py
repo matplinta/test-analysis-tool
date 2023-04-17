@@ -2,11 +2,11 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from backend.serializers import UserSerializer
-
 from .models import (Branch, EnvIssueType, FailMessageType,
                      FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
                      Notification, Organization, TestInstance, TestlineType,
                      TestRun, TestRunResult, TestSetFilter)
+from . import utils
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -112,16 +112,27 @@ class TestInstanceSerializer(serializers.ModelSerializer):
     test_set = TestSetSerializer()
     last_passing_logs = LastPassingLogsSerializer(read_only=True)
     organization = serializers.CharField(source='organization.name')
+    # pass_ratio = serializers.SerializerMethodField()
+    pass_ratio = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 'organization', 'no_run_in_rp', 'execution_suspended', 'test_entity',)
-        read_only_fields = ('last_passing_logs',)
+        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 
+                  'organization', 'no_run_in_rp', 'execution_suspended', 'test_entity', 'pass_ratio',)
+        read_only_fields = ('last_passing_logs', 'pass_ratio', )
         extra_kwargs = {
             'test_set': {'validators': []},
             'test_case_name': {'validators': []},
             'execution_suspended': {'validators': []},
         }
+
+    # def get_pass_ratio(self, obj):
+    #     all_trs = obj.test_runs.count()
+    #     passing_trs = obj.test_runs.filter(result=utils.get_passed_result_instance()).count()
+    #     if passing_trs == 0:
+    #         return 0
+    #     else:
+    #         return round((passing_trs/all_trs) * 100)
 
     def create(self, validated_data):
         test_set_data = validated_data.pop('test_set')

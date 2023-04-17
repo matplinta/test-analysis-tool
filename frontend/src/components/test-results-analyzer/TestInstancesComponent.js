@@ -65,7 +65,8 @@ let TestInstancesComponent = () => {
             'organization__name__icontains': { value: null, matchMode: 'contains' },
             'execution_suspended': { value: null, matchMode: 'equal' },
             'no_run_in_rp': { value: null, matchMode: 'equal' },
-            'test_entity': { value: null, matchMode: 'equal' }
+            'test_entity': { value: null, matchMode: 'equal' },
+            'pass_ratio': { value: null, matchMode: 'equal' }
         }
     });
 
@@ -187,6 +188,14 @@ let TestInstancesComponent = () => {
                     <span className="block text-lg">Link</span>
                 </Link>
             )
+        }
+    }
+
+    let passRatioBodyTemplate = (rowData) => {
+        if (rowData.pass_ratio === null){
+            return <span style={{ color: 'grey', fontWeight: 'bold', fontSize: '16px' }}>No testruns</span>
+        } else {
+            return <span style={{ color: 'MediumSeaGreen', fontWeight: 'bold', fontSize: '16px' }}>{rowData.pass_ratio}%</span>
         }
     }
 
@@ -383,14 +392,16 @@ let TestInstancesComponent = () => {
                         style={{ fontSize: '11px', width: '4%' }} />
 
                     <Column body={logLinkBodyTemplate} columnKey="last_passing_logs.url" header="Last Passing Logs"
-                        sortable sortField="last_passing_logs__utecloud_run_id"
-                        filter filterField="last_passing_logs__utecloud_run_id"
-                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '6%' }} />
 
                     <Column body={testRunsBodyTemplate} columnKey="id" header="Test Runs"
                         showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
                         style={{ fontSize: '11px', textAlign: 'center', width: '4%' }} />
+
+                    <Column body={passRatioBodyTemplate} columnKey="pass_ratio" header="Pass ratio"
+                        sortable sortField="pass_ratio"
+                        showFilterMenuOptions={false} showClearButton={false} showFilterMenu={false}
+                        style={{ fontSize: '11px', textAlign: 'center', width: '3%' }} />
 
                     <Column body={noRunInRpBodyTemplate} columnKey="no_run_in_rp" header="RUN in RP in FB"
                         sortable sortField="no_run_in_rp"

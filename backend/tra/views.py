@@ -1,21 +1,9 @@
 import copy
-import distutils
-import distutils.util
-import json
-from dataclasses import fields
 from functools import reduce
-from itertools import chain
-from sre_constants import SUCCESS
-from urllib import response
-
 from celery.result import AsyncResult
-from dj_rest_auth.views import LogoutView
-from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.serializers import serialize
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Case, When, Value
 from django.db import IntegrityError
-from django.shortcuts import render
 from django.views.generic import ListView
 from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import (authentication, generics, mixins, permissions,
@@ -27,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
 from backend.openapi_schemes import *
-from backend.permissions import IsAuthorOfObject
+from backend.permissions import IsAuthorOfObject, IsUserOfObject
 
 from . import tasks as celery_tasks
 from . import test_runs_processing, utils
@@ -103,6 +91,10 @@ class NotificationView(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     pagination_class = None
 
+    def get_permissions(self):
+        permissions = [permission() for permission in self.permission_classes]
+        return permissions + [IsUserOfObject()]
+
     def get_queryset(self):
         if self.request.user.is_anonymous:
             return Notification.objects.none()
@@ -110,31 +102,31 @@ class NotificationView(viewsets.ModelViewSet):
             return Notification.objects.filter(user=self.request.user)
 
 
-class TestlineTypeView(viewsets.ModelViewSet):
+class TestlineTypeView(viewsets.ReadOnlyModelViewSet):
     serializer_class = TestlineTypeSerializer
     queryset = TestlineType.objects.all()
     pagination_class = None
 
 
-class BranchView(viewsets.ModelViewSet):
+class BranchView(viewsets.ReadOnlyModelViewSet):
     serializer_class = BranchSerializer
     queryset = Branch.objects.all()
     pagination_class = None
 
 
-class TestRunResultView(viewsets.ModelViewSet):
+class TestRunResultView(viewsets.ReadOnlyModelViewSet):
     serializer_class = TestRunResultSerializer
     queryset = TestRunResult.objects.all()
     pagination_class = None
 
 
-class EnvIssueTypeView(viewsets.ModelViewSet):
+class EnvIssueTypeView(viewsets.ReadOnlyModelViewSet):
     serializer_class = EnvIssueTypeSerializer
     queryset = EnvIssueType.objects.all()
     pagination_class = None
 
 
-class LastPassingLogsView(viewsets.ModelViewSet):
+class LastPassingLogsView(viewsets.ReadOnlyModelViewSet):
     serializer_class = LastPassingLogsSerializer
     queryset = LastPassingLogs.objects.all()
     pagination_class = None
@@ -360,7 +352,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
         return permissions
 
 
-class TestRunView(viewsets.ModelViewSet):
+class TestRunView(viewsets.ReadOnlyModelViewSet):
     serializer_class = TestRunSerializer
     queryset = TestRun.objects.all()
 
@@ -453,10 +445,18 @@ class TestInstancesBasedOnQuery(generics.ListAPIView):
         'execution_suspended',
         'no_run_in_rp',
         'test_entity',
+        'pass_ratio',
     )
 
     def get_queryset(self):
-        return TestInstance.objects.filter(test_set__subscribers=self.request.user)
+        queryset = TestInstance.objects.filter(test_set__subscribers=self.request.user)
+        return queryset.annotate(
+            testruns_count=Count('test_runs'),
+            pass_ratio=Case(
+                When(testruns_count=0, then=None),
+                default=100 * Count('test_runs', filter=Q(test_runs__result__name="passed")) / Count('test_runs')
+            )
+        )
 
 
 class TestRunsAnalyzeToRP(APIView):
