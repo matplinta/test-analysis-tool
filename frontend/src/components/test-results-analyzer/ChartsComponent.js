@@ -156,7 +156,7 @@ let ChartsComponent = () => {
         getFilterFields().then(
             (results) => {
                 let filterFields = results.data.filter(field => field.name !== "fail_message_type_groups");
-                setFilterFields(filterFields.map(item => item.name));
+                setFilterFields(filterFields);
                 setUnselectedFilterFields(results.data);
             }, (error) => {
 
@@ -164,19 +164,14 @@ let ChartsComponent = () => {
     }
 
     const onFilterChange = (item, index, e) => {
-        if (selectedFilterFields.filter(selectedFilter => selectedFilter.field === e.value).length > 0) {
+        if (selectedFilterFields.map(selectedFilter => selectedFilter.name).includes(e.value)) {
             setDisplayAlertFieldAlreadyUsed(true)
         } else {
             let tmp = [...filters]
             tmp[index].field = e.value;
             setFilters(tmp)
-            let unselectedfilterFieldsList = [...unselectedFilterFields].filter(item => item.id !== e.value.id);
-            let selectedfilterFieldsList = [...selectedFilterFields];
-            selectedfilterFieldsList.push(item);
-
-            setUnselectedFilterFields(unselectedfilterFieldsList)
-            setSelectedFilterFields(selectedfilterFieldsList);
         }
+        
     }
 
     const onFilterValueChange = (item, index, e) => {
@@ -189,14 +184,6 @@ let ChartsComponent = () => {
         let tmp = [...filters];
         tmp.splice(index, 1);
         setFilters(tmp);
-
-        if (item.field.id !== undefined) {
-            let selectedfilterFieldsList = [...selectedFilterFields].filter(selectedFilter => selectedFilter.field.id !== item.field.id);
-            let unselectedfilterFieldsList = [...unselectedFilterFields]
-            unselectedfilterFieldsList.push(item);
-            setUnselectedFilterFields(unselectedfilterFieldsList)
-            setSelectedFilterFields(selectedfilterFieldsList);
-        }
     }
 
     const setFiltersetNameOnFiltersList = (e) => {
@@ -397,6 +384,14 @@ let ChartsComponent = () => {
     }
 
     useEffect(() => {
+        let selFilterFields = filterFields.filter(item => filters.map(filter_obj => filter_obj.field).includes(item.name))
+        setSelectedFilterFields(selFilterFields);
+        let unselFilterFields = filterFields.filter(item => ! selFilterFields.map(filter_obj => filter_obj.name).includes(item.name));
+        setUnselectedFilterFields(unselFilterFields);
+    }, [filters])
+
+
+    useEffect(() => {
         fetchFilterFields();
         fetchFailMessageTypeGroups();
     }, [])
@@ -445,7 +440,7 @@ let ChartsComponent = () => {
                         </Row>
 
                         <Row>
-                            <FilterListFormComponent filters={filters} filterFields={filterFields} onFilterChange={onFilterChange}
+                            <FilterListFormComponent filters={filters} filterFields={filterFields.map(item => item.name)} onFilterChange={onFilterChange}
                                 removeFilter={removeFilter} onFilterValueChange={onFilterValueChange} />
                         </Row>
 
