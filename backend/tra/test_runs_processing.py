@@ -257,11 +257,11 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
     def _create_testrun_and_handle_its_actions_based_on_its_result(test_run):
         try:
             tr = create_testrun_obj_based_on_rp_data(test_run, ignore_old_testruns=True)
-            if tr.has_ute_logs_available():
-                tr.save()
-                new_runs.append(tr.rp_id)
-            else:
-                skipped_runs.append(tr.rp_id)
+            # if tr.has_ute_logs_available():
+            tr.save()
+            new_runs.append(tr.rp_id)
+            # else:
+            #     skipped_runs.append(tr.rp_id)
 
         except TestRunWithSuchRPIDAlreadyExists as exc_rp_id:
             skipped_runs.append(str(exc_rp_id))
