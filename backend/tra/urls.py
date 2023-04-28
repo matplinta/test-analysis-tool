@@ -71,6 +71,5 @@ urlpatterns = [
     path('celery/check_all_tasks_status/', views.CheckIfAllTasksFinished.as_view(), 
          name='check_all_tasks_status'),
     
-    
     path('', include(router.urls)),
 ]

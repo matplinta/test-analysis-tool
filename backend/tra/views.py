@@ -813,4 +813,3 @@ class SummaryStatisticsView(APIView):
             "current_fb": current_fb.name
         }
         return Response(response)
-

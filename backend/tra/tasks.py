@@ -9,50 +9,54 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.auth.models import User
 from rep_portal.api import RepPortal, RepPortalError, RepPortalFieldNotFound
+from constance import config
 
 from backend.celery import app
 
 from . import test_runs_processing, utils
 from .models import *
 from .storage import get_storage_instance, get_loghtml_storage_instance
-
 logger = get_task_logger(__name__)
 
 
 if settings.DEBUG is False:
     @app.on_after_finalize.connect
     def setup_periodic_tasks(sender, **kwargs):
-        sender.add_periodic_task(crontab(hour=18, day_of_week=3), celery_remove_old_feature_builds.s(), name='Delete older than last 3 FBs')
+        sender.add_periodic_task(crontab(hour=18, day_of_week=3), 
+                                    celery_remove_old_feature_builds.s(), 
+                                    name='celery_remove_old_feature_builds')
         sender.add_periodic_task(crontab(minute=30, hour="*/4"), 
-                                 celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
-                                 name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
+                                    celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
+                                    name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
         sender.add_periodic_task(crontab(minute=15, hour="*/4"), 
-                                 celery_pull_passed_testruns_by_all_testset_filters.s(), 
-                                 name='celery_pull_passed_testruns_by_all_testset_filters')
+                                    celery_pull_passed_testruns_by_all_testset_filters.s(), 
+                                    name='celery_pull_passed_testruns_by_all_testset_filters')
         sender.add_periodic_task(crontab(minute=0, hour="21"), 
-                                 celery_download_latest_passed_logs_to_storage.s(), 
-                                 name='celery_download_latest_passed_logs_to_storage')
+                                    celery_download_latest_passed_logs_to_storage.s(), 
+                                    name='celery_download_latest_passed_logs_to_storage')
         sender.add_periodic_task(crontab(minute=0, hour="23"), 
-                                 celery_download_testrun_logs_to_mirror_storage.s(), 
-                                 name='celery_download_testrun_logs_to_mirror_storage')
+                                    celery_download_testrun_logs_to_mirror_storage.s(), 
+                                    name='celery_download_testrun_logs_to_mirror_storage')
         sender.add_periodic_task(crontab(minute=50, hour="*/4"), 
-                                 celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
-                                 name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
+                                    celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
+                                    name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
         sender.add_periodic_task(crontab(minute=45, hour="*/4"), 
-                                 celery_sync_norun_data_of_all_test_instances.s(), 
-                                 name='celery_sync_norun_data_of_all_test_instances')
+                                    celery_sync_norun_data_of_all_test_instances.s(), 
+                                    name='celery_sync_norun_data_of_all_test_instances')
         sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
-                                 celery_remove_old_passed_logs_from_log_storage.s(), 
-                                 name='celery_remove_old_passed_logs_from_log_storage')
+                                    celery_remove_old_passed_logs_from_log_storage.s(), 
+                                    name='celery_remove_old_passed_logs_from_log_storage')
         sender.add_periodic_task(crontab(minute=30, hour="6", day_of_week=1), 
-                                 celery_remove_mirrored_logs.s(), 
-                                 name='celery_remove_mirrored_logs')
+                                    celery_remove_mirrored_logs.s(), 
+                                    name='celery_remove_mirrored_logs')
 
 
 @app.task()
-def celery_remove_old_feature_builds(keep_fb_threshold=3):
+def celery_remove_old_feature_builds(keep_fb_threshold=None):
     """Keeps only the number (defined in keep_fb_threshold) of the newest fbs
     """
+    if keep_fb_threshold is None:
+        keep_fb_threshold = getattr(config, 'FB_TESTRUN_RETENTION', 3)
     fb_to_delete = FeatureBuild.objects.all()[keep_fb_threshold:]
     if fb_to_delete:
         for fb in fb_to_delete:
@@ -275,4 +279,5 @@ def celery_sync_norun_data_per_organization_and_branch(organization_name: int, b
     ti_difference = ti_eligible_ids.difference(ti_noruns_ids)
     TestInstance.objects.filter(rp_id__in=list(ti_difference)).update(no_run_in_rp=False)
     TestInstance.objects.filter(rp_id__in=list(ti_intersection)).update(no_run_in_rp=True)
-    return {"warning_except": warn_msg ,"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}
+    return {"warning_except": warn_msg ,"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), 
+            "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}

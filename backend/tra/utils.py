@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.serializers import serialize
 from django.db.models import Q
+from constance import config
 
 from .models import (Branch, EnvIssueType, FailMessageType,
                      FailMessageTypeGroup, FeatureBuild, Organization,
@@ -103,7 +104,7 @@ def try_to_get_rp_api_token_from_testset_filter_owners(testset_filter: TestSetFi
 def get_rp_api_auth_params(testset_filter: TestSetFilter=None, token=None):
     if not token:
         token = try_to_get_rp_api_token_from_testset_filter_owners(testset_filter=testset_filter)
-    return {"token": token, "user": settings.RP_USER, "passwd": settings.RP_PASSWORD, "debug": settings.DEBUG}
+    return {"token": token, "user": config.RP_USER, "passwd": config.RP_PASSWORD, "debug": settings.DEBUG}
 
 
 

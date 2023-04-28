@@ -2,11 +2,12 @@ from django.test import TestCase
 from rep_portal.api import *
 from django.conf import settings
 from time import time
+from constance import config
 
 
 class GetDataTestCase(TestCase):
     def setUp(self):
-        self.auth_params = {"token": None, "user": settings.RP_USER, "passwd": settings.RP_PASSWORD, "debug": settings.DEBUG}
+        self.auth_params = {"token": None, "user": config.RP_USER, "passwd": config.RP_PASSWORD, "debug": settings.DEBUG}
         self.organization = "RAN_L2_SW_KRK_2_SG02"
         self.filters = {
         "result": "not analyzed",
@@ -47,7 +48,7 @@ class GetDataTestCase(TestCase):
 
 class PostDataTestCase(TestCase):
     def setUp(self):
-        self.auth_params = {"token": None, "user": settings.RP_USER, "passwd": settings.RP_PASSWORD, "debug": settings.DEBUG}
+        self.auth_params = {"token": None, "user": config.RP_USER, "passwd": config.RP_PASSWORD, "debug": settings.DEBUG}
 
 
     def test_analyze_testruns(self):
