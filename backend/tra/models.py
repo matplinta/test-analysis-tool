@@ -6,6 +6,7 @@ import pytz
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from constance import config
 
 
 class Organization(models.Model):
@@ -180,7 +181,7 @@ class TestRun(models.Model):
     def has_ute_logs_available(self):
         timezone = pytz.timezone(settings.TIME_ZONE)
         now =  timezone.localize(datetime.now())
-        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=settings.UTE_LOGS_LIFESPAN)) 
+        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=config.UTE_LOGS_LIFESPAN)) 
 
 
 

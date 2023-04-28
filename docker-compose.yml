@@ -55,7 +55,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.dev
-    command: celery -A backend beat -l info
+    command: celery -A backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file:
       - ./.env
     environment:

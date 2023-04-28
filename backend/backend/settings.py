@@ -77,16 +77,12 @@ SECRET_KEY = 'django-insecure-cal*j$k8(!5o^lnb69#0t0&1e*hojf(sk^obf&kj_44f5#hdr2
 
 
 DEBUG                               = bool(os.environ.get("DEBUG", default=''))
-RP_USER                             = os.environ.get("RP_USER", default='')
-RP_PASSWORD                         = os.environ.get("RP_PASSWORD", default='')
+
 LOGS_STORAGE_DOCKER_PATH            = os.environ.get("LOGS_STORAGE_DOCKER_PATH", default='')
 LOGS_STORAGE_DOCKER_PATH_DEBUG      = os.environ.get("LOGS_STORAGE_DOCKER_PATH_DEBUG", default='')
 LOGS_STORAGE_HTTP_SERVER            = os.environ.get("LOGS_STORAGE_HTTP_SERVER", default='')
 LOGS_STORAGE_HTTP_SERVER_DEBUG      = os.environ.get("LOGS_STORAGE_HTTP_SERVER_DEBUG", default='')
 LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT = os.environ.get("LOGS_STORAGE_HTTP_SERVER_DEBUG_PORT", default='')
-
-UTE_LOGS_LIFESPAN = 6 #days
-
 
 ALLOWED_HOSTS = ['*']
 
@@ -101,6 +97,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'constance',
+    'constance.backends.database',
     'django_filters',
     'dj_rest_auth',
     'drf_yasg',
@@ -108,6 +106,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'tra',
     'stats',
+    'django_celery_beat',
 ]
 
 if DEBUG:
@@ -212,6 +211,16 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'CET' # UTC
 USE_I18N = True
 USE_TZ = True
+
+# CONSTANCE 
+CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_CONFIG = {
+    'UTE_LOGS_LIFESPAN': (6, 'Lifespan of logs at UTE Logs storage', int),
+    'FB_TESTRUN_RETENTION': (3, 'Number of FBs of which we want to hold data in the DB', int),
+    'RP_USER': (os.environ.get("RP_USER", default=''), 'Reporting Portal Username', str),
+    'RP_PASSWORD': (os.environ.get("RP_PASSWORD", default=''), 'Reporting Portal Username password', str),
+}
 
 # CELERY STUFF
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://localhost:6379")
