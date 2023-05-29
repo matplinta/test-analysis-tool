@@ -235,14 +235,27 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
         )
     }
 
+    let no_messages = () => {
+        return (
+            <>
+                <div className="flex align-items-center  align-content-center justify-content-center p-2">
+                    <div className='flex '>
+                        <p>You have no messages.</p>
+                    </div>
+                </div>
+                
+            </>
+        )
+    }
+
+
     return (
         <>
 
             <Menubar model={isUserLoggedIn ? items : null} start={start} end={end} className="menu" style={{ height: '55px' }} />
             <Outlet />
             <OverlayPanel ref={op} style={{width: '500px'}} className="msgOverlay">
-                
-                {messages !== null ? message_short_list(messages) : null}
+                {messages !== null && messages.length != 0 ? message_short_list(messages) : no_messages()}
                 <Button label="Show all messages" className="p-button-sm p-button-primary" style={{width: '100%'}} onClick={(e) => {
                     op.current.hide(e)
                     navigate("messages")
