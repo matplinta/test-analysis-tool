@@ -154,7 +154,7 @@ class TestRunSerializer(serializers.ModelSerializer):
         model = TestRun
         fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
                   'result', 'env_issue_type', 'comment', 'builds', 'airphone', 'fail_message', 'ute_exec_url', 'log_file_url', 
-                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by', 'exec_trigger',)
+                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by', 'exec_trigger', 'execution_id',)
         read_only_fields = ('analyzed', )
 
 

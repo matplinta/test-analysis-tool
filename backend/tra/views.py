@@ -412,9 +412,12 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
     def get_queryset(self):
         queryset = TestRun.objects.all()
         tsfilters = TestSetFilter.objects.filter(subscribers=self.request.user)
-        queryset = queryset.filter(
-            reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
-        )
+        if tsfilters.exists():
+            queryset = queryset.filter(
+                reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
+            )
+        else:
+            queryset = TestRun.objects.none()
         return queryset
 
 class TestRunsByTestInstance(generics.ListAPIView):

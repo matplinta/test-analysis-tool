@@ -146,6 +146,8 @@ def get_distinct_values_based_on_subscribed_regfilters(user: User):
                                           order_by_param="test_instance__test_set__branch__name")
         test_set_distinct_values = tsfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
         fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
+        if not tsfilters.exists():
+            return {key: [] for key in fields_dict.keys()}
         return fields_dict
 
 

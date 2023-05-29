@@ -30,15 +30,17 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         { field: 'test_line', header: 'Testline' },
         { field: 'test_suite', header: 'Test Suite' },
         { field: 'organization', header: 'Organization' },
-        { field: 'start_time', header: 'Start time' },
-        { field: 'end_time', header: 'End time' },
         { field: 'analyzed_by', header: 'Analyzed by' },
         { field: 'fb', header: 'FB' },
         { field: 'airphone', header: 'AirPhone' },
         { field: 'comment', header: 'Comment' },
         { field: 'env_issue_type', header: 'Env issue type' },
         { field: 'exec_trigger', header: 'Execution Trigger' },
-        { field: 'log_file_url_ext', header: 'Logs mirror' }
+        { field: 'log_file_url_ext', header: 'Logs mirror' },
+        { field: 'ute_run_url', header: 'UTE Cloud Run' },
+        { field: 'rerun_in_ute', header: 'Rerun in UTE Cloud' },
+        { field: 'start_time', header: 'Start time' },
+        { field: 'end_time', header: 'End time' }
     ];
 
     const [selectedColumns, setSelectedColumns] = useState([]);
@@ -151,6 +153,18 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         ) : null
     }
 
+    let uteExecBodyTemplate = (rowData) => {
+        return rowData.execution_id ? (
+            <a href={`https://cloud.ute.nsn-rdnet.net/execution/${rowData.execution_id}/show`} target="_blank" style={{ fontSize: '11px' }}>UTE Cloud Run</a>
+        ) : null
+    }
+
+    let testRerunBodyTemplate = (rowData) => {
+        return rowData.execution_id ? (
+            <a href={`https://cloud.ute.nsn-rdnet.net/execution/create?id=${rowData.execution_id}`} target="_blank" style={{ fontSize: '11px' }}>Retest in CM</a>
+        ) : null
+    }
+
     let rpLinkBodyTemplate = (rowData) => {
         const rpUrl = "https://rep-portal.wroclaw.nsn-rdnet.net/reports/test-runs/?columns=no,qc_test_set,test_case.name,hyperlink_set.test_logs_url,test_col.name,start,result,qc_test_instance.id,test_line,test_col.testline_type,builds,test_col.ute_version,qc_test_instance.organization,qc_test_instance.feature,fail_message&id=";
         const rpLink = rpUrl + rowData.rp_id;
@@ -241,6 +255,12 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         else if (col.field === 'log_file_url_ext') {
             return <Column key={col.field} body={logExtLinkBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
         } 
+        else if (col.field === 'ute_run_url') {
+            return <Column key={col.field} body={uteExecBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
+        } 
+        else if (col.field === 'rerun_in_ute') {
+            return <Column key={col.field} body={testRerunBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
+        } 
         else if (col.field === 'exec_trigger') {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '80px' }} />;
         } 
@@ -277,7 +297,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 rowsPerPageOptions={[10, 30, 50, 100]}
                 reorderableColumns={true}
                 resizableColumns columnResizeMode="expand" 
-                emptyMessage="No test runs found! Please change your selected filters."
+                emptyMessage="No test runs found! Please change your selected filters. Perhaps you do not have any Test Set Filters subscribed?"
                 sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} removableSort 
                 selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}
                 className="test-runs-table">
