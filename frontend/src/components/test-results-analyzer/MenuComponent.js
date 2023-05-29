@@ -15,6 +15,7 @@ import AuthService from './../../services/auth.service.js';
 import GoToAdminComponent from './../home/GoToAdminComponent';
 import LogoutComponent from './../home/authorization/LogoutComponent';
 import LoginComponent from './../home/authorization/LoginComponent';
+import NavigatingButton from './NavigatingButton'
 import { useUserMessages } from '../../services/UserMessagesContext';
 
 import logo_TRA from './../../assets/logo_TRA.png';
@@ -64,57 +65,100 @@ let MenuComponent = ({ isUserLoggedIn, setIsUserLoggedIn }) => {
 
     const items = [
         {
-            label: <span><HiOutlineDatabase size='20' style={{ marginBottom: '3px' }} /> Regression Test Runs</span>,
-            command: () => { navigate('regression-test-runs') },
-            // url: 'regression-test-runs'
+            label:  
+                <NavigatingButton navigatePath='regression-test-runs' className="menu-button" >
+                    <HiOutlineDatabase size='20'/>
+                    <span className="text-base pl-1">Regression Test Runs</span>
+                </NavigatingButton>,
+            className: 'override-menuitemlink-padding'
         },
         {
-            label: <span><BiLayer size='20' style={{ marginBottom: '3px' }} /> Test Instances</span>,
-            command: () => { navigate('test-instances') },
-            // url: 'test-instances'
+            label:  
+                <NavigatingButton navigatePath='test-instances' className="menu-button" >
+                    <BiLayer size='20'/>
+                    <span className="text-base pl-1">Test Instances</span>
+                </NavigatingButton>,
+            className: 'override-menuitemlink-padding'
         },
         {
-            label: <span><FiFilter size='20' style={{ marginBottom: '3px' }} /> Test Set Filters</span>,
-            items: [{
-                label: "All",
-                command: () => { navigate('test-set-filters') },
-                // url: 'test-set-filters',
-            }, {
-                label: "Subscribed",
-                command: () => { navigate('subscribed-test-set-filters') },
-                // url: 'subscribed-test-set-filters',
-            }, {
-                label: "Owned",
-                command: () => { navigate('owned-test-set-filters') },
-                // url: 'owned-test-set-filters',
-            }, {
-                label: "Prapare to branch off",
-                command: () => { navigate('test-set-filters-branch-off') },
-                // url: 'test-set-filters-branch-off',
-            }]
+            label: 
+                <div>
+                    <FiFilter size='20' style={{color: 'white'}}  />
+                    <span className="text-base menu-button-nestable pl-1" >Test Set Filters</span>
+                </div>,
+            className: "menu-button",
+            items: [
+                {
+                    label:  
+                        <NavigatingButton navigatePath={"test-set-filters"} className="menu-button-nested" >
+                            <span className="text-base">All</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                },
+                {
+                    label:  
+                        <NavigatingButton navigatePath={"subscribed-test-set-filters"} className="menu-button-nested" >
+                            <span className="text-base">Subscribed</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                },
+                {
+                    label:  
+                        <NavigatingButton navigatePath={"owned-test-set-filters"} className="menu-button-nested" >
+                            <span className="text-base">Owned</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                },
+                {
+                    label:  
+                        <NavigatingButton navigatePath={"test-set-filters-branch-off"} className="menu-button-nested" >
+                            <span className="text-base">Prapare to branch off</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                }
+            ]
         },
         {
-            label: <span><VscRegex size='20' style={{ marginBottom: '3px' }} /> Fail Messages</span>,
-            items: [{
-                label: <span>Fail Message Regexes</span>,
-                command: () => { navigate('fail-regex') },
-                // url: 'fail-regex',
-            }, {
-                label: <span>Fail Message Groups</span>,
-                command: () => { navigate('fail-regex-groups') },
-                // url: 'fail-regex-groups',
-            }]
+            label:
+                <div>
+                    <VscRegex size='20' style={{color: 'white'}}  />
+                    <span className="text-base menu-button-nestable pl-1" >Fail Messages</span>
+                </div>,
+            className: "menu-button",
+            items: [
+                {
+                    label:  
+                        <NavigatingButton navigatePath={`fail-regex`} className="menu-button-nested" >
+                            <span className="text-base">Fail Message Regexes</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                },
+                {
+                    label:  
+                        <NavigatingButton navigatePath={`fail-regex-groups`} className="menu-button-nested" >
+                            <span className="text-base">Fail Message Groups</span>
+                        </NavigatingButton>,
+                    className: 'override-menuitemlink-padding'
+                },
+        
+            ]
         },
         {
-            label: <span><AiOutlineBarChart size='20' style={{ marginBottom: '3px' }} /> Statistics</span>,
-            command: () => { navigate('statistics') },
-            // url: 'statistics'
+            label:  
+                <NavigatingButton navigatePath={`statistics`} className="menu-button" >
+                    <AiOutlineBarChart size='20'  className=''/>
+                    <span className="text-base pl-1">Statistics</span>
+                </NavigatingButton>,
+            className: 'override-menuitemlink-padding'
         },
         {
-            label: <span><MdOutlineHelpOutline size='20' style={{ marginBottom: '3px' }} /> About</span>,
-            command: () => { navigate('about') },
-            // url: 'about'
-        }
+            label:  
+                <NavigatingButton navigatePath={`about`} className="menu-button" >
+                    <MdOutlineHelpOutline size='20'  className=''/>
+                    <span className="text-base pl-1">About</span>
+                </NavigatingButton>,
+            className: 'override-menuitemlink-padding'
+        },
     ]
 
     const start =
