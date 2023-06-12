@@ -212,6 +212,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
 def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: int, try_to_analyze: bool=True, query_limit: int=None):
     def _create_testrun_and_handle_its_actions_based_on_its_result(test_run):
         try:
+            rp_id_raw = test_run["id"] if "id" in test_run.keys() else None
             tr = create_testrun_obj_based_on_rp_data(test_run, ignore_old_testruns=True)
             not_analyzed = utils.get_not_analyzed_result_instance()
             if try_to_analyze and testset_filter and (tr.result == not_analyzed):
@@ -220,20 +221,20 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
             tr.save()
             new_runs.append(tr.rp_id)
 
-        except TestRunWithSuchRPIDAlreadyExists as exc_rp_id:
-            skipped_runs.append(str(exc_rp_id))
-            utils.log_exception_info(exc_rp_id)
+        except TestRunWithSuchRPIDAlreadyExists as e:
+            skipped_runs.append(rp_id_raw)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
-        except TestRunUpdated as exc_rp_id:
-            updated.append(str(exc_rp_id))
-            utils.log_exception_info(exc_rp_id)
+        except TestRunUpdated as e:
+            updated.append(rp_id_raw)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
         except TestRunFBOlderThan3ConsecFBs as e:
-            utils.log_exception_info(e)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
         except IntegrityError as e:
-            errored.append(str(exc_rp_id))
-            utils.log_exception_info(e)
+            errored.append(dict(rp_id=rp_id_raw, error=type(e).__name__))
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
 
     testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
@@ -256,6 +257,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
 def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: int=None):
     def _create_testrun_and_handle_its_actions_based_on_its_result(test_run):
         try:
+            rp_id_raw = test_run["id"] if "id" in test_run.keys() else None
             tr = create_testrun_obj_based_on_rp_data(test_run, ignore_old_testruns=True)
             # if tr.has_ute_logs_available():
             tr.save()
@@ -263,20 +265,20 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
             # else:
             #     skipped_runs.append(tr.rp_id)
 
-        except TestRunWithSuchRPIDAlreadyExists as exc_rp_id:
-            skipped_runs.append(str(exc_rp_id))
-            utils.log_exception_info(exc_rp_id)
+        except TestRunWithSuchRPIDAlreadyExists as e:
+            skipped_runs.append(rp_id_raw)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
-        except TestRunUpdated as exc_rp_id:
-            updated.append(str(exc_rp_id))
-            utils.log_exception_info(exc_rp_id)
+        except TestRunUpdated as e:
+            updated.append(rp_id_raw)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
         except TestRunFBOlderThan3ConsecFBs as e:
-            utils.log_exception_info(e)
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
         except IntegrityError as e:
-            errored.append(str(e))
-            utils.log_exception_info(e)
+            errored.append(dict(rp_id=rp_id_raw, error=type(e).__name__))
+            utils.log_exception_info(exception=e, rp_id=rp_id_raw)
 
 
 

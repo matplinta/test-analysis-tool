@@ -108,8 +108,11 @@ def get_rp_api_auth_params(testset_filter: TestSetFilter=None, token=None):
 
 
 
-def log_exception_info(exception: Exception):
-    logging.info(f"{type(exception).__name__} was raised for rp_id={exception}")
+def log_exception_info(exception: Exception, rp_id=None):
+    error_msg = f"{type(exception).__name__} was raised"
+    if rp_id:
+        error_msg += f" for rp_id={rp_id}"
+    logging.info(error_msg)
 
 
 def get_testrun_ute_cloud_sr_execution_id(ute_exec_url: str):
