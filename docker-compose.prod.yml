@@ -2,7 +2,7 @@ version: "3.9"
    
 services:
   db:
-    image: postgres
+    image: postgres:14
     container_name: postgres_db
     volumes:
       - postgres_db:/var/lib/postgresql/data
@@ -23,6 +23,7 @@ services:
     build: 
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.prod
+    image: ${DOCKER_WEBTOOLS_REGISTRY}/test-results-analyzer_web:latest
     command: /app/wsgi-entrypoint.sh
     volumes:
       - static_volume:/app/django_static
@@ -40,6 +41,7 @@ services:
     build:
       context: ./frontend
       dockerfile: ../docker/nginx/Dockerfile
+    image: ${DOCKER_WEBTOOLS_REGISTRY}/test-results-analyzer_nginx:latest
     ports:
       - 80:80
       - 443:443
@@ -58,6 +60,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.prod
+    image: ${DOCKER_WEBTOOLS_REGISTRY}/test-results-analyzer_celery_worker:latest
     command: celery -A backend worker -l info
     env_file:
       - ./.env
@@ -78,6 +81,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.prod
+    image: ${DOCKER_WEBTOOLS_REGISTRY}/test-results-analyzer_celery_beat:latest
     command: celery -A backend beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file:
       - ./.env
@@ -92,6 +96,7 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile.prod
+    image: ${DOCKER_WEBTOOLS_REGISTRY}/test-results-analyzer_flower:latest
     env_file:
       - ./.env
     command: /start-flower
