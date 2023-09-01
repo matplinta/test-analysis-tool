@@ -50,10 +50,10 @@ def match_fail_message_type(fail_message: str, fail_message_types: List[FailMess
 
 def send_testrun_analysis_to_rp(test_run, auth_params):
     celery_tasks.celery_analyze_testruns.delay(
-        runs=[test_run.rp_id], 
-        comment=f"Analyzed by user {test_run.analyzed_by.username}: {test_run.comment}", 
-        common_build=test_run.builds, 
-        result=test_run.result.name, 
+        runs=[test_run.rp_id],
+        comment=f"Analyzed by user {test_run.analyzed_by.username}: {test_run.comment}",
+        common_build=test_run.builds,
+        result=test_run.result.name,
         env_issue_type=test_run.env_issue_type.name,
         auth_params=auth_params
     )
@@ -78,12 +78,12 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     def _strip_time(value: str):
         return datetime.strptime(value.split(".")[0], '%Y-%m-%dT%H:%M:%S')
 
-    def _has_any_major_fields_changed(trdb: TestRun, result: TestRunResult, env_issue_type: EnvIssueType, 
+    def _has_any_major_fields_changed(trdb: TestRun, result: TestRunResult, env_issue_type: EnvIssueType,
                                       comment: str, execution_id: str, exec_trigger: str, test_entity: str):
-        if (trdb.result != result or 
-            trdb.env_issue_type != env_issue_type or 
+        if (trdb.result != result or
+            trdb.env_issue_type != env_issue_type or
             trdb.comment != comment or
-            trdb.execution_id != execution_id or 
+            trdb.execution_id != execution_id or
             trdb.exec_trigger != exec_trigger or
             (trdb.test_instance.test_entity != test_entity and test_entity)
             ):
@@ -106,9 +106,9 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     analyzed_by = utils.get_external_analyzer_user() if result == utils.get_env_issue_result_instance() else None
 
     hyperlink_set = rp_test_run.get("hyperlink_set", "")
-    if hyperlink_set:
-        ute_exec_url=rp_test_run["hyperlink_set"].get("test_logs_url", [""])[0]
-        log_file_url=rp_test_run["hyperlink_set"].get("log_file_url", "")
+    if hyperlink_set and len(hyperlink_set) >= 2:
+        log_file_url=hyperlink_set[0].get("url", "")
+        ute_exec_url=hyperlink_set[1].get("url", "")
     else:
         ute_exec_url, log_file_url = "", ""
 
@@ -146,10 +146,10 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             raise TestRunUpdated(rp_id)
         else:
             raise TestRunWithSuchRPIDAlreadyExists(rp_id)
-        
-        
+
+
     fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
-    
+
     test_set_filter = TestSetFilter.objects.get(
         test_set_name=rp_test_run["qc_test_set"],
         test_lab_path=rp_test_run["qc_test_instance"].get("m_path", ""),
@@ -161,17 +161,17 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     testline_type, _ = TestlineType.objects.get_or_create(
         name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
-    
+
 
     if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
         test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
-        if test_instance.test_set != test_set_filter: 
+        if test_instance.test_set != test_set_filter:
             test_instance.test_set = test_set_filter
         if test_instance.test_case_name != rp_test_run["test_case"]["name"]:
             test_instance.test_case_name = rp_test_run["test_case"]["name"]
-        if test_instance.testline_type != testline_type: 
+        if test_instance.testline_type != testline_type:
             test_instance.testline_type = testline_type
-        if test_entity and test_instance.test_entity != test_entity: 
+        if test_entity and test_instance.test_entity != test_entity:
             test_instance.test_entity = test_entity
         test_instance.save()
     else:
@@ -182,7 +182,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             organization=organization,
             testline_type=testline_type
         )
-    
+
     test_run = TestRun(
         rp_id=rp_id,
         fb=fb,
@@ -308,15 +308,15 @@ def download_latest_passed_logs_to_storage():
         latest_passed_test_run = find_latest_passed_run_with_logs_available(test_instance)
         if not latest_passed_test_run:
             log_inst_info_dict.setdefault(None, {
-            "utecloud_run_id": "Could not find latest passed run with log_file_url filled", 
+            "utecloud_run_id": "Could not find latest passed run with log_file_url filled",
             "ute_exec_url_exact": None,
             "test_instance_ids": []
             })
             log_inst_info_dict[None]["test_instance_ids"].append(test_instance.id)
-            return 
+            return
 
         ute_cloud_sr_id = utils.get_testrun_ute_cloud_sr_execution_id(latest_passed_test_run.ute_exec_url)
-        
+
         if test_instance.has_last_passing_logs_set():
             if test_instance.last_passing_logs.utecloud_run_id == ute_cloud_sr_id:
                 return
@@ -335,7 +335,7 @@ def download_latest_passed_logs_to_storage():
         log_file_url = latest_passed_test_run.log_file_url
         logs_url = log_file_url.split('test_results')[0]
         log_inst_info_dict.setdefault(logs_instance.id, {
-            "utecloud_run_id": ute_cloud_sr_id, 
+            "utecloud_run_id": ute_cloud_sr_id,
             "ute_exec_url_exact": logs_url,
             "test_instance_ids": []
             }
@@ -350,9 +350,9 @@ def download_latest_passed_logs_to_storage():
                 continue
             utecloud_run_id = info["utecloud_run_id"]
             task = celery_tasks.celery_download_resursively_contents_to_storage.delay(
-                lpl_id=logs_instance_id, 
-                test_instance_ids=info["test_instance_ids"], 
-                directory=utecloud_run_id, 
+                lpl_id=logs_instance_id,
+                test_instance_ids=info["test_instance_ids"],
+                directory=utecloud_run_id,
                 url=info["ute_exec_url_exact"]
             )
             tasks[logs_instance_id] = task.id
@@ -361,12 +361,12 @@ def download_latest_passed_logs_to_storage():
     log_inst_info_dict = {}
     testset_filters = TestSetFilter.objects.all()
     for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone(): 
+        if testset_filter.is_subscribed_by_anyone():
             test_instances = testset_filter.test_instances.all()
             for test_instance in test_instances:
                 find_latest_passed_run_and_prepare_last_passing_logs_data(test_instance)
-            
-    
+
+
     async_tasks = schedule_download_of_logs(log_inst_info_dict)
     return {"celery_tasks": async_tasks, "log_inst_info_dict": log_inst_info_dict}
 
@@ -381,7 +381,7 @@ def download_testrun_logs_to_mirror_storage():
 
     eligible_trs = []
     for testset_filter in TestSetFilter.objects.all():
-        if testset_filter.is_subscribed_by_anyone(): 
+        if testset_filter.is_subscribed_by_anyone():
             test_instances = testset_filter.test_instances.all()
             for test_instance in test_instances:
                 eligible_trs_per_ti = get_all_testruns_with_logs_available(test_instance)
@@ -399,7 +399,7 @@ def download_testrun_logs_to_mirror_storage():
         exec_id = testrun['execution_id'] if testrun['execution_id'] else utils.get_testrun_ute_cloud_sr_execution_id(testrun['ute_exec_url'])
         if exec_id not in dirs:
             task = celery_tasks.celery_download_logs_to_mirror_storage.delay(
-                directory=exec_id, 
+                directory=exec_id,
                 url=testrun['ute_exec_url']
             )
             tasks.append(task.id)
@@ -416,7 +416,7 @@ def sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id
     postfix = testset_filter.test_lab_path.split('\\')[-1]
     if not limit:
         limit = testset_filter.limit
-        
+
     auth_params = utils.get_rp_api_auth_params(testset_filter)
     results, _ = RepPortal(**auth_params).get_data_from_testinstances(limit=limit, test_lab_path=testset_filter.test_lab_path)
     for test_instance in testset_filter.test_instances.all():
@@ -454,8 +454,8 @@ def sync_suspension_status_of_test_instances_by_ids(ti_ids: List[int], auth_para
 
 def pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(query_limit: int=None):
     testset_filters = TestSetFilter.objects.all()
-    tr_by_rf = {testset_filter.id: [] for testset_filter in testset_filters} 
-    tr_by_rf_skipped = {testset_filter.id: [] for testset_filter in testset_filters} 
+    tr_by_rf = {testset_filter.id: [] for testset_filter in testset_filters}
+    tr_by_rf_skipped = {testset_filter.id: [] for testset_filter in testset_filters}
     for testset_filter in testset_filters:
         pull_stats = pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id=testset_filter.id, query_limit=query_limit)
         tr_by_rf[testset_filter.id] = pull_stats["loaded_new_runs"]
@@ -485,5 +485,5 @@ def fill_empty_test_instances_with_their_rp_ids():
             else:
                 test_instance.rp_id = rp_id
                 test_instance.save()
-                
+
     return [str(e) for e in not_found]
