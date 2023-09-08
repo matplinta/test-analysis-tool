@@ -22,32 +22,32 @@ logger = get_task_logger(__name__)
 # if settings.DEBUG is False:
 #     @app.on_after_finalize.connect
 #     def setup_periodic_tasks(sender, **kwargs):
-#         sender.add_periodic_task(crontab(hour=18, day_of_week=3), 
-#                                     celery_remove_old_feature_builds.s(), 
+#         sender.add_periodic_task(crontab(hour=18, day_of_week=3),
+#                                     celery_remove_old_feature_builds.s(),
 #                                     name='celery_remove_old_feature_builds')
-#         sender.add_periodic_task(crontab(minute=30, hour="*/4"), 
-#                                     celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(), 
+#         sender.add_periodic_task(crontab(minute=30, hour="*/4"),
+#                                     celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(),
 #                                     name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
-#         sender.add_periodic_task(crontab(minute=15, hour="*/4"), 
-#                                     celery_pull_passed_testruns_by_all_testset_filters.s(), 
+#         sender.add_periodic_task(crontab(minute=15, hour="*/4"),
+#                                     celery_pull_passed_testruns_by_all_testset_filters.s(),
 #                                     name='celery_pull_passed_testruns_by_all_testset_filters')
-#         sender.add_periodic_task(crontab(minute=0, hour="21"), 
-#                                     celery_download_latest_passed_logs_to_storage.s(), 
+#         sender.add_periodic_task(crontab(minute=0, hour="21"),
+#                                     celery_download_latest_passed_logs_to_storage.s(),
 #                                     name='celery_download_latest_passed_logs_to_storage')
-#         sender.add_periodic_task(crontab(minute=0, hour="23"), 
-#                                     celery_download_testrun_logs_to_mirror_storage.s(), 
+#         sender.add_periodic_task(crontab(minute=0, hour="23"),
+#                                     celery_download_testrun_logs_to_mirror_storage.s(),
 #                                     name='celery_download_testrun_logs_to_mirror_storage')
-#         sender.add_periodic_task(crontab(minute=50, hour="*/4"), 
-#                                     celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(), 
+#         sender.add_periodic_task(crontab(minute=50, hour="*/4"),
+#                                     celery_sync_suspension_status_of_test_instances_by_all_testset_filters.s(),
 #                                     name='celery_sync_suspension_status_of_test_instances_by_all_testset_filters')
-#         sender.add_periodic_task(crontab(minute=45, hour="*/4"), 
-#                                     celery_sync_norun_data_of_all_test_instances.s(), 
+#         sender.add_periodic_task(crontab(minute=45, hour="*/4"),
+#                                     celery_sync_norun_data_of_all_test_instances.s(),
 #                                     name='celery_sync_norun_data_of_all_test_instances')
-#         sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1), 
-#                                     celery_remove_old_passed_logs_from_log_storage.s(), 
+#         sender.add_periodic_task(crontab(minute=0, hour="6", day_of_week=1),
+#                                     celery_remove_old_passed_logs_from_log_storage.s(),
 #                                     name='celery_remove_old_passed_logs_from_log_storage')
-#         sender.add_periodic_task(crontab(minute=30, hour="6", day_of_week=1), 
-#                                     celery_remove_mirrored_logs.s(), 
+#         sender.add_periodic_task(crontab(minute=30, hour="6", day_of_week=1),
+#                                     celery_remove_mirrored_logs.s(),
 #                                     name='celery_remove_mirrored_logs')
 
 
@@ -66,10 +66,27 @@ def celery_remove_old_feature_builds(keep_fb_threshold=None):
 @app.task()
 def celery_remove_old_passed_logs_from_log_storage():
     """Removes logs from passed executions when none test instances have last_passed_logs assigned to this instance"""
-    last_passing_logs = LastPassingLogs.objects.all()
-    for lpl in last_passing_logs: 
-        if not lpl.test_instances.all().exists():
-            lpl.delete()
+    removed_old = []
+    removed_trash = []
+    storage = get_storage_instance()
+    # old_last_passing_logs = LastPassingLogs.objects.filter(test_instances__isnull=True)
+    if storage.exists(''):
+        dirs, _ = storage.listdir('')
+        for directory in dirs:
+            if directory:
+                try:
+                    lpl = LastPassingLogs.objects.get(utecloud_run_id=directory)
+                except LastPassingLogs.DoesNotExist:
+                    # storage.delete(directory)
+                    print(f"Directory {directory} should not exist!")
+                    removed_trash.append(directory)
+                else:
+                    if not lpl.test_instances.all().exists():
+                        storage.delete(directory)
+                        removed_old.append(directory)
+                        lpl.delete()
+
+    return {"removed_trash": removed_trash, "removed_old": removed_old}
 
 
 @app.task()
@@ -83,7 +100,7 @@ def celery_remove_mirrored_logs():
             if directory and not TestRun.objects.filter(log_file_url_ext__contains=directory).exists():
                 storage.delete(directory)
                 removed.append(directory)
-    
+
     return {"removed": removed}
 
 
@@ -92,11 +109,11 @@ def celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(query_l
     testset_filters = TestSetFilter.objects.all()
     status_response = {}
     for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone(): 
-            status_response[testset_filter.id] = "pull scheduled" 
+        if testset_filter.is_subscribed_by_anyone():
+            status_response[testset_filter.id] = "pull scheduled"
             celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(testset_filter_id=testset_filter.id, query_limit=query_limit)
         else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped" 
+            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
     return status_response
 
 
@@ -105,11 +122,11 @@ def celery_pull_passed_testruns_by_all_testset_filters(query_limit: int=None):
     testset_filters = TestSetFilter.objects.all()
     status_response = {}
     for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone(): 
-            status_response[testset_filter.id] = "pull scheduled" 
+        if testset_filter.is_subscribed_by_anyone():
+            status_response[testset_filter.id] = "pull scheduled"
             celery_pull_passed_testruns_by_testset_filter.delay(testset_filter_id=testset_filter.id, query_limit=query_limit)
         else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped" 
+            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
     return status_response
 
 
@@ -118,11 +135,11 @@ def celery_sync_suspension_status_of_test_instances_by_all_testset_filters(query
     testset_filters = TestSetFilter.objects.all()
     status_response = {}
     for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone(): 
-            status_response[testset_filter.id] = "sync scheduled" 
+        if testset_filter.is_subscribed_by_anyone():
+            status_response[testset_filter.id] = "sync scheduled"
             celery_sync_suspension_status_of_test_instances_by_testset_filter.delay(testset_filter_id=testset_filter.id, limit=query_limit)
         else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped" 
+            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
     return status_response
 
 
@@ -132,7 +149,7 @@ def celery_sync_norun_data_of_all_test_instances():
     branches = set([tsf.branch for tsf in testset_filters])
     ti_eligible_to_sync_all = TestInstance.objects.none()
     for testset_filter in testset_filters:
-        ti_eligible_to_sync_all = ti_eligible_to_sync_all | testset_filter.test_instances.all() 
+        ti_eligible_to_sync_all = ti_eligible_to_sync_all | testset_filter.test_instances.all()
     organizations = set([ti.organization for ti in ti_eligible_to_sync_all])
 
     for organization in organizations:
@@ -187,7 +204,7 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
 
     str_list_of_tsf_msg = ', '.join([f"{get_shortened_name(tsf.test_set_name)}: {tsf.branch.name}" for tsf in TestSetFilter.objects.filter(id__in=testset_filters_ids)])
     msg = f"Test runs for TestSetFilters: {str_list_of_tsf_msg} have successfully pulled data from the Reporting Portal!"
-    if user_ids: 
+    if user_ids:
         while all([AsyncResult(taskid).ready() for taskid in tasks]) is not True:
             sleep(5)
 
@@ -201,7 +218,7 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
 
         return {"msg": msg, "user_id": user.id}
     return {"msg": msg}
-    
+
 
 @shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
 def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, auth_params=None):
@@ -211,7 +228,7 @@ def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue
     if resp is None:
         return {"status": "failed", "url": url}
     return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
-    
+
 
 @shared_task(name="celery_suspend_testinstances", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
 def celery_suspend_testinstances(self, test_instances, suspend_status, auth_params=None):
@@ -220,7 +237,7 @@ def celery_suspend_testinstances(self, test_instances, suspend_status, auth_para
     resp, url, data =  RepPortal(**auth_params).set_suspension_status_for_test_instances(ti_ids=test_instances, suspend_status=suspend_status)
     if resp is None:
         return {"status": "failed", "url": url}
-    
+
     TestInstance.objects.filter(rp_id__in=test_instances).update(execution_suspended=suspend_status)
     return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}
 
@@ -236,14 +253,14 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
         logs_instance.url = storage.url(name)
         size = storage.size(name)
         if size == 0:
-            return {"resp": resp, "test_instance_ids": test_instance_ids, 
+            return {"resp": resp, "test_instance_ids": test_instance_ids,
                     "location": name, "url": storage.url(name), "size": size}
         else:
             logs_instance.size = size
             logs_instance.downloaded = True
             logs_instance.save()
             TestInstance.objects.filter(id__in=test_instance_ids).update(last_passing_logs=logs_instance)
-       
+
     return {"resp": resp, "test_instance_ids": test_instance_ids}
 
 
@@ -279,5 +296,5 @@ def celery_sync_norun_data_per_organization_and_branch(organization_name: int, b
     ti_difference = ti_eligible_ids.difference(ti_noruns_ids)
     TestInstance.objects.filter(rp_id__in=list(ti_difference)).update(no_run_in_rp=False)
     TestInstance.objects.filter(rp_id__in=list(ti_intersection)).update(no_run_in_rp=True)
-    return {"warning_except": warn_msg ,"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection), 
+    return {"warning_except": warn_msg ,"ti_noruns_len": len(ti_noruns_ids), "ti_intersection_len": len(ti_intersection),
             "ti_difference_len": len(ti_difference), "branch": branch.name, "organization": organization.name}
