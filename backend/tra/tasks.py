@@ -69,22 +69,19 @@ def celery_remove_old_passed_logs_from_log_storage():
     removed_old = []
     removed_trash = []
     storage = get_storage_instance()
-    # old_last_passing_logs = LastPassingLogs.objects.filter(test_instances__isnull=True)
+    unused_last_passing_logs = LastPassingLogs.objects.filter(test_instances__isnull=True)
+    utecloud_run_ids_list = LastPassingLogs.objects.values_list("utecloud_run_id", flat=True)
     if storage.exists(''):
         dirs, _ = storage.listdir('')
-        for directory in dirs:
-            if directory:
-                try:
-                    lpl = LastPassingLogs.objects.get(utecloud_run_id=directory)
-                except LastPassingLogs.DoesNotExist:
-                    # storage.delete(directory)
-                    print(f"Directory {directory} should not exist!")
-                    removed_trash.append(directory)
-                else:
-                    if not lpl.test_instances.all().exists():
-                        storage.delete(directory)
-                        removed_old.append(directory)
-                        lpl.delete()
+        unaccounted_for_dirs = set(dirs).difference(set(utecloud_run_ids_list))
+        for directory in unaccounted_for_dirs:
+            storage.delete(directory)
+            removed_trash.append(directory)
+
+        for lpl in unused_last_passing_logs:
+            storage.delete(lpl.location)
+            removed_old.append(lpl.location)
+            lpl.delete()
 
     return {"removed_trash": removed_trash, "removed_old": removed_old}
 
