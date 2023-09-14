@@ -249,7 +249,7 @@ let TestSetFiltersComponent = ({ type }) => {
             <Toast ref={toast} />
             <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-success p-button-sm" onClick={addFilter}>
                 <MdAddCircle size='20' />
-                <span style={{ marginLeft: '5px' }}>Add Regression Filter</span>
+                <span style={{ marginLeft: '5px' }}>Add Test Set</span>
             </Button>
             {type === "subscribed" ?
                 <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button p-button-sm" onClick={triggerPull}
@@ -259,7 +259,7 @@ let TestSetFiltersComponent = ({ type }) => {
             </Button>
                 : null
             }
-            
+
             {type !== "subscribed" ?
                 <Button style={{ marginLeft: '5px', marginTop: '5px', fontWeight: 'bold' }} className="p-button-info p-button-sm"
                     onClick={sunscribeSelectedTestFilters} disabled={selectedTestFilters.length === 0}>
