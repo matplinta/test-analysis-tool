@@ -250,6 +250,8 @@ def celery_download_resursively_contents_to_storage(lpl_id, test_instance_ids, d
         logs_instance.url = storage.url(name)
         size = storage.size(name)
         if size == 0:
+            storage.delete(name)
+            logs_instance.delete()
             return {"resp": resp, "test_instance_ids": test_instance_ids,
                     "location": name, "url": storage.url(name), "size": size}
         else:
