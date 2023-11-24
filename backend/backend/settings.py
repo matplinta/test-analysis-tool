@@ -127,15 +127,15 @@ NOTEBOOK_ARGUMENTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
     "http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net",
-    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337", 
-    "https://localhost:1337", 
+    "https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:1337",
+    "https://localhost:1337",
 ]
 
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # USE_X_FORWARDED_HOST = True
 # USE_X_FORWARDED_PORT = True
 
-CORS_ALLOWED_ORIGINS = [    
+CORS_ALLOWED_ORIGINS = [
     'https://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net',
     'http://test-results-analyzer.sc5g.krk-lab.nsn-rdnet.net:3000',
     'http://localhost:3000',
@@ -212,7 +212,7 @@ TIME_ZONE = 'CET' # UTC
 USE_I18N = True
 USE_TZ = True
 
-# CONSTANCE 
+# CONSTANCE
 CONSTANCE_IGNORE_ADMIN_VERSION_CHECK = True
 CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
@@ -220,6 +220,7 @@ CONSTANCE_CONFIG = {
     'FB_TESTRUN_RETENTION': (3, 'Number of FBs of which we want to hold data in the DB', int),
     'RP_USER': (os.environ.get("RP_USER", default=''), 'Reporting Portal Username', str),
     'RP_PASSWORD': (os.environ.get("RP_PASSWORD", default=''), 'Reporting Portal Username password', str),
+    'RP_URL': (os.environ.get("RP_URL", default="https://rep-portal.wroclaw.nsn-rdnet.net"), 'Reporting Portal URL', str),
 }
 
 # CELERY STUFF

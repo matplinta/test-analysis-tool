@@ -36,7 +36,7 @@ def get_fb_info_based_on_date(test_datetime):
     if test_datetime.year < 2022:
         return "FB earlier than 2022 year", datetime.datetime.min, datetime.datetime.min
     fb_no = 1
-    
+
     while True:
         fb_end = fb_start + datetime.timedelta(days=13, hours=23, minutes=59, seconds=59)
         if fb_start <= test_datetime <= fb_end:
@@ -48,10 +48,10 @@ def get_fb_info_based_on_date(test_datetime):
                 fb_no = 1
             else:
                 fb_no += 1
-    
+
     name = f"FB{str(fb_start.year)[-2:]}{fb_no:02d}"
     return name, fb_start, fb_end
-    
+
 
 def check_if_testrun_is_older_than_3_fbs(rp_id: int, end: datetime.datetime, exception: Exception):
     if len(FeatureBuild.objects.all()) >= 3:
@@ -104,7 +104,13 @@ def try_to_get_rp_api_token_from_testset_filter_owners(testset_filter: TestSetFi
 def get_rp_api_auth_params(testset_filter: TestSetFilter=None, token=None):
     if not token:
         token = try_to_get_rp_api_token_from_testset_filter_owners(testset_filter=testset_filter)
-    return {"token": token, "user": config.RP_USER, "passwd": config.RP_PASSWORD, "debug": settings.DEBUG}
+    return {
+        "token": token,
+        "user": config.RP_USER,
+        "passwd": config.RP_PASSWORD,
+        "debug": settings.DEBUG,
+        "rp_url": config.RP_URL
+    }
 
 
 
