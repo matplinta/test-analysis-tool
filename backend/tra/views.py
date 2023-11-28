@@ -791,6 +791,8 @@ class SummaryStatisticsView(APIView):
         na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
         passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
         envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
+        failed_testruns = testruns_in_current_fb.filter(result=utils.get_failed_result_instance())
+        blocked_testruns = testruns_in_current_fb.filter(result=utils.get_blocked_result_instance())
         suspended_tis = observed_test_instances.filter(execution_suspended=True)
         norun_tis = observed_test_instances.filter(no_run_in_rp=True)
 
@@ -820,6 +822,12 @@ class SummaryStatisticsView(APIView):
             },
             "passed": {
                 "count": passed_testruns.count()
+            },
+            "failed": {
+                "count": failed_testruns.count()
+            },
+            "blocked": {
+                "count": blocked_testruns.count()
             },
             "all_in_fb_count": testruns_in_current_fb.count(),
             "test_instances":
