@@ -19,6 +19,9 @@ class Organization(models.Model):
 class EnvIssueType(models.Model):
     name = models.CharField(primary_key=True, max_length=200, blank=False, null=False, unique=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
 
@@ -127,7 +130,7 @@ class TestInstance(models.Model):
     test_entity         = models.CharField(max_length=30, blank=True, null=True, help_text="Test Entity")
     execution_suspended = models.BooleanField(blank=True, default=False, null=True,  help_text="Execution suspended status")
     no_run_in_rp        = models.BooleanField(blank=True, default=False, null=True, help_text="No run status in ReportingPortal for the current Feature Build")
-    
+
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set", "test_case_name"], name='testinstance_uniq')]
         ordering = ['test_set', 'test_case_name',]
@@ -145,7 +148,21 @@ class TestInstance(models.Model):
             return True
 
 
+class TestRunManager(models.Manager):
+    def create_testrun_obj_based_on_rp_data(self, title):
+        tr = self.model(title=title)  # TODO przepisać create_testrun_obj_based_on_rp_data tutaj
+        return tr
+
+    # def _check_for_testrun_existence_and_update_if_present # TODO
+
+    # _handle_test_instance_update_or_creation # TODO
+
+    # check_if_testrun_is_older_than_3_fbs  # TODO
+
+
 class TestRun(models.Model):
+    # objects          = TestRunManager()  # TODO
+
     id               = models.BigAutoField(primary_key=True, help_text="Internal TRA TestRun id")
     rp_id            = models.BigIntegerField(unique=True, blank=False, null=True, help_text="Reporting Portal TestRun id")
     test_instance    = models.ForeignKey(TestInstance, on_delete=models.CASCADE, blank=False, help_text="Test instance", related_name="test_runs")
@@ -163,6 +180,7 @@ class TestRun(models.Model):
     test_suite       = models.TextField(max_length=200, blank=False, null=True, help_text="Testsuite name")
     builds           = models.TextField(max_length=100, blank=False, null=True, help_text="Builds")
     airphone         = models.TextField(max_length=100, blank=True, null=True, help_text="Airphone Build")
+    pronto           = models.TextField(max_length=100, blank=True, null=True, help_text="Pronto")
     ute_exec_url     = models.TextField(max_length=1000, blank=True, null=True, help_text="URL of ute execution details")
     log_file_url     = models.TextField(max_length=1000, blank=True, null=True, help_text="UTE Cloud log file url")
     log_file_url_ext = models.TextField(max_length=1000, blank=True, null=True, help_text="External log file url")
@@ -181,7 +199,7 @@ class TestRun(models.Model):
     def has_ute_logs_available(self):
         timezone = pytz.timezone(settings.TIME_ZONE)
         now =  timezone.localize(datetime.now())
-        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=config.UTE_LOGS_LIFESPAN)) 
+        return self.ute_exec_url and ( now - self.end_time <= timedelta(days=config.UTE_LOGS_LIFESPAN))
 
 
 
@@ -195,17 +213,17 @@ class RepPortalUserToken(models.Model):
 
 class TestSetFilter(models.Model):
     id                       = models.BigAutoField(primary_key=True)
-    limit                    = models.IntegerField(blank=False, default=50, 
+    limit                    = models.IntegerField(blank=False, default=50,
                                                    help_text="Number of test runs pulled from Reporting Portal during every refresh")
     test_set_name            = models.TextField(max_length=300, blank=False, null=True, help_text="QC Test Set")
     test_lab_path            = models.TextField(max_length=300, blank=False, null=True, help_text="Test Lab Path")
     branch                   = models.ForeignKey(Branch, on_delete=models.CASCADE, blank=True, help_text="Branch, field set automatically")
-    testline_types           = models.ManyToManyField(TestlineType, related_name="test_set_filters", blank=False, 
+    testline_types           = models.ManyToManyField(TestlineType, related_name="test_set_filters", blank=False,
                                                       help_text="Testline types used for tests in this TestSet")
     owners                   = models.ManyToManyField(User, related_name="owned_testsets", blank=True)
     subscribers              = models.ManyToManyField(User, related_name="subscribed_testsets", blank=True)
     fail_message_type_groups = models.ManyToManyField(FailMessageTypeGroup, blank=True)
-    
+
     class Meta:
         constraints = [models.UniqueConstraint(fields=["test_set_name", "test_lab_path"], name='test_set_uniq_constr')]
         ordering = ['id']

@@ -117,7 +117,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestInstance
-        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs', 
+        fields = ('id', 'rp_id', 'test_set', 'testline_type', 'test_case_name', 'last_passing_logs',
                   'organization', 'no_run_in_rp', 'execution_suspended', 'test_entity', 'pass_ratio',)
         read_only_fields = ('last_passing_logs', 'pass_ratio', )
         extra_kwargs = {
@@ -152,9 +152,9 @@ class TestRunSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestRun
-        fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization', 
-                  'result', 'env_issue_type', 'comment', 'builds', 'airphone', 'fail_message', 'ute_exec_url', 'log_file_url', 
-                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by', 'exec_trigger', 'execution_id',)
+        fields = ('id', 'rp_id', 'fb', 'test_instance', 'testline_type', 'test_line', 'test_suite', 'organization',
+                  'result', 'env_issue_type', 'comment', 'builds', 'airphone', 'fail_message', 'ute_exec_url', 'log_file_url',
+                  'log_file_url_ext', 'start_time', 'end_time', 'analyzed', 'analyzed_by', 'exec_trigger', 'execution_id', 'pronto')
         read_only_fields = ('analyzed', )
 
 
@@ -176,8 +176,8 @@ class TestRunSerializer(serializers.ModelSerializer):
         test_set_instance = TestSetFilter.objects.get(**test_set_data)
         test_instance_instance, _ = TestInstance.objects.get_or_create(test_set=test_set_instance, **test_instance_data)
 
-        test_run_instance = TestRun.objects.create(testline_type=testline_type_instance, 
-                                                   test_instance=test_instance_instance, 
+        test_run_instance = TestRun.objects.create(testline_type=testline_type_instance,
+                                                   test_instance=test_instance_instance,
                                                    organization=organization_instance,
                                                    result=result_instance,
                                                    env_issue_type=env_issue_type_instance,
@@ -217,9 +217,9 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
             'subscribers': {'validators': []},
             'testline_types': {'validators': []},  #TODO handle testline_types validation
         }
-        
+
     def validate_owners(self, value):
-        try: 
+        try:
             owners = [User.objects.get(**owner) for owner in value]
             if len(owners) == 0:
                 raise serializers.ValidationError(f"Owners field must not be empty: there must be at least one owner for TestSetFilter")
@@ -235,7 +235,7 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
         subscribers_data = validated_data.pop('subscribers')
 
         tsfilter_instance = TestSetFilter.objects.create(**validated_data)
-        
+
         testline_types = [TestlineType.objects.get(**ttd) for ttd in testline_types_data]
         fmtgs = [FailMessageTypeGroup.objects.get(**fmtg) for fmtg in fail_message_type_groups_data]
         owners = [User.objects.get(**owner) for owner in owners_data]
@@ -260,7 +260,7 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
         owners = [User.objects.get(**owner) for owner in owners_data]
         subscribers = [User.objects.get(**subscriber) for subscriber in subscribers_data]
 
-        
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 

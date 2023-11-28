@@ -218,10 +218,12 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
 
 
 @shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
-def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, auth_params=None):
+def celery_analyze_testruns(self, runs, comment, common_build, result, env_issue_type, pronto="", send_to_qc=False, auth_params=None):
     if not auth_params:
         auth_params = utils.get_rp_api_auth_params()
-    resp, url, data =  RepPortal(**auth_params).analyze_testruns(runs, comment, common_build, result, env_issue_type)
+    resp, url, data =  RepPortal(**auth_params).analyze_testruns(
+        runs, comment, common_build, result, env_issue_type, pronto=pronto, send_to_qc=send_to_qc
+    )
     if resp is None:
         return {"status": "failed", "url": url}
     return {"resp.text": resp.text, "resp.status_code": resp.status_code, "url": url}

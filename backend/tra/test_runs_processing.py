@@ -1,24 +1,22 @@
-import json
-import logging
 import os
 import re
 from datetime import datetime
-from distutils.command.build import build
 from itertools import chain
 from typing import Dict, List, Tuple
 
 from celery import shared_task
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from rep_portal.api import RepPortal, RepPortalError
 
-from .storage import get_loghtml_storage_instance
 from . import tasks as celery_tasks
 from . import utils
-from .models import (EnvIssueType, FailMessageType, FailMessageTypeGroup,
-                     FeatureBuild, LastPassingLogs, Organization, TestInstance,
-                     TestlineType, TestRun, TestRunResult, TestSetFilter)
+from .models import (
+    EnvIssueType, FailMessageType,
+    FeatureBuild, LastPassingLogs, Organization, TestInstance,
+    TestlineType, TestRun, TestRunResult, TestSetFilter
+)
+from .storage import get_loghtml_storage_instance
 
 
 class TestRunUpdated(Exception):
@@ -88,11 +86,69 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
             (trdb.test_instance.test_entity != test_entity and test_entity)
             ):
             return True
+        return False
+
+    def _check_for_testrun_existence_and_update_if_present():
+        this_testrun_in_db = TestRun.objects.filter(rp_id=rp_id)
+        _major_fields =  {
+            "result": result,
+            "env_issue_type": env_issue_type,
+            "comment": comment,
+            "execution_id": execution_id,
+            "exec_trigger": exec_trigger,
+            "test_entity": test_entity
+        }
+        if this_testrun_in_db.exists():
+            testrun_db = this_testrun_in_db.first()
+            if _has_any_major_fields_changed(trdb=testrun_db, **_major_fields):
+                for attribute, value in _major_fields.items():
+                    # handle update of test_entity in test_instance if new testrun indicates
+                    # that test_entity changed
+                    if attribute == "test_entity" and value:
+                        if not getattr(testrun_db.test_instance, attribute):
+                            setattr(testrun_db.test_instance, attribute, value)
+                            testrun_db.test_instance.save()
+                        continue
+                    # update of every major field
+                    if getattr(testrun_db, attribute) != value:
+                        if getattr(testrun_db, attribute) == utils.get_not_analyzed_result_instance():
+                            # handle case when not_analyzed tr is analyzed as env issue
+                            if value == utils.get_env_issue_result_instance():
+                                setattr(testrun_db, "analyzed_by", utils.get_external_analyzer_user())
+                            if value == utils.get_failed_result_instance():
+                                setattr(testrun_db, "pronto", pronto)
+                            if value == utils.get_blocked_result_instance():
+                                pass
+                        setattr(testrun_db, attribute, value)
+                testrun_db.save()
+                raise TestRunUpdated(rp_id)
+            raise TestRunWithSuchRPIDAlreadyExists(rp_id)
+
+    def _handle_test_instance_update_or_creation():
+        if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
+            test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
+            if test_instance.test_set != test_set_filter:
+                test_instance.test_set = test_set_filter
+            if test_instance.test_case_name != rp_test_run["test_case"]["name"]:
+                test_instance.test_case_name = rp_test_run["test_case"]["name"]
+            if test_instance.testline_type != testline_type:
+                test_instance.testline_type = testline_type
+            if test_entity and test_instance.test_entity != test_entity:
+                test_instance.test_entity = test_entity
+            test_instance.save()
         else:
-            return False
+            test_instance = TestInstance.objects.create(
+                rp_id=rp_test_run["qc_test_instance"]["id"],
+                test_set=test_set_filter,
+                test_case_name=rp_test_run["test_case"]["name"],
+                organization=organization,
+                testline_type=testline_type
+            )
+        return test_instance
 
     rp_id = rp_test_run["id"]
     comment = rp_test_run["comment"]
+    pronto = ", ".join(rp_test_run["pronto"])
     start = utils.get_timezone_aware_datetime(_strip_time(rp_test_run["start"]))
     end = utils.get_timezone_aware_datetime(_strip_time(rp_test_run["end"]))
     fb_name, fb_start, fb_end = utils.get_fb_info_based_on_date(end)
@@ -118,35 +174,9 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
     param1 = rp_test_run['qc_test_instance']["param1"]
     cit_cdrt_result = rp_test_run['cit_cdrt_result']
     user_name = rp_test_run['user_name']
-    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result, user_name, hyperlink_set)
-
-    this_testrun_in_db = TestRun.objects.filter(rp_id=rp_id)
-    _major_fields =  {
-        "result": result,
-        "env_issue_type": env_issue_type,
-        "comment": comment,
-        "execution_id": execution_id,
-        "exec_trigger": exec_trigger,
-        "test_entity": test_entity
-    }
-    if this_testrun_in_db.exists():
-        testrun_db = this_testrun_in_db.first()
-        if _has_any_major_fields_changed(trdb=testrun_db, **_major_fields):
-            for attribute, value in _major_fields.items():
-                if attribute == "test_entity" and value:
-                    if not getattr(testrun_db.test_instance, attribute):
-                        setattr(testrun_db.test_instance, attribute, value)
-                        testrun_db.test_instance.save()
-                    continue
-                if getattr(testrun_db, attribute) != value:
-                    if getattr(testrun_db, attribute) == utils.get_not_analyzed_result_instance() and value == utils.get_env_issue_result_instance():
-                        setattr(testrun_db, "analyzed_by", utils.get_external_analyzer_user())
-                    setattr(testrun_db, attribute, value)
-            testrun_db.save()
-            raise TestRunUpdated(rp_id)
-        else:
-            raise TestRunWithSuchRPIDAlreadyExists(rp_id)
-
+    exec_trigger = utils.establish_testrun_test_entity_type(test_entity, param1, cit_cdrt_result,
+                                                            user_name, hyperlink_set)
+    _check_for_testrun_existence_and_update_if_present()
 
     fb, _ = FeatureBuild.objects.get_or_create(name=fb_name, start_time=fb_start, end_time=fb_end)
 
@@ -162,26 +192,7 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         name=return_empty_if_none(rp_test_run['test_col']["testline_type"])
     )
 
-
-    if TestInstance.objects.filter(rp_id=rp_test_run["qc_test_instance"]["id"]).exists():
-        test_instance = TestInstance.objects.get(rp_id=rp_test_run["qc_test_instance"]["id"])
-        if test_instance.test_set != test_set_filter:
-            test_instance.test_set = test_set_filter
-        if test_instance.test_case_name != rp_test_run["test_case"]["name"]:
-            test_instance.test_case_name = rp_test_run["test_case"]["name"]
-        if test_instance.testline_type != testline_type:
-            test_instance.testline_type = testline_type
-        if test_entity and test_instance.test_entity != test_entity:
-            test_instance.test_entity = test_entity
-        test_instance.save()
-    else:
-        test_instance = TestInstance.objects.create(
-            rp_id=rp_test_run["qc_test_instance"]["id"],
-            test_set=test_set_filter,
-            test_case_name=rp_test_run["test_case"]["name"],
-            organization=organization,
-            testline_type=testline_type
-        )
+    test_instance = _handle_test_instance_update_or_creation()
 
     test_run = TestRun(
         rp_id=rp_id,
@@ -191,7 +202,8 @@ def create_testrun_obj_based_on_rp_data(rp_test_run: Dict, ignore_old_testruns: 
         organization=organization,
         result=result,
         env_issue_type=env_issue_type,
-        comment=rp_test_run["comment"],
+        comment=comment,
+        pronto=pronto,
         fail_message=rp_test_run["fail_message"],
         test_line=rp_test_run["test_line"],
         test_suite=rp_test_run["test_suite"],
@@ -238,7 +250,10 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
 
 
     testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
-    filters = utils.get_filters_for_rp_api(testrun_result="not analyzed,environment issue", testset_filter=testset_filter)
+    filters = utils.get_filters_for_rp_api(
+        testrun_result=",".join(utils.get_list_of_result_names_other_than_passed()),
+        testset_filter=testset_filter
+    )
     if not query_limit:
         query_limit = testset_filter.limit
 
@@ -298,7 +313,8 @@ def pull_passed_testruns_by_testset_filter(testset_filter_id: int, query_limit: 
 
 def download_latest_passed_logs_to_storage():
     def find_latest_passed_run_with_logs_available(test_instance):
-        for test_run in test_instance.test_runs.all().exclude(log_file_url='').exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time'):
+        for test_run in test_instance.test_runs.all().exclude(log_file_url='').\
+            exclude(log_file_url=None).filter(result=utils.get_passed_result_instance()).order_by('-end_time'):
             if test_run.has_ute_logs_available():
                 return test_run
         return None

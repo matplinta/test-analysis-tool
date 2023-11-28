@@ -17,7 +17,7 @@ import './TestRunTableComponent.css';
 let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) => {
 
     const [testRuns, setTestRuns] = useState([]);
-    const [selectedTestRuns, setSelectedTestRuns] = useState(null);
+    const [selectedTestRuns, setSelectedTestRuns] = useState([]);
     const [first, setFirst] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -32,6 +32,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
         { field: 'organization', header: 'Organization' },
         { field: 'analyzed_by', header: 'Analyzed by' },
         { field: 'fb', header: 'FB' },
+        { field: 'pronto', header: 'Pronto' },
         { field: 'airphone', header: 'AirPhone' },
         { field: 'comment', header: 'Comment' },
         { field: 'env_issue_type', header: 'Env issue type' },
@@ -226,8 +227,8 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 </Button>
             </div>
             <div className='flex-none flex'>
-                <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-help p-button-sm" onClick={handleAnalizeTestRuns}>
-                    Analyze Test Runs As Env Issue
+                <Button style={{ marginRight: '2px', marginLeft: '2px', fontWeight: 'bold' }} className="p-button-warning p-button-sm" onClick={handleAnalizeTestRuns}>
+                    Analyze Test Runs
                 </Button>
             </div>
 
@@ -242,28 +243,28 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
     const columnComponents = selectedColumns.map(col => {
         if (col.field === 'start_time') {
             return <Column key={col.field} body={startDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
-        } 
+        }
         else if (col.field === 'end_time') {
             return <Column key={col.field} body={endDateBodyTemplate} header={col.header} columnKey={col.field} sortField={col.field} sortable style={{ fontSize: '11px' }} />;
-        } 
+        }
         else if (col.field === 'fail_message') {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '450px' }} />;
-        } 
+        }
         else if (col.field === 'airphone') {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '50px' }} />;
-        } 
+        }
         else if (col.field === 'log_file_url_ext') {
             return <Column key={col.field} body={logExtLinkBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
-        } 
+        }
         else if (col.field === 'ute_run_url') {
             return <Column key={col.field} body={uteExecBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
-        } 
+        }
         else if (col.field === 'rerun_in_ute') {
             return <Column key={col.field} body={testRerunBodyTemplate} columnKey={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} style={{ fontSize: '11px', minWidth: '80px' }} />;
-        } 
+        }
         else if (col.field === 'exec_trigger') {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '80px' }} />;
-        } 
+        }
         else {
             return <Column key={col.field} field={col.field} header={col.header} sortField={defineSortFieldNameByField(col.field)} sortable style={{ fontSize: '11px', minWidth: '150px' }} />;
         }
@@ -296,9 +297,9 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 dataKey="id" rowHover loading={loading}
                 rowsPerPageOptions={[10, 30, 50, 100]}
                 reorderableColumns={true}
-                resizableColumns columnResizeMode="expand" 
+                resizableColumns columnResizeMode="expand"
                 emptyMessage="No test runs found! Please change your selected filters. Perhaps you do not have any Test Set Filters subscribed?"
-                sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} removableSort 
+                sortField={sortField} sortOrder={sortOrder} onSort={onSortColumn} removableSort
                 selection={selectedTestRuns} onSelectionChange={e => setSelectedTestRuns(e.value)}
                 className="test-runs-table">
 
