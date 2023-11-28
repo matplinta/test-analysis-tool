@@ -201,7 +201,7 @@ def get_distinct_values_based_on_test_instance(test_instance: TestInstance):
     get_distinct_values_and_serialize('fb', FeatureBuild, FeatureBuildSerializer, order_by_param='fb__name')
     get_distinct_values_and_serialize('result', TestRunResult, TestRunResultSerializer)
     get_distinct_values_and_serialize('testline_type', TestlineType, TestlineTypeSerializer)
-    get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer)
+    get_distinct_values_and_serialize('env_issue_type', EnvIssueType, EnvIssueTypeSerializer, order_by_param='env_issue_type__name')
     get_distinct_values_and_serialize('analyzed_by', User, UserSerializer)
     return fields_dict
 
