@@ -251,7 +251,7 @@ def pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id: 
 
     testset_filter = TestSetFilter.objects.get(id=testset_filter_id)
     filters = utils.get_filters_for_rp_api(
-        testrun_result=",".join(utils.get_list_of_result_names_other_than_passed()),
+        testrun_result="not analyzed,environment issue,failed,blocked",
         testset_filter=testset_filter
     )
     if not query_limit:
