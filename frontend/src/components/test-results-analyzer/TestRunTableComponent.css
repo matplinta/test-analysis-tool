@@ -33,6 +33,16 @@
     color: #0c4600;
 }
 
+.result-badge.result-failed {
+    background-color: #ffd7d7;
+    color: #990000;
+}
+
+.result-badge.result-blocked {
+    background-color: #03001f;
+    color: #e7e6f0;
+}
+
 .p-card .p-card-body {
     padding-left: 0.35rem;
     padding-right: 0.35rem;

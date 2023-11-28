@@ -89,6 +89,7 @@ class RepPortal:
         "tc_execution_id",
         "qc_test_instance__param1",
         "user_name",
+        "pronto",
     ]
 
     TEST_RUN_FILTER_DICT = {
@@ -199,6 +200,8 @@ class RepPortal:
         common_build="",
         suggested_prontos: List[str]=None,
         pronto="",
+        expanded_env_issue_type=False,
+        is_not_analyzed=False,
         default_blocked=True,
         send_to_qc=False,
         suspend=None,
@@ -213,6 +216,8 @@ class RepPortal:
             "suggested_prontos": suggested_prontos,
             "pronto": pronto,
             "default_blocked": default_blocked,
+            "expanded_env_issue_type": expanded_env_issue_type,
+            "is_not_analyzed": is_not_analyzed,
             "runs": runs,
             "send_to_qc": send_to_qc,
             "result": result,
@@ -278,17 +283,18 @@ class RepPortal:
                 try:
                     while _retry > 0:
                         resp, url, data = func(self, *args, api=api, **kwargs)
+                        if self.debug:
+                            break
                         if resp.status_code in [200, 202]:
                             break
-                        elif resp.status_code == 429:
+                        if resp.status_code == 429:
                             wait_sec_until_throttle_is_finished = self.api_throttle_time - int(time.time()) % self.api_throttle_time
                             time.sleep(wait_sec_until_throttle_is_finished)
                             _retry -= 1
                             continue
-                        else:
-                            raise RepPortalError(
-                                f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}, data: {data}"
-                            )
+                        raise RepPortalError(
+                            f"Unexpected response: {resp}, {resp.text}, {resp.status_code}, url: {url}, data: {data}"
+                        )
                 finally:
                     api.logout()
                 return resp, url, data
@@ -460,6 +466,8 @@ class RepPortal:
         common_build,
         result="environment issue",
         env_issue_type=None,
+        pronto="",
+        send_to_qc=False,
         **kwargs,
     ):
         if self.debug:
@@ -471,6 +479,8 @@ class RepPortal:
             result=result,
             env_issue_type=env_issue_type,
             common_build=common_build,
+            pronto=pronto,
+            send_to_qc=send_to_qc
         )
         resp = kwargs["api"].post(url, params=None, data=data)
         return resp, url, data

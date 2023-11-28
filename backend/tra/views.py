@@ -51,7 +51,7 @@ class FailMessageTypeView(viewsets.ModelViewSet):
         try:
             serializer.save(author=self.request.user)
         except IntegrityError as e:
-            if 'unique constraint "regex_author_uniq"' in e.args[0]: 
+            if 'unique constraint "regex_author_uniq"' in e.args[0]:
                 raise ValidationError("This user already has FailMessageType with such regex.")
 
     def get_permissions(self):
@@ -59,7 +59,7 @@ class FailMessageTypeView(viewsets.ModelViewSet):
         if self.request.method in ['PUT', 'DELETE']:
             return permissions + [IsAuthorOfObject()]
         return permissions
-        
+
 
 class FailMessageTypeGroupView(viewsets.ModelViewSet):
     serializer_class = FailMessageTypeGroupSerializer
@@ -76,7 +76,7 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
         try:
             serializer.save(author=self.request.user)
         except IntegrityError as e:
-            if 'unique constraint "fmtg_name_author_uniq"' in e.args[0]: 
+            if 'unique constraint "fmtg_name_author_uniq"' in e.args[0]:
                 raise ValidationError("This user already has FailMessageTypeGroup with such name.")
 
     def get_permissions(self):
@@ -195,7 +195,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
             if self.request.user not in tsfilter.subscribers.all():
                 tsfilter.subscribers.add(self.request.user)
                 tsfilter.save()
-                
+
         return self._serialize_response(tsfilters)
 
     @swagger_auto_schema(
@@ -260,7 +260,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
 
         for tsfilter in tsfilters:
             self.check_object_permissions(self.request, tsfilter)
-        
+
         branch_set = set([tsfilter.branch for tsfilter in tsfilters])
         if len(branch_set) != 1:
             return Response(f"Selected TestSetFilters do not have single common branch to branchoff: {branch_set}", status=status.HTTP_400_BAD_REQUEST)
@@ -275,10 +275,10 @@ class TestSetFilterView(viewsets.ModelViewSet):
             new_tsfilter.test_lab_path = old_test_lab_path.replace(str(old_branch), str(new_branch.name), 1)
             new_tsfilter.save()
 
-            new_tsfilter.owners.add(*old_tsfilter.owners.all()) 
-            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all()) 
-            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all()) 
-            new_tsfilter.testline_types.add(*old_tsfilter.testline_types.all()) 
+            new_tsfilter.owners.add(*old_tsfilter.owners.all())
+            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all())
+            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all())
+            new_tsfilter.testline_types.add(*old_tsfilter.testline_types.all())
             new_tsfilters.append(new_tsfilter)
 
         if should_delete:
@@ -382,28 +382,28 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
     filterset_class = TestRunFilter
     pagination_class = StandardResultsSetPagination
     ordering_fields = (
-        'id', 
-        'rp_id', 
-        'test_instance', 
-        'testline_type', 
-        'organization', 
-        'result', 
-        'env_issue_type', 
-        'fb', 
-        'fail_message', 
-        'comment', 
-        'test_line', 
-        'test_suite', 
-        'builds', 
-        'ute_exec_url', 
-        'log_file_url', 
-        'log_file_url_ext', 
-        'start_time', 
-        'end_time', 
+        'id',
+        'rp_id',
+        'test_instance',
+        'testline_type',
+        'organization',
+        'result',
+        'env_issue_type',
+        'fb',
+        'fail_message',
+        'comment',
+        'test_line',
+        'test_suite',
+        'builds',
+        'ute_exec_url',
+        'log_file_url',
+        'log_file_url_ext',
+        'start_time',
+        'end_time',
         'analyzed',
         'exec_trigger',
 
-        "test_instance__test_case_name", 
+        "test_instance__test_case_name",
         "test_instance__test_set__test_set_name",
         "test_instance__test_set__branch",
         "test_instance__test_set__test_lab_path",
@@ -472,13 +472,15 @@ class TestRunsAnalyzeToRP(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         comment = data["comment"]
+        pronto = data["pronto"]
         result = data["result"]
+        send_to_qc = data["send_to_qc"]
         env_issue_type = data["env_issue_type"]
-        
+
         result_obj = TestRunResult.objects.get(name=result)
-        env_issue_type_obj = EnvIssueType.objects.get(name=env_issue_type)
+        env_issue_type_obj = EnvIssueType.objects.get(name=env_issue_type) if env_issue_type else None
         test_runs_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
         user = self.request.user
 
@@ -491,14 +493,27 @@ class TestRunsAnalyzeToRP(APIView):
 
         celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
-            comment=comment, 
-            common_build="", 
-            result=result_obj.name, 
+            comment=comment,
+            pronto=pronto,
+            common_build="",
+            result=result_obj.name,
             env_issue_type=env_issue_type,
+            send_to_qc=send_to_qc,
             auth_params=auth_params
         )
+        analyze_kwargs = dict(
+            analyzed=True,
+            analyzed_by=user,
+            comment=comment,
+            result=result_obj,
+        )
 
-        test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
+        if result_obj == utils.get_env_issue_result_instance():
+            analyze_kwargs["env_issue_type"] = env_issue_type_obj
+        elif result_obj == utils.get_failed_result_instance():
+            analyze_kwargs["pronto"] = pronto
+
+        test_runs_to_analyze.update(**analyze_kwargs)
 
         return Response(status=200)
 
@@ -513,9 +528,9 @@ class TestInstancesSuspendActionToRP(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         suspend = data["suspend"]
-        
+
         user = self.request.user
         token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
         auth_params = utils.get_rp_api_auth_params(token=token)
@@ -539,7 +554,7 @@ class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         user = self.request.user
         token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
         auth_params = utils.get_rp_api_auth_params(token=token)
@@ -548,7 +563,7 @@ class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 
 class PullNotPassedTestrunsByTestSetFilter(APIView):
@@ -671,7 +686,7 @@ class DownloadLatestPassedLogsToStorage(APIView):
     def get(self, request):
         celery_tasks.celery_download_latest_passed_logs_to_storage.delay()
         return Response("OK")
-    
+
 
 class DownloadLogsToMirrorStorage(APIView):
     @swagger_auto_schema(
@@ -767,7 +782,7 @@ class SummaryStatisticsView(APIView):
         tags=["summary", 'api']
     )
     def get(self, request):
-        
+
         observed_test_instances = TestInstance.objects.filter(test_set__subscribers=self.request.user)
         observed_test_runs = TestRun.objects.filter(test_instance__test_set__subscribers=self.request.user)
 
