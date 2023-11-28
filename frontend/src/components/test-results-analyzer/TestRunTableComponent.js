@@ -308,7 +308,7 @@ let TestRunTableComponent = ({ filterUrl, onSortColumn, sortField, sortOrder }) 
                 <Column field="test_instance.test_case_name" header="Test Case" sortField={defineSortFieldNameByField("test_instance.test_case_name")} sortable style={{ fontSize: '11px', minWidth: '200px', maxWidth: '400px' }} />
                 <Column field="test_instance.test_set.branch" header="Branch" sortField={defineSortFieldNameByField("test_instance.test_set.branch")} sortable style={{ fontSize: '11px', minWidth: "80px" }} />
                 <Column field="testline_type" header="Testline Type" sortable style={{ fontSize: '11px', minWidth: '170px' }} />
-                <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '120px' }} />
+                <Column field="builds" header="Build" sortable style={{ fontSize: '11px', minWidth: '190px' }} />
                 <Column body={resultBodyTemplate} columnKey="result" header="Result" sortField="result" sortable style={{ fontSize: '11px', minWidth: "145px" }} />
                 <Column body={logLinkBodyTemplate} columnKey="log_file_url" header="Logs" style={{ fontSize: '11px', minWidth: '80px' }} />
                 <Column field="fail_message" header="Fail message" style={{ fontSize: '11px', minWidth: "120px" }} />
