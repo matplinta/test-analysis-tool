@@ -26,13 +26,17 @@ from .models import (Branch, EnvIssueType, FailMessageType,
                      TestRun, TestRunResult, TestSetFilter)
 from .pagination import StandardResultsSetPagination
 from .permissions import IsOwnerOfObject, IsSubscribedToObject
-from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
-                          FailMessageTypeGroupSerializer,
-                          FailMessageTypeSerializer, FeatureBuildSerializer,
-                          LastPassingLogsSerializer, NotificationSerializer,
-                          TestInstanceSerializer, TestlineTypeSerializer,
-                          TestRunResultSerializer, TestRunSerializer,
-                          TestSetFilterSerializer, UserSerializer)
+from .serializers import (
+    BranchSerializer, EnvIssueTypeSerializer,
+    FailMessageTypeGroupSerializer,
+    FailMessageTypeSerializer, FeatureBuildSerializer,
+    LastPassingLogsSerializer, NotificationSerializer,
+    TestInstanceSerializer, TestlineTypeSerializer,
+    TestRunResultSerializer, TestRunSerializer,
+    TestSetFilterSerializer, UserSerializer,
+    get_distinct_values_based_on_subscribed_testsetfilters,
+    get_distinct_values_based_on_test_instance
+)
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -359,13 +363,13 @@ class TestRunView(viewsets.ReadOnlyModelViewSet):
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
     def get(self, request):
-        fields_dict = utils.get_distinct_values_based_on_subscribed_regfilters(user=self.request.user)
+        fields_dict = get_distinct_values_based_on_subscribed_testsetfilters(user=self.request.user)
         return Response(fields_dict)
 
 
 class TestRunsByTestInstanceDictinctValues(APIView):
     def get(self, request, ti):
-        return Response(utils.get_distinct_values_based_on_test_instance(test_instance=ti))
+        return Response(get_distinct_values_based_on_test_instance(test_instance=ti))
 
 
 class TestEntityDistinctValuesByTestInstancesOfUser(APIView):
@@ -508,9 +512,9 @@ class TestRunsAnalyzeToRP(APIView):
             result=result_obj,
         )
 
-        if result_obj == utils.get_env_issue_result_instance():
+        if result_obj == TestRunResult.objects.get_env_issue_instance():
             analyze_kwargs["env_issue_type"] = env_issue_type_obj
-        elif result_obj == utils.get_failed_result_instance():
+        elif result_obj == TestRunResult.objects.get_failed_instance():
             analyze_kwargs["pronto"] = pronto
 
         test_runs_to_analyze.update(**analyze_kwargs)
@@ -788,11 +792,11 @@ class SummaryStatisticsView(APIView):
 
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
         testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
-        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
-        passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
-        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
-        failed_testruns = testruns_in_current_fb.filter(result=utils.get_failed_result_instance())
-        blocked_testruns = testruns_in_current_fb.filter(result=utils.get_blocked_result_instance())
+        na_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_not_analyzed_instance())
+        passed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_passed_instance())
+        envissue_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_env_issue_instance())
+        failed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_failed_instance())
+        blocked_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_blocked_instance())
         suspended_tis = observed_test_instances.filter(execution_suspended=True)
         norun_tis = observed_test_instances.filter(no_run_in_rp=True)
 

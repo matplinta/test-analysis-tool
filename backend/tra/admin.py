@@ -116,7 +116,7 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
 class TestSetFilterAdmin(admin.ModelAdmin):
     list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'limit']
     list_filter = ['test_set_name', 'branch']
-    search_fields = ['test_set_name', ]
+    search_fields = ['test_set_name', 'test_lab_path']
 
 
 @admin.register(LastPassingLogs)
