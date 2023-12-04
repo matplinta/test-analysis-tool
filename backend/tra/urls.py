@@ -43,8 +43,8 @@ urlpatterns = [
     # additional parameter limit=<int> can be provided to override default limit specified by regression filter
     path('celery/pull_testruns_by_all_testset_filters_celery/', views.PullTestrunsByAllTestSetFiltersCelery.as_view(),
          name='pull_testruns_by_all_testset_filters_celery'),
-    path('celery/pull_testruns_by_testsetfilters/', views.PullAllTestRunsBySelectedTestSetFiltersCelery.as_view(),
-         name='pull_testruns_by_testsetfilters'),
+    path('celery/pull_testruns_by_testset_filters/', views.PullAllTestRunsBySelectedTestSetFiltersCelery.as_view(),
+         name='pull_testruns_by_testset_filters'),
     path('celery/download_latest_passed_logs_to_storage/', views.DownloadLatestPassedLogsToStorage.as_view(),
          name='download_latest_passed_logs_to_storage'),
     path('celery/download_testrun_logs_to_mirror_storage/', views.DownloadLogsToMirrorStorage.as_view(),
