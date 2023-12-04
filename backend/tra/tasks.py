@@ -99,22 +99,6 @@ def celery_remove_mirrored_logs():
 
 
 @app.task()
-def celery_pull_testruns_by_all_testset_filters(query_limit: int=None):
-    status_response = {}
-    for testset_filter in TestSetFilter.objects.all():
-        if testset_filter.is_subscribed_by_anyone():
-            celery_pull_testruns_by_testset_filter.delay(
-                testset_filter_id=testset_filter.id,
-                query_limit=query_limit
-            )
-            status_response[testset_filter.id] = "pull scheduled"
-        else:
-            status_response[testset_filter.id] = (f"TestSetFilter.id: {testset_filter.id} "
-                                                  f"has 0 subscribers - will be skipped")
-    return status_response
-
-
-@app.task()
 def celery_sync_suspension_status_of_test_instances_by_all_testset_filters(query_limit: int=None):
     status_response = {}
     for testset_filter in TestSetFilter.objects.all():
@@ -159,6 +143,22 @@ def celery_download_latest_passed_logs_to_storage():
 @app.task()
 def celery_download_testrun_logs_to_mirror_storage():
     return test_runs_processing.download_testrun_logs_to_mirror_storage()
+
+
+@app.task()
+def celery_pull_testruns_by_all_testset_filters(query_limit: int=None):
+    status_response = {}
+    for testset_filter in TestSetFilter.objects.all():
+        if testset_filter.is_subscribed_by_anyone():
+            celery_pull_testruns_by_testset_filter.delay(
+                testset_filter_id=testset_filter.id,
+                query_limit=query_limit
+            )
+            status_response[testset_filter.id] = "pull scheduled"
+        else:
+            status_response[testset_filter.id] = (f"TestSetFilter.id: {testset_filter.id} "
+                                                  f"has 0 subscribers - will be skipped")
+    return status_response
 
 
 @shared_task(

@@ -321,7 +321,6 @@ class TestRun(models.Model):
         return False
 
 
-
 class RepPortalUserToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="rp_token")
     token = models.CharField(max_length=300, blank=False, null=True, help_text="RepPortal user specific token")
