@@ -27,13 +27,7 @@ logger = get_task_logger(__name__)
 #     def setup_periodic_tasks(sender, **kwargs):
 #         sender.add_periodic_task(crontab(hour=18, day_of_week=3),
 #                                     celery_remove_old_feature_builds.s(),
-#                                     name='celery_remove_old_feature_builds')
-#         sender.add_periodic_task(crontab(minute=30, hour="*/4"),
-#                                     celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.s(),
-#                                     name='celery_pull_and_analyze_not_analyzed_test_runs_by_all_regfilters')
-#         sender.add_periodic_task(crontab(minute=15, hour="*/4"),
-#                                     celery_pull_passed_testruns_by_all_testset_filters.s(),
-#                                     name='celery_pull_passed_testruns_by_all_testset_filters')
+#                                     name='celery_remove_old_feature_builds'),
 #         sender.add_periodic_task(crontab(minute=0, hour="21"),
 #                                     celery_download_latest_passed_logs_to_storage.s(),
 #                                     name='celery_download_latest_passed_logs_to_storage')
@@ -105,50 +99,34 @@ def celery_remove_mirrored_logs():
 
 
 @app.task()
-def celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(query_limit: int=None):
-    testset_filters = TestSetFilter.objects.all()
+def celery_pull_testruns_by_all_testset_filters(query_limit: int=None):
     status_response = {}
-    for testset_filter in testset_filters:
+    for testset_filter in TestSetFilter.objects.all():
         if testset_filter.is_subscribed_by_anyone():
-            status_response[testset_filter.id] = "pull scheduled"
-            celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(
+            celery_pull_testruns_by_testset_filter.delay(
                 testset_filter_id=testset_filter.id,
                 query_limit=query_limit
             )
-        else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
-    return status_response
-
-
-@app.task()
-def celery_pull_passed_testruns_by_all_testset_filters(query_limit: int=None):
-    testset_filters = TestSetFilter.objects.all()
-    status_response = {}
-    for testset_filter in testset_filters:
-        if testset_filter.is_subscribed_by_anyone():
             status_response[testset_filter.id] = "pull scheduled"
-            celery_pull_passed_testruns_by_testset_filter.delay(
-                testset_filter_id=testset_filter.id,
-                query_limit=query_limit
-            )
         else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
+            status_response[testset_filter.id] = (f"TestSetFilter.id: {testset_filter.id} "
+                                                  f"has 0 subscribers - will be skipped")
     return status_response
 
 
 @app.task()
 def celery_sync_suspension_status_of_test_instances_by_all_testset_filters(query_limit: int=None):
-    testset_filters = TestSetFilter.objects.all()
     status_response = {}
-    for testset_filter in testset_filters:
+    for testset_filter in TestSetFilter.objects.all():
         if testset_filter.is_subscribed_by_anyone():
-            status_response[testset_filter.id] = "sync scheduled"
             celery_sync_suspension_status_of_test_instances_by_testset_filter.delay(
                 testset_filter_id=testset_filter.id,
                 limit=query_limit
             )
+            status_response[testset_filter.id] = "sync scheduled"
         else:
-            status_response[testset_filter.id] = f"TestSetFilter.id: {testset_filter.id} has 0 subscribers - will be skipped"
+            status_response[testset_filter.id] = (f"TestSetFilter.id: {testset_filter.id} "
+                                                  f"has 0 subscribers - will be skipped")
     return status_response
 
 
@@ -183,23 +161,27 @@ def celery_download_testrun_logs_to_mirror_storage():
     return test_runs_processing.download_testrun_logs_to_mirror_storage()
 
 
-@shared_task(name="celery_pull_and_analyze_notanalyzed_testruns_by_testset_filter")
-def celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id, query_limit: int=None):
-    return test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter_id=testset_filter_id, query_limit=query_limit)
-
-
-@shared_task(name="celery_pull_passed_testruns_by_testset_filter")
-def celery_pull_passed_testruns_by_testset_filter(testset_filter_id, query_limit: int=None):
-    return test_runs_processing.pull_passed_testruns_by_testset_filter(testset_filter_id=testset_filter_id, query_limit=query_limit)
-
-
-@shared_task(name="celery_sync_suspension_status_of_test_instances_by_testset_filter", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
+@shared_task(
+    name="celery_sync_suspension_status_of_test_instances_by_testset_filter",
+    bind=True,
+    autoretry_for=(RepPortalError,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 5}
+)
 def celery_sync_suspension_status_of_test_instances_by_testset_filter(self, testset_filter_id, limit=None): # pylint: disable=W0613
     return test_runs_processing.sync_suspension_status_of_test_instances_by_testset_filter(testset_filter_id, limit)
 
 
-@shared_task(name="celery_pull_testruns_by_testsetfilters")
-def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[List[int], None]=None):
+@shared_task(name="celery_pull_testruns_by_testset_filter")
+def celery_pull_testruns_by_testset_filter(testset_filter_id, query_limit: int=None):
+    return test_runs_processing.pull_testruns_by_testset_filter(
+        testset_filter_id=testset_filter_id,
+        query_limit=query_limit
+    )
+
+
+@shared_task(name="celery_pull_testruns_by_testset_filters")
+def celery_pull_testruns_by_testset_filters(testset_filters_ids, user_ids: Union[List[int], None]=None):
     def get_shortened_name(name):
         if len(name) < 35:
             return name
@@ -207,14 +189,10 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
 
     tasks = []
     for tsf_id in testset_filters_ids:
-        passed_task = celery_pull_passed_testruns_by_testset_filter.delay(
+        pull_task = celery_pull_testruns_by_testset_filter.delay(
             testset_filter_id=int(tsf_id)
         )
-        na_env_task = celery_pull_notanalyzed_and_envissue_testruns_by_testset_filter.delay(
-            testset_filter_id=int(tsf_id)
-        )
-        tasks.append(passed_task.task_id)
-        tasks.append(na_env_task.task_id)
+        tasks.append(pull_task.task_id)
 
     str_list_of_tsf_msg = ', '.join(
         [f"{get_shortened_name(tsf.test_set_name)}: {tsf.branch.name}" \
@@ -237,7 +215,13 @@ def celery_pull_testruns_by_testsetfilters(testset_filters_ids, user_ids: Union[
     return {"msg": msg}
 
 
-@shared_task(name="celery_analyze_testruns", bind=True, autoretry_for=(RepPortalError,), retry_backoff=True, retry_kwargs={'max_retries': 5})
+@shared_task(
+    name="celery_analyze_testruns",
+    bind=True,
+    autoretry_for=(RepPortalError,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 5}
+)
 def celery_analyze_testruns(
     self, runs, comment, common_build, result, env_issue_type,
     pronto="", send_to_qc=False, auth_params=None
