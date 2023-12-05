@@ -258,15 +258,12 @@ def pull_testruns_by_testset_filter(
             test_run.save()
             new_runs.append(rp_id)
 
-        except TestRunWithSuchRpIdAlreadyExists as e:
-            skipped_runs.append(rp_id)
-            utils.log_exception_info(exception=e, rp_id=rp_id)
-
         except TestRunUpdated as e:
             updated.append(rp_id)
             utils.log_exception_info(exception=e, rp_id=rp_id)
 
         except TestRunProcException as e:
+            skipped_runs.append(rp_id)
             utils.log_exception_info(exception=e, rp_id=rp_id)
 
         except IntegrityError as e:
