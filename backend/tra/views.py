@@ -22,17 +22,20 @@ from . import test_runs_processing, utils
 from .filters import TestInstanceFilter, TestRunFilter
 from .models import (Branch, EnvIssueType, FailMessageType,
                      FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
-                     Notification, Organization, TestInstance, TestlineType,
+                     Notification, TestInstance, TestlineType,
                      TestRun, TestRunResult, TestSetFilter)
 from .pagination import StandardResultsSetPagination
-from .permissions import IsOwnerOfObject, IsSubscribedToObject
-from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
-                          FailMessageTypeGroupSerializer,
-                          FailMessageTypeSerializer, FeatureBuildSerializer,
-                          LastPassingLogsSerializer, NotificationSerializer,
-                          TestInstanceSerializer, TestlineTypeSerializer,
-                          TestRunResultSerializer, TestRunSerializer,
-                          TestSetFilterSerializer, UserSerializer)
+from .permissions import IsOwnerOfObject
+from .serializers import (
+    BranchSerializer, EnvIssueTypeSerializer,
+    FailMessageTypeGroupSerializer,
+    FailMessageTypeSerializer, LastPassingLogsSerializer, NotificationSerializer,
+    TestInstanceSerializer, TestlineTypeSerializer,
+    TestRunResultSerializer, TestRunSerializer,
+    TestSetFilterSerializer,
+    get_distinct_values_based_on_subscribed_testsetfilters,
+    get_distinct_values_based_on_test_instance
+)
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -359,13 +362,13 @@ class TestRunView(viewsets.ReadOnlyModelViewSet):
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
     def get(self, request):
-        fields_dict = utils.get_distinct_values_based_on_subscribed_regfilters(user=self.request.user)
+        fields_dict = get_distinct_values_based_on_subscribed_testsetfilters(user=self.request.user)
         return Response(fields_dict)
 
 
 class TestRunsByTestInstanceDictinctValues(APIView):
     def get(self, request, ti):
-        return Response(utils.get_distinct_values_based_on_test_instance(test_instance=ti))
+        return Response(get_distinct_values_based_on_test_instance(test_instance=ti))
 
 
 class TestEntityDistinctValuesByTestInstancesOfUser(APIView):
@@ -508,9 +511,9 @@ class TestRunsAnalyzeToRP(APIView):
             result=result_obj,
         )
 
-        if result_obj == utils.get_env_issue_result_instance():
+        if result_obj == TestRunResult.objects.get_env_issue_instance():
             analyze_kwargs["env_issue_type"] = env_issue_type_obj
-        elif result_obj == utils.get_failed_result_instance():
+        elif result_obj == TestRunResult.objects.get_failed_instance():
             analyze_kwargs["pronto"] = pronto
 
         test_runs_to_analyze.update(**analyze_kwargs)
@@ -566,25 +569,25 @@ class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
 
 
 
-class PullNotPassedTestrunsByTestSetFilter(APIView):
+class PullTestrunsByTestSetFilter(APIView):
     def get(self, request, tsfid):
         testset_filter = TestSetFilter.objects.get(pk=tsfid)
         limit = self.request.query_params.get('limit', None)
-        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter.id, limit)
+        content = test_runs_processing.pull_testruns_by_testset_filter(testset_filter.id, limit)
         return Response(content)
 
 
-class PullNotPassedTestrunsByAllTestSetFilters(APIView):
+class PullTestrunsByAllTestSetFilters(APIView):
     def get(self, request):
         limit = self.request.query_params.get('limit', None)
-        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(limit)
+        content = test_runs_processing.pull_testruns_by_all_testset_filters(limit)
         return Response(content)
 
 
-class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
+class PullTestrunsByAllTestSetFiltersCelery(APIView):
     @swagger_auto_schema(
-        description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
-        operation_description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        description="Pull test runs from ReportingPortal to DB",
+        operation_description="Pull test runs from ReportingPortal to DB",
         request_body=no_body,
         responses={
             200: "",
@@ -592,22 +595,7 @@ class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
         tags=["celery"]
     )
     def get(self, request):
-        celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.delay()
-        return Response("OK")
-
-
-class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
-    @swagger_auto_schema(
-        description="Pull passed test runs from ReportingPortal to DB",
-        operation_description="Pull passed test runs from ReportingPortal to DB",
-        request_body=no_body,
-        responses={
-            200: "",
-        },
-        tags=["celery"]
-    )
-    def get(self, request):
-        celery_tasks.celery_pull_passed_testruns_by_all_testset_filters.delay()
+        celery_tasks.celery_pull_testruns_by_all_testset_filters.delay()
         return Response("OK")
 
 
@@ -627,7 +615,10 @@ class PullAllTestRunsBySelectedTestSetFiltersCelery(APIView):
     )
     def get(self, request):
         testsetfilters = request.query_params.get('testsetfilters', [])
-        taskid = celery_tasks.celery_pull_testruns_by_testsetfilters.delay(testset_filters_ids=[int(_id) for _id in testsetfilters.split(',')], user_ids=[request.user.id])
+        taskid = celery_tasks.celery_pull_testruns_by_testset_filters.delay(
+            testset_filters_ids=[int(_id) for _id in testsetfilters.split(',')],
+            user_ids=[request.user.id]
+        )
         return Response(taskid.id)
 
 
@@ -665,7 +656,7 @@ class CheckIfAllTasksFinished(APIView):
     def post(self, request):
         taskids = request.data
         if not taskids:
-            return Response(f"You need to specify taskids", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You need to specify taskids", status=status.HTTP_400_BAD_REQUEST)
         tasks = []
         for taskid in taskids:
             tasks.append(AsyncResult(taskid).ready())
@@ -788,11 +779,11 @@ class SummaryStatisticsView(APIView):
 
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
         testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
-        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
-        passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
-        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
-        failed_testruns = testruns_in_current_fb.filter(result=utils.get_failed_result_instance())
-        blocked_testruns = testruns_in_current_fb.filter(result=utils.get_blocked_result_instance())
+        na_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_not_analyzed_instance())
+        passed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_passed_instance())
+        envissue_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_env_issue_instance())
+        failed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_failed_instance())
+        blocked_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_blocked_instance())
         suspended_tis = observed_test_instances.filter(execution_suspended=True)
         norun_tis = observed_test_instances.filter(no_run_in_rp=True)
 

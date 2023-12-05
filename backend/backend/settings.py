@@ -218,6 +218,7 @@ CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
 CONSTANCE_CONFIG = {
     'UTE_LOGS_LIFESPAN': (6, 'Lifespan of logs at UTE Logs storage', int),
     'FB_TESTRUN_RETENTION': (3, 'Number of FBs of which we want to hold data in the DB', int),
+    'FB_TESTRUN_PULL_SYNC_RETENTION': (3, 'Number of FBs of which we want to pull and sync data in the DB from the RP', int),
     'RP_USER': (os.environ.get("RP_USER", default=''), 'Reporting Portal Username', str),
     'RP_PASSWORD': (os.environ.get("RP_PASSWORD", default=''), 'Reporting Portal Username password', str),
     'RP_URL': (os.environ.get("RP_URL", default="https://rep-portal.wroclaw.nsn-rdnet.net"), 'Reporting Portal URL', str),

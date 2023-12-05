@@ -1,12 +1,17 @@
+import json
+from functools import reduce
+
 from django.contrib.auth.models import User
+from django.core.serializers import serialize
+from django.db.models import Q
 from rest_framework import serializers
 
 from backend.serializers import UserSerializer
+
 from .models import (Branch, EnvIssueType, FailMessageType,
                      FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
                      Notification, Organization, TestInstance, TestlineType,
                      TestRun, TestRunResult, TestSetFilter)
-from . import utils
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -128,7 +133,7 @@ class TestInstanceSerializer(serializers.ModelSerializer):
 
     # def get_pass_ratio(self, obj):
     #     all_trs = obj.test_runs.count()
-    #     passing_trs = obj.test_runs.filter(result=utils.get_passed_result_instance()).count()
+    #     passing_trs = obj.test_runs.filter(result=TestRunResult.objects.get_passed_instance()).count()
     #     if passing_trs == 0:
     #         return 0
     #     else:
@@ -222,9 +227,9 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
         try:
             owners = [User.objects.get(**owner) for owner in value]
             if len(owners) == 0:
-                raise serializers.ValidationError(f"Owners field must not be empty: there must be at least one owner for TestSetFilter")
-        except User.DoesNotExist:
-            raise serializers.ValidationError(f"Specified owner does not exist")
+                raise serializers.ValidationError("Owners field must not be empty: there must be at least one owner for TestSetFilter")
+        except User.DoesNotExist as exc:
+            raise serializers.ValidationError("Specified owner does not exist") from exc
         return value
 
 
@@ -272,3 +277,60 @@ class TestSetFilterSerializer(serializers.ModelSerializer):
         instance.subscribers.set(subscribers)
 
         return instance
+
+
+def get_distinct_values_based_on_subscribed_testsetfilters(user: User):
+    fields_dict = {}
+    def get_distinct_values_and_serialize(field, model, order_by_param=None, key_override=None):
+        order_by_param = order_by_param if order_by_param else field
+        distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
+        objects = model.objects.filter(pk__in=distinct_values)
+        data = serialize("json", objects)
+        key = field if not key_override else key_override
+        fields_dict[key] = json.loads(data)
+
+    queryset = TestRun.objects.all()
+    tsfilters = TestSetFilter.objects.filter(subscribers=user)
+    queryset = queryset.filter(
+        reduce(lambda q, tsfilter: q | Q(test_instance__test_set=tsfilter), tsfilters, Q())
+    )
+
+    # fields_dict["tsfilters"] = json.loads(serialize("json", tsfilters))
+    fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
+    fields_dict['exec_trigger'] = queryset.order_by('exec_trigger').distinct('exec_trigger').values_list("exec_trigger", flat=True)
+    fields_dict['exec_trigger'] = sorted(["null" if elem is None else elem for elem in fields_dict['exec_trigger']])
+    # get_distinct_values_and_serialize('test_instance', TestInstance, order_by_param="test_instance_id")
+    get_distinct_values_and_serialize('fb', FeatureBuild, order_by_param='fb__name')
+    get_distinct_values_and_serialize('result', TestRunResult)
+    get_distinct_values_and_serialize('testline_type', TestlineType)
+    get_distinct_values_and_serialize('env_issue_type', EnvIssueType, order_by_param='env_issue_type__name')
+    get_distinct_values_and_serialize('analyzed_by', User)
+    get_distinct_values_and_serialize('test_instance__test_set__branch', Branch, key_override="branch",
+                                        order_by_param="test_instance__test_set__branch__name")
+    test_set_distinct_values = tsfilters.order_by('test_set_name').distinct('test_set_name').values_list('test_set_name', flat=True)
+    fields_dict['test_set_name'] = [{'pk': elem} for elem in list(test_set_distinct_values)]
+    if not tsfilters.exists():
+        return {key: [] for key in fields_dict.keys()}
+    return fields_dict
+
+
+def get_distinct_values_based_on_test_instance(test_instance: TestInstance):
+    fields_dict = {}
+    def get_distinct_values_and_serialize(field, model, order_by_param=None, key_override=None):
+        order_by_param = order_by_param if order_by_param else field
+        distinct_values = queryset.order_by(order_by_param).distinct(field).values_list(field, flat=True)
+        objects = model.objects.filter(pk__in=distinct_values)
+        data = serialize("json", objects)
+        key = field if not key_override else key_override
+        fields_dict[key] = json.loads(data)
+
+    queryset = TestRun.objects.filter(test_instance=test_instance)
+    fields_dict['analyzed'] = queryset.order_by('analyzed').distinct('analyzed').values_list("analyzed", flat=True)
+    fields_dict['exec_trigger'] = queryset.order_by('exec_trigger').distinct('exec_trigger').values_list("exec_trigger", flat=True)
+    fields_dict['exec_trigger'] = sorted(["null" if elem is None else elem for elem in fields_dict['exec_trigger']])
+    get_distinct_values_and_serialize('fb', FeatureBuild, order_by_param='fb__name')
+    get_distinct_values_and_serialize('result', TestRunResult)
+    get_distinct_values_and_serialize('testline_type', TestlineType)
+    get_distinct_values_and_serialize('env_issue_type', EnvIssueType, order_by_param='env_issue_type__name')
+    get_distinct_values_and_serialize('analyzed_by', User)
+    return fields_dict

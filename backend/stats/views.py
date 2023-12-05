@@ -12,7 +12,7 @@ from .serializers import FilterSerializer, FilterSetSerializer, FilterFieldSeria
 from .permissions import IsAuthorOfRelatedObject, IsAuthorOfFilterSetOrReadOnly
 from backend.permissions import IsAuthorOfObject
 from backend.openapi_schemes import *
-from stats.models import * 
+from stats.models import *
 import tra.models as tra_models
 from tra.views import TestRunsBasedOnQueryDictinctValues
 from stats.analyzer import Analyzer
@@ -23,12 +23,12 @@ from django.shortcuts import HttpResponse, get_object_or_404
 from drf_yasg.utils import swagger_auto_schema, no_body
 from drf_yasg import openapi
 from .filters import FilterSetFilterClass
-from tra import utils
+from tra.serializers import get_distinct_values_based_on_subscribed_testsetfilters
 
 
 
 class FilterSetView(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
     serializer_class = FilterSetSerializer
     queryset = FilterSet.objects.all()
 
@@ -159,7 +159,7 @@ class FilterSetDetailView(viewsets.GenericViewSet):
                 obj.value = filter_data["value"]
                 to_update.append(obj)
 
-            
+
             Filter.objects.bulk_update(to_update, ["value"])
             return Response(self._serialize_data_with_filters(filterset), status=status.HTTP_200_OK)
 
@@ -193,14 +193,14 @@ class FilterView(viewsets.ModelViewSet):
 
 
 class FilterFieldView(generics.ListAPIView):
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
     serializer_class = FilterFieldSerializer
     queryset = FilterField.objects.all()
     pagination_class = None
 
 
 class GetDataForFailChartBase(APIView):
-    permission_classes = (IsAuthenticated,)   
+    permission_classes = (IsAuthenticated,)
 
     def _handle_filterset_id_in_request(self, request):
         filterset = request.query_params.get("filterset", None)
@@ -252,7 +252,7 @@ class GetDataForFailChartBase(APIView):
         analyzer.get_data_from_rp()
         analyzer.get_data_filtered_by_date_ranges(date_start, date_end)
         return analyzer
-    
+
     def is_dataframe_empty(self, analyzer):
         return True if len(analyzer.df.index) == 0 else False
 
@@ -343,8 +343,8 @@ class GetExcelData(GetDataForFailChartBase):
         analyzer.add_normalized_exception_data_column()
         data = self.get_excel_data(analyzer)
         return HttpResponse(
-            data, 
-            headers={'Content-Disposition': f'attachment; filename={filename}'}, 
+            data,
+            headers={'Content-Disposition': f'attachment; filename={filename}'},
             content_type='application/vnd.ms-excel'
         )
 
@@ -367,8 +367,8 @@ class GetExcelData(GetDataForFailChartBase):
         analyzer.add_normalized_exception_data_column()
         data = self.get_excel_data(analyzer)
         return HttpResponse(
-            data, 
-            headers={'Content-Disposition': 'attachment; filename=report.xlsx'}, 
+            data,
+            headers={'Content-Disposition': 'attachment; filename=report.xlsx'},
             content_type='application/vnd.ms-excel'
         )
 
@@ -393,7 +393,7 @@ class AllSubscribedTestSetFiltersBase(GetDataForFailChartBase):
                     branches_new.append(f"SBTS{branch}")
             return branches_new
 
-        fields_dict = utils.get_distinct_values_based_on_subscribed_regfilters(self.request.user)
+        fields_dict = get_distinct_values_based_on_subscribed_testsetfilters(self.request.user)
         test_sets =      [elem["pk"] for elem in fields_dict["test_set_name"]]
         testline_types = [elem["pk"] for elem in fields_dict["testline_type"]]
         branches =       [elem["pk"] for elem in fields_dict["branch"]]
@@ -518,8 +518,8 @@ class GetExcelDataForAllSubscribedTestSetFilters(AllSubscribedTestSetFiltersBase
             return Response({"message": "No test runs found with specified filters!"}, status=status.HTTP_404_NOT_FOUND)
         data = self.get_excel_data(analyzer)
         return HttpResponse(
-            data, 
-            headers={'Content-Disposition': 'attachment; filename=report.xlsx'}, 
+            data,
+            headers={'Content-Disposition': 'attachment; filename=report.xlsx'},
             content_type='application/vnd.ms-excel'
         )
 
