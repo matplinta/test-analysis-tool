@@ -21,6 +21,7 @@ docker-build:
     # DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
     # DOCKER_HOST: tcp://docker:2375
+    ALL_PROXY: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     https_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     ftp_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
@@ -41,9 +42,9 @@ docker-build:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - docker-compose -f docker-compose.prod.yml down
-    - docker-compose -f docker-compose.prod.yml pull
-    - docker-compose -f docker-compose.prod.yml build
-    - docker-compose -f docker-compose.prod.yml push 
+    - docker compose -f docker-compose.prod.yml down
+    - docker compose -f docker-compose.prod.yml pull
+    - docker compose -f docker-compose.prod.yml build
+    - docker compose -f docker-compose.prod.yml push 
   
 
