@@ -33,10 +33,10 @@ docker-build:
         TAG=""
         echo "Running on default branch '$CI_DEFAULT_BRANCH': TAG = 'latest'"
       else
-        TAG=":$CI_COMMIT_REF_SLUG"
+        TAG="$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': TAG = $TAG"
       fi
-      export $TAG
+      export TAG
     - docker compose -f docker-compose.prod.yml down
     - docker compose -f docker-compose.prod.yml pull
     - docker compose -f docker-compose.prod.yml build
