@@ -27,9 +27,9 @@ docker-build:
         tag=":$CI_COMMIT_REF_SLUG"
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
-    - docker-compose down
-    - docker-compose pull
-    - docker-compose build
-    - docker-compose push 
+    - docker-compose -f docker-compose.prod.yml down
+    - docker-compose -f docker-compose.prod.yml pull
+    - docker-compose -f docker-compose.prod.yml build
+    - docker-compose -f docker-compose.prod.yml push 
   
 
