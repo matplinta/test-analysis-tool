@@ -12,6 +12,7 @@ docker-build:
   variables:
     # DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    DOCKER_OPTS="${DOCKER_OPTS} --registry-mirror https://docker-registry-remote.artifactory-espoo1.int.net.com --registry-mirror https://registry1-docker-io.repo.cci..net"
     # DOCKER_HOST: tcp://docker:2375
     # ALL_PROXY: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     # http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
