@@ -9,7 +9,8 @@ docker-build:
   services:
     - docker:24.0-dind
   variables:
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
     DOCKER_HOST: tcp://docker:2375
 
   before_script:
