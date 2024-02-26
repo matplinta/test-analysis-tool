@@ -18,7 +18,7 @@ class FailMessageTypeAdmin(admin.ModelAdmin):
 
 class FailMessageTypeInline(admin.TabularInline):
     # model = FailMessageType
-    model = FailMessageTypeGroup.fail_message_types.through 
+    model = FailMessageTypeGroup.fail_message_types.through
     extra = 0
     # filter_horizontal = ('fail_message_types',)
 
@@ -76,29 +76,30 @@ class TestInstanceAdmin(admin.ModelAdmin):
 @admin.register(TestRun)
 class TestRunAdmin(admin.ModelAdmin):
     list_display = [
-        'id', 
-        'rp_id', 
-        'fb', 
-        'test_instance', 
-        'testline_type', 
-        'test_line', 
-        'test_suite',       
-        'organization', 
-        'result', 
-        'analyzed', 
+        'id',
+        'rp_id',
+        'fb',
+        'test_instance',
+        'testline_type',
+        'test_line',
+        'test_suite',
+        'organization',
+        'result',
+        'analyzed',
         'analyzed_by',
-        'env_issue_type', 
-        'comment', 
-        'builds', 
-        'airphone', 
-        'fail_message', 
-        'ute_exec_url', 
-        'log_file_url',  
-        'log_file_url_ext', 
-        'start_time', 
+        'env_issue_type',
+        'comment',
+        'builds',
+        'airphone',
+        'fail_message',
+        'ute_exec_url',
+        'log_file_url',
+        'log_file_url_ext',
+        'start_time',
         'end_time',
         'exec_trigger',
         'execution_id',
+        'pronto',
     ]
     list_filter = ['result', 'fb', 'testline_type', 'exec_trigger', 'analyzed_by', 'test_suite',]
     search_fields = ['fail_message', 'result__name', 'env_issue_type__name', 'fb__name', 'rp_id', 'exec_trigger', 'execution_id',]
@@ -115,7 +116,7 @@ class RepPortalUserTokenAdmin(admin.ModelAdmin):
 class TestSetFilterAdmin(admin.ModelAdmin):
     list_display = ['test_set_name', 'id', 'test_lab_path', "branch", 'limit']
     list_filter = ['test_set_name', 'branch']
-    search_fields = ['test_set_name', ]
+    search_fields = ['test_set_name', 'test_lab_path']
 
 
 @admin.register(LastPassingLogs)

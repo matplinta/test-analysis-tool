@@ -22,17 +22,20 @@ from . import test_runs_processing, utils
 from .filters import TestInstanceFilter, TestRunFilter
 from .models import (Branch, EnvIssueType, FailMessageType,
                      FailMessageTypeGroup, FeatureBuild, LastPassingLogs,
-                     Notification, Organization, TestInstance, TestlineType,
+                     Notification, TestInstance, TestlineType,
                      TestRun, TestRunResult, TestSetFilter)
 from .pagination import StandardResultsSetPagination
-from .permissions import IsOwnerOfObject, IsSubscribedToObject
-from .serializers import (BranchSerializer, EnvIssueTypeSerializer,
-                          FailMessageTypeGroupSerializer,
-                          FailMessageTypeSerializer, FeatureBuildSerializer,
-                          LastPassingLogsSerializer, NotificationSerializer,
-                          TestInstanceSerializer, TestlineTypeSerializer,
-                          TestRunResultSerializer, TestRunSerializer,
-                          TestSetFilterSerializer, UserSerializer)
+from .permissions import IsOwnerOfObject
+from .serializers import (
+    BranchSerializer, EnvIssueTypeSerializer,
+    FailMessageTypeGroupSerializer,
+    FailMessageTypeSerializer, LastPassingLogsSerializer, NotificationSerializer,
+    TestInstanceSerializer, TestlineTypeSerializer,
+    TestRunResultSerializer, TestRunSerializer,
+    TestSetFilterSerializer,
+    get_distinct_values_based_on_subscribed_testsetfilters,
+    get_distinct_values_based_on_test_instance
+)
 
 
 class FailMessageTypeView(viewsets.ModelViewSet):
@@ -51,7 +54,7 @@ class FailMessageTypeView(viewsets.ModelViewSet):
         try:
             serializer.save(author=self.request.user)
         except IntegrityError as e:
-            if 'unique constraint "regex_author_uniq"' in e.args[0]: 
+            if 'unique constraint "regex_author_uniq"' in e.args[0]:
                 raise ValidationError("This user already has FailMessageType with such regex.")
 
     def get_permissions(self):
@@ -59,7 +62,7 @@ class FailMessageTypeView(viewsets.ModelViewSet):
         if self.request.method in ['PUT', 'DELETE']:
             return permissions + [IsAuthorOfObject()]
         return permissions
-        
+
 
 class FailMessageTypeGroupView(viewsets.ModelViewSet):
     serializer_class = FailMessageTypeGroupSerializer
@@ -76,7 +79,7 @@ class FailMessageTypeGroupView(viewsets.ModelViewSet):
         try:
             serializer.save(author=self.request.user)
         except IntegrityError as e:
-            if 'unique constraint "fmtg_name_author_uniq"' in e.args[0]: 
+            if 'unique constraint "fmtg_name_author_uniq"' in e.args[0]:
                 raise ValidationError("This user already has FailMessageTypeGroup with such name.")
 
     def get_permissions(self):
@@ -195,7 +198,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
             if self.request.user not in tsfilter.subscribers.all():
                 tsfilter.subscribers.add(self.request.user)
                 tsfilter.save()
-                
+
         return self._serialize_response(tsfilters)
 
     @swagger_auto_schema(
@@ -260,7 +263,7 @@ class TestSetFilterView(viewsets.ModelViewSet):
 
         for tsfilter in tsfilters:
             self.check_object_permissions(self.request, tsfilter)
-        
+
         branch_set = set([tsfilter.branch for tsfilter in tsfilters])
         if len(branch_set) != 1:
             return Response(f"Selected TestSetFilters do not have single common branch to branchoff: {branch_set}", status=status.HTTP_400_BAD_REQUEST)
@@ -275,10 +278,10 @@ class TestSetFilterView(viewsets.ModelViewSet):
             new_tsfilter.test_lab_path = old_test_lab_path.replace(str(old_branch), str(new_branch.name), 1)
             new_tsfilter.save()
 
-            new_tsfilter.owners.add(*old_tsfilter.owners.all()) 
-            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all()) 
-            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all()) 
-            new_tsfilter.testline_types.add(*old_tsfilter.testline_types.all()) 
+            new_tsfilter.owners.add(*old_tsfilter.owners.all())
+            new_tsfilter.subscribers.add(*old_tsfilter.subscribers.all())
+            new_tsfilter.fail_message_type_groups.add(*old_tsfilter.fail_message_type_groups.all())
+            new_tsfilter.testline_types.add(*old_tsfilter.testline_types.all())
             new_tsfilters.append(new_tsfilter)
 
         if should_delete:
@@ -359,13 +362,13 @@ class TestRunView(viewsets.ReadOnlyModelViewSet):
 
 class TestRunsBasedOnQueryDictinctValues(APIView):
     def get(self, request):
-        fields_dict = utils.get_distinct_values_based_on_subscribed_regfilters(user=self.request.user)
+        fields_dict = get_distinct_values_based_on_subscribed_testsetfilters(user=self.request.user)
         return Response(fields_dict)
 
 
 class TestRunsByTestInstanceDictinctValues(APIView):
     def get(self, request, ti):
-        return Response(utils.get_distinct_values_based_on_test_instance(test_instance=ti))
+        return Response(get_distinct_values_based_on_test_instance(test_instance=ti))
 
 
 class TestEntityDistinctValuesByTestInstancesOfUser(APIView):
@@ -382,28 +385,28 @@ class TestRunsBasedOnQuery(generics.ListAPIView):
     filterset_class = TestRunFilter
     pagination_class = StandardResultsSetPagination
     ordering_fields = (
-        'id', 
-        'rp_id', 
-        'test_instance', 
-        'testline_type', 
-        'organization', 
-        'result', 
-        'env_issue_type', 
-        'fb', 
-        'fail_message', 
-        'comment', 
-        'test_line', 
-        'test_suite', 
-        'builds', 
-        'ute_exec_url', 
-        'log_file_url', 
-        'log_file_url_ext', 
-        'start_time', 
-        'end_time', 
+        'id',
+        'rp_id',
+        'test_instance',
+        'testline_type',
+        'organization',
+        'result',
+        'env_issue_type',
+        'fb',
+        'fail_message',
+        'comment',
+        'test_line',
+        'test_suite',
+        'builds',
+        'ute_exec_url',
+        'log_file_url',
+        'log_file_url_ext',
+        'start_time',
+        'end_time',
         'analyzed',
         'exec_trigger',
 
-        "test_instance__test_case_name", 
+        "test_instance__test_case_name",
         "test_instance__test_set__test_set_name",
         "test_instance__test_set__branch",
         "test_instance__test_set__test_lab_path",
@@ -472,13 +475,15 @@ class TestRunsAnalyzeToRP(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         comment = data["comment"]
+        pronto = data["pronto"]
         result = data["result"]
+        send_to_qc = data["send_to_qc"]
         env_issue_type = data["env_issue_type"]
-        
+
         result_obj = TestRunResult.objects.get(name=result)
-        env_issue_type_obj = EnvIssueType.objects.get(name=env_issue_type)
+        env_issue_type_obj = EnvIssueType.objects.get(name=env_issue_type) if env_issue_type else None
         test_runs_to_analyze = TestRun.objects.filter(rp_id__in=rp_ids)
         user = self.request.user
 
@@ -491,14 +496,27 @@ class TestRunsAnalyzeToRP(APIView):
 
         celery_tasks.celery_analyze_testruns.delay(
             runs=rp_ids,
-            comment=comment, 
-            common_build="", 
-            result=result_obj.name, 
+            comment=comment,
+            pronto=pronto,
+            common_build="",
+            result=result_obj.name,
             env_issue_type=env_issue_type,
+            send_to_qc=send_to_qc,
             auth_params=auth_params
         )
+        analyze_kwargs = dict(
+            analyzed=True,
+            analyzed_by=user,
+            comment=comment,
+            result=result_obj,
+        )
 
-        test_runs_to_analyze.update(analyzed=True, analyzed_by=user, comment=comment, result=result_obj, env_issue_type=env_issue_type_obj)
+        if result_obj == TestRunResult.objects.get_env_issue_instance():
+            analyze_kwargs["env_issue_type"] = env_issue_type_obj
+        elif result_obj == TestRunResult.objects.get_failed_instance():
+            analyze_kwargs["pronto"] = pronto
+
+        test_runs_to_analyze.update(**analyze_kwargs)
 
         return Response(status=200)
 
@@ -513,9 +531,9 @@ class TestInstancesSuspendActionToRP(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         suspend = data["suspend"]
-        
+
         user = self.request.user
         token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
         auth_params = utils.get_rp_api_auth_params(token=token)
@@ -539,7 +557,7 @@ class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
     )
     def post(self, request):
         data = self.request.data
-        rp_ids = data["rp_ids"] 
+        rp_ids = data["rp_ids"]
         user = self.request.user
         token = user.rp_token.token if hasattr(user, 'rp_token') and user.rp_token.token else None
         auth_params = utils.get_rp_api_auth_params(token=token)
@@ -548,28 +566,28 @@ class TestInstancesSyncSuspendInfoFromRPByIds(APIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
 
 
-class PullNotPassedTestrunsByTestSetFilter(APIView):
+
+class PullTestrunsByTestSetFilter(APIView):
     def get(self, request, tsfid):
         testset_filter = TestSetFilter.objects.get(pk=tsfid)
         limit = self.request.query_params.get('limit', None)
-        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_testset_filter(testset_filter.id, limit)
+        content = test_runs_processing.pull_testruns_by_testset_filter(testset_filter.id, limit)
         return Response(content)
 
 
-class PullNotPassedTestrunsByAllTestSetFilters(APIView):
+class PullTestrunsByAllTestSetFilters(APIView):
     def get(self, request):
         limit = self.request.query_params.get('limit', None)
-        content = test_runs_processing.pull_notanalyzed_and_envissue_testruns_by_all_testset_filters(limit)
+        content = test_runs_processing.pull_testruns_by_all_testset_filters(limit)
         return Response(content)
 
 
-class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
+class PullTestrunsByAllTestSetFiltersCelery(APIView):
     @swagger_auto_schema(
-        description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
-        operation_description="Pull not analyzed and environment issue test runs from ReportingPortal to DB",
+        description="Pull test runs from ReportingPortal to DB",
+        operation_description="Pull test runs from ReportingPortal to DB",
         request_body=no_body,
         responses={
             200: "",
@@ -577,22 +595,7 @@ class PullNotPassedTestrunsByAllTestSetFiltersCelery(APIView):
         tags=["celery"]
     )
     def get(self, request):
-        celery_tasks.celery_pull_notanalyzed_and_envissue_testruns_by_all_testset_filters.delay()
-        return Response("OK")
-
-
-class PullPassedTestrunsByAllTestSetFiltersCelery(APIView):
-    @swagger_auto_schema(
-        description="Pull passed test runs from ReportingPortal to DB",
-        operation_description="Pull passed test runs from ReportingPortal to DB",
-        request_body=no_body,
-        responses={
-            200: "",
-        },
-        tags=["celery"]
-    )
-    def get(self, request):
-        celery_tasks.celery_pull_passed_testruns_by_all_testset_filters.delay()
+        celery_tasks.celery_pull_testruns_by_all_testset_filters.delay()
         return Response("OK")
 
 
@@ -612,7 +615,10 @@ class PullAllTestRunsBySelectedTestSetFiltersCelery(APIView):
     )
     def get(self, request):
         testsetfilters = request.query_params.get('testsetfilters', [])
-        taskid = celery_tasks.celery_pull_testruns_by_testsetfilters.delay(testset_filters_ids=[int(_id) for _id in testsetfilters.split(',')], user_ids=[request.user.id])
+        taskid = celery_tasks.celery_pull_testruns_by_testset_filters.delay(
+            testset_filters_ids=[int(_id) for _id in testsetfilters.split(',')],
+            user_ids=[request.user.id]
+        )
         return Response(taskid.id)
 
 
@@ -650,7 +656,7 @@ class CheckIfAllTasksFinished(APIView):
     def post(self, request):
         taskids = request.data
         if not taskids:
-            return Response(f"You need to specify taskids", status=status.HTTP_400_BAD_REQUEST)
+            return Response("You need to specify taskids", status=status.HTTP_400_BAD_REQUEST)
         tasks = []
         for taskid in taskids:
             tasks.append(AsyncResult(taskid).ready())
@@ -671,7 +677,7 @@ class DownloadLatestPassedLogsToStorage(APIView):
     def get(self, request):
         celery_tasks.celery_download_latest_passed_logs_to_storage.delay()
         return Response("OK")
-    
+
 
 class DownloadLogsToMirrorStorage(APIView):
     @swagger_auto_schema(
@@ -767,15 +773,17 @@ class SummaryStatisticsView(APIView):
         tags=["summary", 'api']
     )
     def get(self, request):
-        
+
         observed_test_instances = TestInstance.objects.filter(test_set__subscribers=self.request.user)
         observed_test_runs = TestRun.objects.filter(test_instance__test_set__subscribers=self.request.user)
 
         current_fb = FeatureBuild.objects.all().order_by("-name").first()
         testruns_in_current_fb = observed_test_runs.filter(fb=current_fb)
-        na_testruns = testruns_in_current_fb.filter(result=utils.get_not_analyzed_result_instance())
-        passed_testruns = testruns_in_current_fb.filter(result=utils.get_passed_result_instance())
-        envissue_testruns = testruns_in_current_fb.filter(result=utils.get_env_issue_result_instance())
+        na_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_not_analyzed_instance())
+        passed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_passed_instance())
+        envissue_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_env_issue_instance())
+        failed_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_failed_instance())
+        blocked_testruns = testruns_in_current_fb.filter(result=TestRunResult.objects.get_blocked_instance())
         suspended_tis = observed_test_instances.filter(execution_suspended=True)
         norun_tis = observed_test_instances.filter(no_run_in_rp=True)
 
@@ -805,6 +813,12 @@ class SummaryStatisticsView(APIView):
             },
             "passed": {
                 "count": passed_testruns.count()
+            },
+            "failed": {
+                "count": failed_testruns.count()
+            },
+            "blocked": {
+                "count": blocked_testruns.count()
             },
             "all_in_fb_count": testruns_in_current_fb.count(),
             "test_instances":

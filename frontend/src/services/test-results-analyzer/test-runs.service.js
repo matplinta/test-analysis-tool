@@ -10,7 +10,7 @@ export const getTestRunsUsingFilter = async (filter, page, pageSize) => {
 }
 
 export const schedulePullOfTestRunsDataByTestSetFilters = async (testsetfilter_ids) => {
-    return (await axios.get(`api/tra/celery/pull_testruns_by_testsetfilters?testsetfilters=${testsetfilter_ids}`, { headers: authHeader() }));
+    return (await axios.get(`api/tra/celery/pull_testruns_by_testset_filters?testsetfilters=${testsetfilter_ids}`, { headers: authHeader() }));
 }
 
 export const getTestRunsByTestInstance = async (testInstanceId, filter, page, pageSize) => {

@@ -90,8 +90,12 @@ const SummaryComponent = () => {
                         </div>
                         {generateCard('Latest Feature Build', summary.current_fb, '', 3, "pi-bolt", "green")}
                         {generateCard('All test runs', summary.all_in_fb_count, '', 3, "pi-database", "blue")}
-                        {generateCard('Test runs (passed / not analyzed / environment issue)',
-                            `${countPercent(summary.passed.count, summary.all_in_fb_count)}% / ${countPercent(summary.not_analyzed.count, summary.all_in_fb_count)}% / ${countPercent(summary.env_issues.count, summary.all_in_fb_count)}%`,
+                        {generateCard('Test runs (passed / not analyzed / environment issue / failed / blocked)',
+                            `${countPercent(summary.passed.count, summary.all_in_fb_count)}% / ` +
+                            `${countPercent(summary.not_analyzed.count, summary.all_in_fb_count)}% / ` +
+                            `${countPercent(summary.env_issues.count, summary.all_in_fb_count)}% / ` +
+                            `${countPercent(summary.failed.count, summary.all_in_fb_count)}% / ` +
+                            `${countPercent(summary.blocked.count, summary.all_in_fb_count)}%`,
                             '', 6, "pi-percentage", "indigo")}
                         {generateCardTestInstances('Suspended Test Instances',
                             `${summary.test_instances.suspended} (${countPercent(summary.test_instances.suspended, summary.test_instances.all)}%)`,
@@ -104,7 +108,7 @@ const SummaryComponent = () => {
                         {generateCard('Environment Issues', summary.env_issues.count, summary.env_issues.top, 6, "pi-undo", "purple",
                             `Top (${summary.env_issues.top_count_percent}%): `)}
                     </div>
-                </div> : 
+                </div> :
                 <div className="loader-container">
                     <div className="spinner"></div>
                 </div>

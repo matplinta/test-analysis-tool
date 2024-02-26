@@ -75,7 +75,7 @@ let ChartsComponent = () => {
 
     let today = new Date();
     let year = today.getFullYear();
-    let prevYear = year - 1;
+    let prevYear = year - 3;
     let minDate = new Date();
     minDate.setFullYear(prevYear);
     let maxDate = new Date();
@@ -171,7 +171,7 @@ let ChartsComponent = () => {
             tmp[index].field = e.value;
             setFilters(tmp)
         }
-        
+
     }
 
     const onFilterValueChange = (item, index, e) => {

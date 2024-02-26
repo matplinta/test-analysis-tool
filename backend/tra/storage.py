@@ -48,9 +48,9 @@ class UTECloudLogsStorage(Storage):
         os.makedirs(path, exist_ok=True)
         proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
         proc.communicate(timeout=timeout)
-        return proc.returncode 
+        return proc.returncode
 
-    
+
     def save(self, name, url, max_length=None, timeout=10800):
         name = self.get_available_name(name, max_length=max_length)
         start_time = time.time()
@@ -74,8 +74,6 @@ class UTECloudLogsStorage(Storage):
         except FileNotFoundError:
             # FileNotFoundError is raised if the file or directory was removed
             # concurrently.
-            pass
-        except OSError as e:
             pass
 
 
@@ -149,4 +147,4 @@ class LogsHTMLStorage(UTECloudLogsStorage):
         os.makedirs(path, exist_ok=True)
         proc = subprocess.Popen(wget_cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
         proc.communicate(timeout=timeout)
-        return proc.returncode 
+        return proc.returncode
