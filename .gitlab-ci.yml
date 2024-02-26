@@ -21,7 +21,7 @@ docker-build:
     # DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
     # DOCKER_HOST: tcp://docker:2375
-    ALL_PROXY: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
+    # ALL_PROXY: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     https_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
     ftp_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
@@ -29,6 +29,7 @@ docker-build:
     no_proxy: "..com,.nsn.com,.nsn-net.net,.emea.nsn-net.net,.com,127.0.0.1,localhost"
 
   before_script:
+    - unset ALL_PROXY
     - docker version
     - docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD" $DOCKER_REGISTRY
   # Default branch leaves tag empty (= latest tag)
