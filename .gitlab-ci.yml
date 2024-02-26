@@ -13,9 +13,9 @@ stages:
 
 docker-build:
   stage: build
-  image: docker:20.10.16
+  image: docker
   services:
-    - docker:20.10.16-dind
+    - docker:dind
 
   variables:
     # DOCKER_DRIVER: overlay2
