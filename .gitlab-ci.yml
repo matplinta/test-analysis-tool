@@ -1,11 +1,3 @@
-variables:
-  http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-  https_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-  ftp_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-  all_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-  no_proxy: "..com,.nsn.com,.nsn-net.net,.emea.nsn-net.net,.com,127.0.0.1,localhost"
-
-
 stages:
 #   - test
   - build
@@ -22,11 +14,11 @@ docker-build:
     DOCKER_TLS_CERTDIR: ""
     # DOCKER_HOST: tcp://docker:2375
     # ALL_PROXY: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-    http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-    https_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-    ftp_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-    all_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
-    no_proxy: "..com,.nsn.com,.nsn-net.net,.emea.nsn-net.net,.com,127.0.0.1,localhost"
+    # http_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
+    # https_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
+    # ftp_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
+    # all_proxy: "http://lab-proxy.krk-lab.nsn-rdnet.net:8080/"
+    # no_proxy: "..com,.nsn.com,.nsn-net.net,.emea.nsn-net.net,.com,127.0.0.1,localhost"
 
   before_script:
     # - unset ALL_PROXY
