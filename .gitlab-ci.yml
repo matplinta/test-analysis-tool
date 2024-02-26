@@ -5,9 +5,9 @@ stages:
 
 docker-build:
   stage: build
-  image: docker
+  image: docker:25.0.3
   services:
-    - name: docker:dind
+    - name: docker:25.0.3-dind
       command: ["--registry-mirror", "https://docker-registry-remote.artifactory-espoo1.int.net.com", "--registry-mirror", "https://registry1-docker-io.repo.cci..net"]   
 
   variables:
