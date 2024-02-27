@@ -37,9 +37,8 @@ docker-build:
         echo "Running on branch '$CI_COMMIT_BRANCH': TAG = $TAG"
       fi
       export TAG
-    - echo "TAGGGGG=$TAG"
     - docker compose -f docker-compose.prod.yml down
-    - docker compose -f docker-compose.prod.yml pull
+    - docker compose -f docker-compose.prod.yml config
     - docker compose -f docker-compose.prod.yml build
     - docker compose -f docker-compose.prod.yml push 
   
