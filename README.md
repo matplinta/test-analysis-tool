@@ -1,19 +1,52 @@
 # Test Results Analyzer
-## notes
+Web app facilitating reporting and semi-automatic analysis of test results for an internal reporting platform. 
+Written in Django (DRF) and ReactJS.
 __________
 
-## Directory structure
-- backend - backend part of web applications
-- frontend - frontend part of web applications
-- docker - files related to docker environment
-    * backend
-    * frontend
-    * nginx
+## Development using Docker 
+### Windows prerequisites
+For Docker development to work with windows, you need to install:
+- WSL 2 (enable hardware virtualization)
+- Docker Desktop
 
-# Local Development
-## Backend
+### Use `docker-compose`
 
-### Add pypi source for rep_api library
+Simply build the environment
+```bash
+docker-compose build
+```
+and start it
+```bash
+docker-compose up
+```
+
+### Postgres DB
+#### Copy database contents from *.sql file
+1. Clear contents of docker mounted volume e.g. `./postgres_db`
+2. Start _db_ container
+3. Copy *.sql file to the container using
+    ```
+    docker cp postgres-backup_1700571601.sql e3053a1400be:/
+    ```
+4. Populate the database with data using the following command on the db container:
+    ```
+    docker exec -it e3053a1400be bash   # get into the container
+    psql -U postgres -d postgres -f postgres-backup_1700571601.sql
+    ```
+
+### Endpoints
+localhost and 127.0.0.1 should be interchangeable.
+- localhost:3000 - frontend via react
+- localhost:5557 - celery flower task dashboard
+- localhost:8000 - backend via django
+    - /api/tra - api endpoint for Test Results Analyzer
+    - /admin - api endpoint for django admin panel
+
+
+## Local Development
+### Backend
+
+#### Add pypi source for rep_api library
 Add the following contents to your local pip configuration file.
 Common location is `/home/<user>/.pip/pip.conf`
 ```
@@ -25,13 +58,13 @@ extra-index-url = https://artifactory-espoo1.ext.net.com/artifactory/api/pypi/re
                   https://pypi.org/simple/
 ```
 This will allow you to install rep_api library via pip.
-### Install python libraries
+#### Install python libraries
 It is advisable to create python virtual environment for local development. Then in it, run:
 `backend/$ pip install requirements/dev.txt`
-### Run django backend
+#### Run django backend
 `backend/$ python manage.py runserver`
 
-### Run jupyter notebook for django development
+#### Run jupyter notebook for django development
 `backend/$ python manage.py shell_plus --notebook`
 For jupyter setup to work asynchronically, firstly run
 ```python
@@ -43,10 +76,11 @@ django.setup()
 ```
 
 
-## Database - Postgre SQL installation
+### Database
+#### Postgre SQL installation
 Tutorial: https://www.digitalocean.com/community/tutorials/how-to-use-postgresql-with-your-django-application-on-ubuntu-20-04
 
-## Issues with PostgreSQL
+#### Issues with PostgreSQL
 ```
 File "/home/user/repos/web_tools/.venv/lib/python3.8/site-packages/psycopg2/__init__.py", line 122, in connect
     conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
@@ -62,16 +96,16 @@ Remedy:
  * Starting PostgreSQL 12 database server                                                                                                                                                          [ OK ]
 (.venv) ➜  web_tools git:(master) ✗
 ```
-### Database backup script
+#### Database backup script
 Done via crone tab:
 ```
 @hourly /home/ute/web-tools/backup_postgres_db.sh >> /home/ute/backup_db_cron_log.txt 2>&1
 ```
 
-## Celery with Redis
+### Celery with Redis
 Tutorial: https://realpython.com/asynchronous-tasks-with-django-and-celery/#what-is-celery
 
-### Usage
+#### Usage
 To start worker
 ```sh
 celery -A backend worker -l info
@@ -82,55 +116,12 @@ To start task scheduler
 celery -A backend beat -l info
 ```
 
-## Frontend
-### Install libraries
+### Frontend
+#### Install libraries
 ```bash
 frontend/$ npm install
 ```
-### Run frontend
+#### Run frontend
 ```bash
 frontend/$ npm start
 ```
-
-# Docker development
-## Windows prerequisites
-For Docker development to work with windows, you need to install:
-- WSL 2 (enable hardware virtualization)
-- Docker Desktop
-
-## Use `docker-compose`
-
-Simply build the environment
-```bash
-docker-compose build
-```
-and start it
-```bash
-docker-compose up
-```
-
-## Postgres DB
-### Copy database contents from *.sql file
-1. Clear contents of docker mounted volume e.g. `./postgres_db`
-2. Start _db_ container
-3. Copy *.sql file to the container using
-    ```
-    docker cp postgres-backup_1700571601.sql e3053a1400be:/
-    ```
-4. Populate the database with data using the following command on the db container:
-    ```
-    docker exec -it e3053a1400be bash   # get into the container
-    psql -U postgres -d postgres -f postgres-backup_1700571601.sql
-    ```
-
-## Endpoints
-> localhost and 127.0.0.1 should be interchangeable
-- ### localhost:3000 - frontend via react
-- ### localhost:5557 - celery flower task dashboard
-- ### localhost:8000 - backend via django
-    - /api/tra - api endpoint for Test Results Analyzer
-    - /api/trs - api endpoint for Testline Reservation Scheduler
-    - /api/tlm - api endpoint for Testline Manager
-    - /admin - api endpoint for django admin panel
-
-
