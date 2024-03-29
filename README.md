@@ -1,4 +1,4 @@
-# Test Results Analyzer
+# Test Analysis Tool
 Web app facilitating reporting and semi-automatic analysis of test results for an internal reporting platform. 
 Written in Django (DRF) and ReactJS.
 __________
